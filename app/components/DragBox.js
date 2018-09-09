@@ -10,17 +10,17 @@ const DragBox = ({ addFile, isUploading }) => {
 
   const onDrop = (acceptedFiles) => {
     uploadQueue = [...uploadQueue, acceptedFiles];
-    if (!isUploading) uploadFile();
+    if (!isUploading) uploadFromQueue();
   };
 
-  const uploadFile = () => {
+  const uploadFromQueue = () => {
     const rawFile = uploadQueue.shift();
     const file = constructFile();
     addFile(file, true);
 
     uploadFile(rawFile, () => {
       if (uploadQueue.length > 0) {
-        uploadFile();
+        uploadFromQueue();
       }
     });
   }
@@ -47,5 +47,10 @@ const DragBox = ({ addFile, isUploading }) => {
     </div>
   );
 };
+
+DragBox.propTypes = {
+  addFile: func.isRequired,
+  isUploading: bool.isRequired
+}
 
 export default DragBox;
