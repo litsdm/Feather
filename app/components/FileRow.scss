@@ -1,0 +1,64 @@
+.row {
+  background-color: #fcfcfc;
+  padding: 12px;
+  transition: 0.2s ease all;
+
+  &:hover {
+    background-color: #fff;
+  }
+}
+
+.top {
+  align-items: center;
+  display: flex;
+  justify-content: space-between;
+}
+
+.info,
+.actions {
+  display: flex;
+}
+
+.name {
+  margin-left: 12px;
+}
+
+.actions {
+  a {
+    align-items: center;
+    border-radius: 50%;
+    color: #000;
+    display: flex;
+    font-size: 12px;
+    height: 25px;
+    justify-content: center;
+    margin: 0 6px;
+    opacity: 1;
+    transition: 0.2s ease all;
+    width: 25px;
+
+    &:hover {
+      background-color: #efefef;
+      color: #4caf50;
+    }
+  }
+
+  button {
+    background-color: transparent;
+    border: none;
+    border-radius: 50%;
+    cursor: pointer;
+    padding: 0 8px;
+    transition: 0.2s ease all;
+
+    &:hover {
+      color: #fff;
+      background-color: #ff5252;
+    }
+  }
+}
+
+.expiry {
+  font-size: 12px;
+  opacity: 0.4;
+}
