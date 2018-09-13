@@ -4,18 +4,34 @@ import { withRouter } from 'react-router';
 
 import AppHeader from '../components/AppHeader';
 
-// history(prop).push('/auth');
+class App extends React.Component {
+  state = {
+    user: null
+  }
 
-const App = ({ children, location: { pathname } }) => (
-  <React.Fragment>
-    {pathname !== '/auth' ? <AppHeader /> : null}
-    {children}
-  </React.Fragment>
-);
+  componentDidMount() {
+    const { history, location: { pathname } } = this.props;
+    const { user } = this.state;
+    const token = localStorage.getItem('tempoToken');
+
+    if (!user && !token && pathname !== '/auth') history.push('/auth');
+  }
+
+  render() {
+    const { children, location: { pathname } } = this.props;
+    return (
+      <React.Fragment>
+        {pathname !== '/auth' ? <AppHeader /> : null}
+        {children}
+      </React.Fragment>
+    );
+  }
+}
 
 App.propTypes = {
   children: node.isRequired,
-  location: object.isRequired // eslint-disable-line react/forbid-prop-types
+  location: object.isRequired, // eslint-disable-line react/forbid-prop-types
+  history: object.isRequired, // eslint-disable-line react/forbid-prop-types
 };
 
 export default withRouter(App);

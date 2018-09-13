@@ -9,7 +9,7 @@ import AuthPage from './containers/AuthPage';
 export default () => (
   <App>
     <Switch>
-      <Route path={routes.HOME} component={HomePage} />
+      <Route path={routes.HOME} component={HomePage} exact />
       <Route path={routes.AUTH} component={AuthPage} />
     </Switch>
   </App>

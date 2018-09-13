@@ -1,11 +1,13 @@
-import React, { Component } from 'react';
+import React, { Component, Fragment } from 'react';
 
 import Login from '../components/Login';
 import Signup from '../components/Signup';
+import Banner from '../components/Banner';
 
 class AuthPage extends Component {
   state = {
-    confirmPassword: '',
+    bannerMessage: null,
+    username: '',
     email: '',
     isNew: false,
     password: ''
@@ -13,20 +15,33 @@ class AuthPage extends Component {
 
   setStateProperty = (property, value) => this.setState({ [property]: value });
 
+  displayBanner = (type, message) => this.setState({ bannerMessage: { type, text: message } });
+
+  setHide = () => this.setState({ bannerMessage: null });
+
   render() {
-    const { confirmPassword, email, isNew, password } = this.state;
-    return isNew
-      ? <Signup
-        confirmPassword={confirmPassword}
-        email={email}
-        password={password}
-        setState={this.setStateProperty}
-      />
-      : <Login
-        email={email}
-        password={password}
-        setState={this.setStateProperty}
-      />;
+    const { username, email, isNew, password, bannerMessage } = this.state;
+    return (
+      <Fragment>
+        <Banner message={bannerMessage} setHide={this.setHide} time={5000} />
+        {
+          isNew
+            ? <Signup
+              username={username}
+              email={email}
+              password={password}
+              setState={this.setStateProperty}
+              displayBanner={this.displayBanner}
+            />
+            : <Login
+              email={email}
+              password={password}
+              setState={this.setStateProperty}
+              displayBanner={this.displayBanner}
+            />
+        }
+      </Fragment>
+    )
   }
 }
 
