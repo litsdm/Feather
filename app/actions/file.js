@@ -15,23 +15,3 @@ export function finishUpload() {
     type: FINISH_UPLOAD
   };
 }
-
-/* export function incrementIfOdd() {
-  return (dispatch: Dispatch, getState: GetState) => {
-    const { counter } = getState();
-
-    if (counter % 2 === 0) {
-      return;
-    }
-
-    dispatch(increment());
-  };
-}
-
-export function incrementAsync(delay: number = 1000) {
-  return (dispatch: Dispatch) => {
-    setTimeout(() => {
-      dispatch(increment());
-    }, delay);
-  };
-} */

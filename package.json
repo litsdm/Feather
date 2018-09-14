@@ -210,6 +210,7 @@
     "devtron": "^1.4.0",
     "electron-debug": "^2.0.0",
     "history": "^4.7.2",
+    "jwt-decode": "^2.2.0",
     "react": "^16.4.1",
     "react-dom": "^16.4.1",
     "react-dropzone": "^5.0.2",

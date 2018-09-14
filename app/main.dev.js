@@ -44,7 +44,7 @@ const installExtensions = async () => {
 };
 
 const createTray = () => {
-  tray = new Tray(path.join(__dirname, '../resources/icons/24x24.png'));
+  tray = new Tray(path.join(__dirname, '../resources/feather.png'));
   tray.on('right-click', toggleWindow);
   tray.on('double-click', toggleWindow);
   tray.on('click', () => {
