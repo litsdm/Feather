@@ -1,9 +1,16 @@
-import React from 'react';
+import React, { Component, Fragment } from 'react';
 import { string } from 'prop-types';
 import styles from './FileRow.scss';
 
-const FileRow = ({ fileName }) => {
-  const getFileIcon = () => {
+import Progressbar from './Progressbar';
+
+class FileRow extends Component {
+  state = {
+    status: 'queued'
+  }
+
+  getFileIcon = () => {
+    const { fileName } = this.props;
     const extension = fileName.slice((Math.max(0, fileName.lastIndexOf(".")) || Infinity) + 1);
 
     switch (extension.toLowerCase()) {
@@ -125,32 +132,65 @@ const FileRow = ({ fileName }) => {
     }
   }
 
-  const fileIcon = getFileIcon();
+  renderInfoSection = () => {
+    const { status } = this.state;
 
-  return (
-    <div className={styles.row}>
-      <div className={styles.top}>
-        <div className={styles.info}>
-          <i className={fileIcon.icon} style={{ color: fileIcon.color }} />
-          <p className={styles.name}>
-            {fileName}
-          </p>
+    if (status === 'uploading' || status === 'downloading') {
+      return <Progressbar progress={1} action={status} />
+    }
+
+    if (status === 'queued') {
+      return <p className={styles.queued}>Queued, download will begin shortly...</p>;
+    }
+
+    return (
+      <Fragment>
+        <p className={styles.expiry}>
+          Expires in x hours
+        </p>
+        <p className={styles.size}>
+          213.6 MB
+        </p>
+      </Fragment>
+    );
+  }
+
+  render() {
+    const { fileName } = this.props;
+    const { status } = this.state;
+    const fileIcon = this.getFileIcon();
+
+    return (
+      <div className={styles.row}>
+        <div className={styles.top}>
+          <div className={styles.info}>
+            <i className={fileIcon.icon} style={{ color: fileIcon.color }} />
+            <p className={styles.name}>
+              {fileName}
+            </p>
+          </div>
+          {
+            status === 'default'
+              ? (
+                <div className={styles.actions}>
+                  <a href="#" download>
+                    <i className="fa fa-download" />
+                  </a>
+                  <button type="button">
+                    <i className="fa fa-trash-alt" />
+                  </button>
+                </div>
+              )
+              : null
+          }
         </div>
-        <div className={styles.actions}>
-          <a href="#" download>
-            <i className="fa fa-download" />
-          </a>
-          <button type="button">
-            <i className="fa fa-trash-alt" />
-          </button>
+        <div className={styles.bottom}>
+          {this.renderInfoSection()}
         </div>
       </div>
-      <p className={styles.expiry}>
-        Expires in x hours
-      </p>
-    </div>
-  );
-};
+    );
+  }
+}
 
 FileRow.propTypes = {
   fileName: string.isRequired

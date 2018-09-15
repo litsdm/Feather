@@ -8,7 +8,8 @@
   }
 }
 
-.top {
+.top,
+.bottom {
   align-items: center;
   display: flex;
   justify-content: space-between;
@@ -58,7 +59,16 @@
   }
 }
 
-.expiry {
+.queued {
+  font-size: 12px;
+  margin-top: 6px;
+  opacity: 0.3;
+  text-align: center;
+  width: 100%;
+}
+
+.expiry,
+.size {
   font-size: 12px;
   opacity: 0.4;
 }
