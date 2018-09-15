@@ -15,4 +15,10 @@ const callApi = (endpoint, body, method = 'GET') => {
   });
 };
 
+export const uploadFile = (file, signedRequest) =>
+  fetch(signedRequest, {
+    method: 'PUT',
+    body: file
+  });
+
 export default callApi;
