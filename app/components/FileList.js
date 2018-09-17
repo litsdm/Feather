@@ -1,27 +1,35 @@
 import React from 'react';
+import { arrayOf, string } from 'prop-types';
 import styles from './FileList.scss';
 
 import FileRow from './FileRow';
 
-const FileList = () => (
-  <div className={styles.container}>
-    <p className={styles.title}>
-      Your Files
-    </p>
-    <div className={styles.list}>
-      <FileRow fileName="file.png" />
-      <FileRow fileName="file.mp4" />
-      <FileRow fileName="file.7z" />
-      <FileRow fileName="file.js" />
-      <FileRow fileName="file.xls" />
-      <FileRow fileName="file.docx" />
-      <FileRow fileName="file.ppt" />
-      <FileRow fileName="file.pdf" />
-      <FileRow fileName="file.txt" />
-      <FileRow fileName="file.tar" />
-      <FileRow fileName="file.other" />
+const FileList = ({ files }) => {
+  const renderFiles = () =>
+    files.map((name, size, createdAt) => <FileRow fileName={name} size={size} date={createdAt} />);
+
+  return (
+    <div className={styles.container}>
+      <p className={styles.title}>
+        Your Files
+      </p>
+      <div className={styles.list}>
+        {
+          files.length > 0
+            ? renderFiles()
+            : (
+              <div className={styles.empty}>
+                You have no files yet. Drag any file above to upload it.
+              </div>
+            )
+        }
+      </div>
     </div>
-  </div>
-);
+  );
+};
+
+FileList.propTypes = {
+  files: arrayOf(string).isRequired
+};
 
 export default FileList;

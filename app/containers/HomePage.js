@@ -1,13 +1,42 @@
-// @flow
-import React, { Component } from 'react';
+import React from 'react';
+import { arrayOf, bool, func, string } from 'prop-types';
+import { connect } from 'react-redux';
+
 import Home from '../components/Home';
 
-type Props = {};
+import { addFile, finishUpload, updateProgress } from '../actions/file';
 
-export default class HomePage extends Component<Props> {
-  props: Props;
-
-  render() {
-    return <Home />;
+const mapStateToProps = ({ file: { isUploading, files }, user }) => (
+  {
+    isUploading,
+    files,
+    userId: user.id
   }
-}
+);
+
+const mapDispatchToProps = dispatch => ({
+  hUpdateProgress: progress => dispatch(updateProgress(progress)),
+  hAddFile: (file, upload) => dispatch(addFile(file, upload)),
+  hFinishUpload: () => dispatch(finishUpload())
+});
+
+const HomePage = ({ isUploading, hAddFile, hFinishUpload, hUpdateProgress, files, userId }) =>
+  <Home
+    isUploading={isUploading}
+    addFile={hAddFile}
+    finishUpload={hFinishUpload}
+    updateProgress={hUpdateProgress}
+    files={files}
+    userId={userId}
+  />
+
+HomePage.propTypes = {
+  isUploading: bool.isRequired,
+  hAddFile: func.isRequired,
+  hFinishUpload: func.isRequired,
+  hUpdateProgress: func.isRequired,
+  files: arrayOf(string).isRequired,
+  userId: string.isRequired
+};
+
+export default connect(mapStateToProps, mapDispatchToProps)(HomePage);

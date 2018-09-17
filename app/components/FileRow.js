@@ -6,7 +6,7 @@ import Progressbar from './Progressbar';
 
 class FileRow extends Component {
   state = {
-    status: 'queued'
+    status: 'default'
   }
 
   getFileIcon = () => {

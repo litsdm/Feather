@@ -1,7 +1,7 @@
 import jwtDecode from 'jwt-decode';
 import { ADD_USER, REMOVE_USER } from '../actions/user';
 
-const token = localStorage.getItem('token');
+const token = localStorage.getItem('tempoToken');
 const initialState = token ? jwtDecode(token) : {};
 
 const users = (state = initialState, { type, user }) => {

@@ -29,7 +29,7 @@ const Login = ({ email, password, setState, displayBanner, addUser, goToHome }) 
       .then(({ token, message }) => {
         if (message) return Promise.reject(message);
 
-        localStorage.setItem('token', token);
+        localStorage.setItem('tempoToken', token);
         addUser(token);
         goToHome();
         return token;

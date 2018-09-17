@@ -15,10 +15,14 @@ const callApi = (endpoint, body, method = 'GET') => {
   });
 };
 
-export const uploadFile = (file, signedRequest) =>
-  fetch(signedRequest, {
-    method: 'PUT',
-    body: file
+export const uploadFile = (file, signedRequest, progressCb, finishCb) => {
+  const oReq = new XMLHttpRequest();
+  oReq.addEventListener('load', finishCb);
+  oReq.addEventListener('progress', ({ loaded, total, lengthComputable }) => {
+    if (lengthComputable) progressCb(loaded / total);
   });
+  oReq.open('PUT', signedRequest);
+  oReq.send(file);
+}
 
 export default callApi;

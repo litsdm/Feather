@@ -36,7 +36,7 @@ const Signup = ({ email, password, username, setState, displayBanner, addUser, g
       .then(({ token, message }) => {
         if (message) return Promise.reject(message);
 
-        localStorage.setItem('token', token);
+        localStorage.setItem('tempoToken', token);
         addUser(token);
         goToHome();
         return token;

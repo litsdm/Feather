@@ -1,13 +1,13 @@
 import React from 'react';
 import Dropzone from 'react-dropzone';
-import { bool, func } from 'prop-types';
+import { bool, func, string } from 'prop-types';
 import styles from './DragBox.scss';
 
 import callApi, { uploadFile } from '../helpers/apiCaller';
 
-const DragBox = ({ addFile, isUploading }) => {
-  let uploadQueue = [];
+let uploadQueue = [];
 
+const DragBox = ({ addFile, isUploading, finishUpload, updateProgress, userId }) => {
   const onDrop = (acceptedFiles) => {
     uploadQueue = [...uploadQueue, acceptedFiles];
     if (!isUploading) uploadFromQueue();
@@ -15,26 +15,20 @@ const DragBox = ({ addFile, isUploading }) => {
 
   const uploadFromQueue = () => {
     const rawFile = uploadQueue.shift();
-    const file = constructFile();
-    console.log(rawFile);
-    addFile(file, true);
+    const file = constructFile(rawFile);
+    let signedReq;
 
     // save file object to DB;
     callApi(`sign-s3?file-name=${rawFile.name}&file-type=${rawFile.type}&folder-name=GameBuilds`)
       .then(res => res.json())
       .then(({ signedRequest, url }) => {
         file.s3Url = url;
-        return uploadFile(rawFile, signedRequest);
-      })
-      .then(res => {
-        if (res.status !== 200) return Promise.reject();
+        signedReq = signedRequest;
         return uploadFileToDB(file);
       })
-      .then(() => {
-        if (uploadQueue.length > 0) {
-          uploadFromQueue();
-        }
-
+      .then(({ file: dbFile }) => {
+        addFile(dbFile, true);
+        uploadFile(rawFile, signedReq, updateProgress, handleFinish);
         return Promise.resolve();
       })
       .catch(() => {
@@ -42,17 +36,24 @@ const DragBox = ({ addFile, isUploading }) => {
       });
   }
 
-  const uploadFileToDB = file => callApi('file/new', file, 'POST')
+  const uploadFileToDB = file => callApi(`${userId}/files`, file, 'POST')
     .then(res => res.json())
     .then(({ status }) => {
       if (status !== 200) return Promise.reject();
       return Promise.resolve();
     });
 
-  const constructFile = (rawFile) => ({
-    createdAt: new Date(),
-    rawFile,
-    state: 'Uploading',
+  const handleFinish = () => {
+    finishUpload();
+    if (uploadQueue.length > 0) {
+      uploadFromQueue();
+    }
+  }
+
+  const constructFile = ({ name, size }) => ({
+    name,
+    s3Url: '',
+    size
   });
 
   return (
@@ -74,7 +75,10 @@ const DragBox = ({ addFile, isUploading }) => {
 
 DragBox.propTypes = {
   addFile: func.isRequired,
-  isUploading: bool.isRequired
+  finishUpload: func.isRequired,
+  updateProgress: func.isRequired,
+  isUploading: bool.isRequired,
+  userId: string.isRequired
 }
 
 export default DragBox;
