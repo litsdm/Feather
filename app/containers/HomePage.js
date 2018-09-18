@@ -1,6 +1,7 @@
 import React from 'react';
-import { arrayOf, bool, func, string } from 'prop-types';
 import { connect } from 'react-redux';
+import { arrayOf, bool, func, string } from 'prop-types';
+import { fileType } from '../propTypes';
 
 import Home from '../components/Home';
 
@@ -35,7 +36,7 @@ HomePage.propTypes = {
   hAddFile: func.isRequired,
   hFinishUpload: func.isRequired,
   hUpdateProgress: func.isRequired,
-  files: arrayOf(string).isRequired,
+  files: arrayOf(fileType).isRequired,
   userId: string.isRequired
 };
 

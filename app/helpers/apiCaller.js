@@ -21,6 +21,7 @@ export const uploadFile = (file, signedRequest, progressCb, finishCb) => {
   oReq.addEventListener('progress', ({ loaded, total, lengthComputable }) => {
     if (lengthComputable) progressCb(loaded / total);
   });
+  oReq.addEventListener('error', (e) => console.log(e));
   oReq.open('PUT', signedRequest);
   oReq.send(file);
 }

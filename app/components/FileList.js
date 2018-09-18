@@ -1,12 +1,15 @@
 import React from 'react';
-import { arrayOf, string } from 'prop-types';
+import uuid from 'uuid/v4';
+import { arrayOf } from 'prop-types';
+import { fileType } from '../propTypes';
 import styles from './FileList.scss';
 
 import FileRow from './FileRow';
 
 const FileList = ({ files }) => {
   const renderFiles = () =>
-    files.map((name, size, createdAt) => <FileRow fileName={name} size={size} date={createdAt} />);
+    files.map(({ name, size, createdAt }) =>
+      <FileRow key={uuid()} fileName={name} size={size} date={createdAt} />);
 
   return (
     <div className={styles.container}>
@@ -29,7 +32,7 @@ const FileList = ({ files }) => {
 };
 
 FileList.propTypes = {
-  files: arrayOf(string).isRequired
+  files: arrayOf(fileType).isRequired
 };
 
 export default FileList;

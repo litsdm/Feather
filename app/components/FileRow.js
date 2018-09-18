@@ -1,5 +1,5 @@
 import React, { Component, Fragment } from 'react';
-import { string } from 'prop-types';
+import { number, string } from 'prop-types';
 import styles from './FileRow.scss';
 
 import Progressbar from './Progressbar';
@@ -123,6 +123,7 @@ class FileRow extends Component {
       case 'wks':
       case 'wps':
       case 'wpd':
+      case 'pages':
         return { icon: 'far fa-file-alt', color: '#607D8B' };
       // pdf files
       case 'pdf':
@@ -132,8 +133,25 @@ class FileRow extends Component {
     }
   }
 
+  humanFileSize = (bytes, si) => {
+    const thresh = si ? 1000 : 1024;
+    if(Math.abs(bytes) < thresh) {
+        return `${bytes} B`;
+    }
+    const units = si
+        ? ['kB','MB','GB','TB','PB','EB','ZB','YB']
+        : ['KiB','MiB','GiB','TiB','PiB','EiB','ZiB','YiB'];
+    let u = -1;
+    do {
+        bytes /= thresh; // eslint-disable-line
+        ++u; // eslint-disable-line
+    } while(Math.abs(bytes) >= thresh && u < units.length - 1);
+    return `${bytes.toFixed(1)} ${units[u]}`;
+}
+
   renderInfoSection = () => {
     const { status } = this.state;
+    const { size } = this.props;
 
     if (status === 'uploading' || status === 'downloading') {
       return <Progressbar progress={1} action={status} />
@@ -149,7 +167,7 @@ class FileRow extends Component {
           Expires in x hours
         </p>
         <p className={styles.size}>
-          213.6 MB
+          {this.humanFileSize(size, true)}
         </p>
       </Fragment>
     );
@@ -193,7 +211,8 @@ class FileRow extends Component {
 }
 
 FileRow.propTypes = {
-  fileName: string.isRequired
+  fileName: string.isRequired,
+  size: number.isRequired
 };
 
 export default FileRow;

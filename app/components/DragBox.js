@@ -9,23 +9,34 @@ let uploadQueue = [];
 
 const DragBox = ({ addFile, isUploading, finishUpload, updateProgress, userId }) => {
   const onDrop = (acceptedFiles) => {
-    uploadQueue = [...uploadQueue, acceptedFiles];
-    if (!isUploading) uploadFromQueue();
+    acceptedFiles.forEach(file => {
+        const reader = new FileReader();
+        reader.onload = () => {
+          uploadQueue = [...uploadQueue, file];
+          if (!isUploading) uploadFromQueue();
+        };
+        reader.onabort = () => console.log('file reading was aborted');
+        reader.onerror = () => console.log('file reading has failed');
+
+        reader.readAsDataURL(file);
+    });
   };
 
   const uploadFromQueue = () => {
     const rawFile = uploadQueue.shift();
     const file = constructFile(rawFile);
+    const type = rawFile.type.replace('+', '%2B');
     let signedReq;
 
     // save file object to DB;
-    callApi(`sign-s3?file-name=${rawFile.name}&file-type=${rawFile.type}&folder-name=GameBuilds`)
+    callApi(`sign-s3?file-name=${rawFile.name}&file-type=${type}&folder-name=Files`)
       .then(res => res.json())
       .then(({ signedRequest, url }) => {
         file.s3Url = url;
         signedReq = signedRequest;
-        return uploadFileToDB(file);
+        return callApi(`${userId}/files`, file, 'POST');
       })
+      .then(res => res.json())
       .then(({ file: dbFile }) => {
         addFile(dbFile, true);
         uploadFile(rawFile, signedReq, updateProgress, handleFinish);
@@ -35,13 +46,6 @@ const DragBox = ({ addFile, isUploading, finishUpload, updateProgress, userId })
         console.log('upload error');
       });
   }
-
-  const uploadFileToDB = file => callApi(`${userId}/files`, file, 'POST')
-    .then(res => res.json())
-    .then(({ status }) => {
-      if (status !== 200) return Promise.reject();
-      return Promise.resolve();
-    });
 
   const handleFinish = () => {
     finishUpload();
@@ -53,7 +57,8 @@ const DragBox = ({ addFile, isUploading, finishUpload, updateProgress, userId })
   const constructFile = ({ name, size }) => ({
     name,
     s3Url: '',
-    size
+    size,
+    sender: userId
   });
 
   return (

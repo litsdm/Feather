@@ -1,5 +1,6 @@
 import React from 'react';
 import { arrayOf, bool, func, string } from 'prop-types';
+import { fileType } from '../propTypes';
 import styles from './Home.scss';
 
 import DragBox from './DragBox';
@@ -23,7 +24,7 @@ Home.propTypes = {
   addFile: func.isRequired,
   finishUpload: func.isRequired,
   updateProgress: func.isRequired,
-  files: arrayOf(string).isRequired,
+  files: arrayOf(fileType).isRequired,
   userId: string.isRequired
 };
 
