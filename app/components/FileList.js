@@ -8,8 +8,8 @@ import FileRow from './FileRow';
 
 const FileList = ({ files }) => {
   const renderFiles = () =>
-    files.map(({ name, size, createdAt }) =>
-      <FileRow key={uuid()} fileName={name} size={size} date={createdAt} />);
+    files.map(({ name, size, createdAt, s3Url }) =>
+      <FileRow key={uuid()} fileName={name} size={size} date={createdAt} url={s3Url} />);
 
   return (
     <div className={styles.container}>

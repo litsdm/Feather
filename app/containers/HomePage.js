@@ -7,11 +7,12 @@ import Home from '../components/Home';
 
 import { addFile, finishUpload, updateProgress } from '../actions/file';
 
-const mapStateToProps = ({ file: { isUploading, files }, user }) => (
+const mapStateToProps = ({ file: { isUploading, files, isFetching }, user }) => (
   {
     isUploading,
     files,
-    userId: user.id
+    userId: user.id,
+    isFetching
   }
 );
 
@@ -21,7 +22,7 @@ const mapDispatchToProps = dispatch => ({
   hFinishUpload: () => dispatch(finishUpload())
 });
 
-const HomePage = ({ isUploading, hAddFile, hFinishUpload, hUpdateProgress, files, userId }) =>
+const HomePage = ({ isUploading, hAddFile, hFinishUpload, hUpdateProgress, files, userId, isFetching }) =>
   <Home
     isUploading={isUploading}
     addFile={hAddFile}
@@ -29,6 +30,7 @@ const HomePage = ({ isUploading, hAddFile, hFinishUpload, hUpdateProgress, files
     updateProgress={hUpdateProgress}
     files={files}
     userId={userId}
+    isFetching={isFetching}
   />
 
 HomePage.propTypes = {
@@ -37,7 +39,8 @@ HomePage.propTypes = {
   hFinishUpload: func.isRequired,
   hUpdateProgress: func.isRequired,
   files: arrayOf(fileType).isRequired,
-  userId: string.isRequired
+  userId: string.isRequired,
+  isFetching: bool.isRequired
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(HomePage);

@@ -174,7 +174,7 @@ class FileRow extends Component {
   }
 
   render() {
-    const { fileName } = this.props;
+    const { fileName, url } = this.props;
     const { status } = this.state;
     const fileIcon = this.getFileIcon();
 
@@ -191,7 +191,7 @@ class FileRow extends Component {
             status === 'default'
               ? (
                 <div className={styles.actions}>
-                  <a href="#" download>
+                  <a href={url} download>
                     <i className="fa fa-download" />
                   </a>
                   <button type="button">
@@ -212,7 +212,8 @@ class FileRow extends Component {
 
 FileRow.propTypes = {
   fileName: string.isRequired,
-  size: number.isRequired
+  size: number.isRequired,
+  url: string.isRequired
 };
 
 export default FileRow;

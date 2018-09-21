@@ -5,8 +5,9 @@ import styles from './Home.scss';
 
 import DragBox from './DragBox';
 import FileList from './FileList';
+import Loader from './Loader';
 
-const Home = ({ isUploading, addFile, updateProgress, finishUpload, files, userId }) => (
+const Home = ({ isUploading, addFile, updateProgress, finishUpload, files, userId, isFetching }) => (
   <div className={styles.container}>
     <DragBox
       isUploading={isUploading}
@@ -15,7 +16,11 @@ const Home = ({ isUploading, addFile, updateProgress, finishUpload, files, userI
       finishUpload={finishUpload}
       userId={userId}
     />
-    <FileList files={files} />
+    {
+      isFetching
+        ? <Loader />
+        : <FileList files={files} />
+    }
   </div>
 );
 
@@ -25,7 +30,8 @@ Home.propTypes = {
   finishUpload: func.isRequired,
   updateProgress: func.isRequired,
   files: arrayOf(fileType).isRequired,
-  userId: string.isRequired
+  userId: string.isRequired,
+  isFetching: bool.isRequired
 };
 
 export default Home;
