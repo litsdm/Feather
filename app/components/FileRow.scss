@@ -24,38 +24,35 @@
   margin-left: 12px;
 }
 
-.actions {
-  a {
-    align-items: center;
-    border-radius: 50%;
-    color: #000;
-    display: flex;
-    font-size: 12px;
-    height: 25px;
-    justify-content: center;
-    margin: 0 6px;
-    opacity: 1;
-    transition: 0.2s ease all;
-    width: 25px;
+.download,
+.delete {
+  align-items: center;
+  background-color: transparent;
+  border: none;
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  font-size: 12px;
+  height: 25px;
+  justify-content: center;
+  outline: none;
+  padding: 0 8px;
+  transition: 0.2s ease all;
+  width: 25px;
 
-    &:hover {
-      background-color: #efefef;
-      color: #4caf50;
-    }
+  &:hover {
+    color: #fff;
+    background-color: #ff5252;
   }
+}
 
-  button {
-    background-color: transparent;
-    border: none;
-    border-radius: 50%;
-    cursor: pointer;
-    padding: 0 8px;
-    transition: 0.2s ease all;
+.download {
+  color: #000;
+  margin: 0 6px;
 
-    &:hover {
-      color: #fff;
-      background-color: #ff5252;
-    }
+  &:hover {
+    background-color: #efefef;
+    color: #4caf50;
   }
 }
 

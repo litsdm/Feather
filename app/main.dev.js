@@ -10,7 +10,8 @@
  *
  * @flow
  */
-import { app, BrowserWindow, Tray } from 'electron';
+import { app, BrowserWindow, Tray, ipcMain } from 'electron';
+import { download } from 'electron-dl';
 import path from 'path';
 import MenuBuilder from './menu';
 
@@ -83,6 +84,25 @@ const getWindowPosition = () => {
 /**
  * Add event listeners...
  */
+
+ipcMain.on('download-file', (e, { url, filename, fileId, localPath }) => {
+  const downloadPath = localPath || app.getPath('downloads');
+  download(mainWindow, url, {
+    directory: downloadPath,
+    onProgress: (progress) => e.sender.send('download-progress', { progress, fileId })
+  }).then(dl => {
+    const savePath = dl.getSavePath().split(' ').join('\\ ');
+
+    const res = {
+      fileId,
+      filename,
+      savePath
+    };
+
+    e.sender.send('download-finish', res);
+    return dl;
+  }).catch(console.error);
+});
 
 app.on('window-all-closed', () => {
   app.quit();

@@ -1,16 +1,17 @@
-import React, { Component, Fragment } from 'react';
-import { number, string } from 'prop-types';
+import React, { Fragment } from 'react';
+import { object, func, number, string } from 'prop-types';
 import styles from './FileRow.scss';
 
 import Progressbar from './Progressbar';
 
-class FileRow extends Component {
-  state = {
-    status: 'default'
-  }
+const FileRow = ({ downloads, downloadFile, fileName, id, size, url }) => {
+  const getState = () => {
+    if (typeof downloads[id] !== 'undefined') return 'downloading';
 
-  getFileIcon = () => {
-    const { fileName } = this.props;
+    return 'default';
+  };
+
+  const getFileIcon = () => {
     const extension = fileName.slice((Math.max(0, fileName.lastIndexOf(".")) || Infinity) + 1);
 
     switch (extension.toLowerCase()) {
@@ -133,7 +134,7 @@ class FileRow extends Component {
     }
   }
 
-  humanFileSize = (bytes, si) => {
+  const humanFileSize = (bytes, si) => {
     const thresh = si ? 1000 : 1024;
     if(Math.abs(bytes) < thresh) {
         return `${bytes} B`;
@@ -147,18 +148,14 @@ class FileRow extends Component {
         ++u; // eslint-disable-line
     } while(Math.abs(bytes) >= thresh && u < units.length - 1);
     return `${bytes.toFixed(1)} ${units[u]}`;
-}
+  }
 
-  renderInfoSection = () => {
-    const { status } = this.state;
-    const { size } = this.props;
+  const state = getState();
+  const fileIcon = getFileIcon();
 
-    if (status === 'uploading' || status === 'downloading') {
-      return <Progressbar progress={1} action={status} />
-    }
-
-    if (status === 'queued') {
-      return <p className={styles.queued}>Queued, download will begin shortly...</p>;
+  const renderInfoSection = () => {
+    if (state === 'downloading') {
+      return <Progressbar progress={downloads[id].progress} action={state} />
     }
 
     return (
@@ -167,53 +164,54 @@ class FileRow extends Component {
           Expires in x hours
         </p>
         <p className={styles.size}>
-          {this.humanFileSize(size, true)}
+          {humanFileSize(size, true)}
         </p>
       </Fragment>
     );
   }
 
-  render() {
-    const { fileName, url } = this.props;
-    const { status } = this.state;
-    const fileIcon = this.getFileIcon();
-
-    return (
-      <div className={styles.row}>
-        <div className={styles.top}>
-          <div className={styles.info}>
-            <i className={fileIcon.icon} style={{ color: fileIcon.color }} />
-            <p className={styles.name}>
-              {fileName}
-            </p>
-          </div>
-          {
-            status === 'default'
-              ? (
-                <div className={styles.actions}>
-                  <a href={url} download>
-                    <i className="fa fa-download" />
-                  </a>
-                  <button type="button">
-                    <i className="fa fa-trash-alt" />
-                  </button>
-                </div>
-              )
-              : null
-          }
+  return (
+    <div className={styles.row}>
+      <div className={styles.top}>
+        <div className={styles.info}>
+          <i className={fileIcon.icon} style={{ color: fileIcon.color }} />
+          <p className={styles.name}>
+            {fileName}
+          </p>
         </div>
-        <div className={styles.bottom}>
-          {this.renderInfoSection()}
-        </div>
+        {
+          state === 'default'
+            ? (
+              <div className={styles.actions}>
+                <button
+                  type="button"
+                  className={styles.download}
+                  onClick={() => downloadFile(id, url, fileName)}
+                >
+                  <i className="fa fa-download" />
+                </button>
+                <button type="button" className={styles.delete}>
+                  <i className="fa fa-trash-alt" />
+                </button>
+              </div>
+            )
+            : null
+        }
       </div>
-    );
-  }
+      <div className={styles.bottom}>
+        {renderInfoSection()}
+      </div>
+    </div>
+  );
 }
 
 FileRow.propTypes = {
   fileName: string.isRequired,
   size: number.isRequired,
-  url: string.isRequired
+  url: string.isRequired,
+  downloads: object.isRequired, // eslint-disable-line
+  downloadFile: func.isRequired,
+  id: string.isRequired
 };
 
 export default FileRow;
