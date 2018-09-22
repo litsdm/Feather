@@ -2,7 +2,7 @@ import { ADD_FILE, FINISH_UPLOAD, UPDATE_UPLOAD_PROGRESS, REQUEST_FILES, RECEIVE
 
 const initialState = {
   isUploading: false,
-  uploadId: null,
+  uploadId: '',
   progress: 0,
   isFetching: false,
   files: []
@@ -15,13 +15,13 @@ export default function counter(state = initialState, { type, file, upload, prog
         ...state,
         files: state.isUploading ? [state.files[0], file, ...state.files.slice(1)] : [file, ...state.files],
         isUploading: upload,
-        uploadId: !state.isUploading && upload ? file.id : null
+        uploadId: !state.isUploading && upload ? file._id : null
       };
     case FINISH_UPLOAD:
       return {
         ...state,
         isUploading: false,
-        uploadId: null
+        uploadId: ''
       };
     case UPDATE_UPLOAD_PROGRESS:
       return {

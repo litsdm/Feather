@@ -1,12 +1,12 @@
 import React from 'react';
 import uuid from 'uuid/v4';
-import { arrayOf, func, object } from 'prop-types';
+import { arrayOf, func, number, object, string } from 'prop-types';
 import { fileType } from '../propTypes';
 import styles from './FileList.scss';
 
 import FileRow from './FileRow';
 
-const FileList = ({ downloadFile, downloads, files }) => {
+const FileList = ({ downloadFile, downloads, files, uploadId, uploadProgress }) => {
   const renderFiles = () =>
     files.map(({ name, size, createdAt, s3Url, _id }) =>
       <FileRow
@@ -18,6 +18,8 @@ const FileList = ({ downloadFile, downloads, files }) => {
         downloads={downloads}
         id={_id}
         downloadFile={downloadFile}
+        uploadId={uploadId}
+        uploadProgress={uploadProgress}
       />);
 
   return (
@@ -43,7 +45,9 @@ const FileList = ({ downloadFile, downloads, files }) => {
 FileList.propTypes = {
   downloadFile: func.isRequired,
   downloads: object.isRequired, // eslint-disable-line react/forbid-prop-types
-  files: arrayOf(fileType).isRequired
+  files: arrayOf(fileType).isRequired,
+  uploadId: string.isRequired,
+  uploadProgress: number.isRequired
 };
 
 export default FileList;

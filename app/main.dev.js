@@ -81,15 +81,10 @@ const getWindowPosition = () => {
   return { x, y };
 }
 
-/**
- * Add event listeners...
- */
-
-ipcMain.on('download-file', (e, { url, filename, fileId, localPath }) => {
-  const downloadPath = localPath || app.getPath('downloads');
+const downloadFile = (url, filename, fileId, dlPath, sender) => {
   download(mainWindow, url, {
-    directory: downloadPath,
-    onProgress: (progress) => e.sender.send('download-progress', { progress, fileId })
+    directory: dlPath,
+    onProgress: (progress) => sender.send('download-progress', { progress, fileId })
   }).then(dl => {
     const savePath = dl.getSavePath().split(' ').join('\\ ');
 
@@ -99,9 +94,18 @@ ipcMain.on('download-file', (e, { url, filename, fileId, localPath }) => {
       savePath
     };
 
-    e.sender.send('download-finish', res);
+    sender.send('download-finish', res);
     return dl;
-  }).catch(console.error);
+  }).catch((err) => console.log(err));
+}
+
+/**
+ * Add event listeners...
+ */
+
+ipcMain.on('download-file', (e, { url, filename, fileId, localPath }) => {
+  const downloadPath = localPath || app.getPath('downloads');
+  downloadFile(url, filename, fileId, downloadPath, e.sender);
 });
 
 app.on('window-all-closed', () => {

@@ -18,7 +18,7 @@ const callApi = (endpoint, body, method = 'GET') => {
 export const uploadFile = (file, signedRequest, progressCb, finishCb) => {
   const oReq = new XMLHttpRequest();
   oReq.addEventListener('load', finishCb);
-  oReq.addEventListener('progress', ({ loaded, total, lengthComputable }) => {
+  oReq.upload.addEventListener('progress', ({ loaded, total, lengthComputable }) => {
     if (lengthComputable) progressCb(loaded / total);
   });
   oReq.addEventListener('error', (e) => console.log(e));

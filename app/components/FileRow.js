@@ -4,9 +4,10 @@ import styles from './FileRow.scss';
 
 import Progressbar from './Progressbar';
 
-const FileRow = ({ downloads, downloadFile, fileName, id, size, url }) => {
+const FileRow = ({ downloads, downloadFile, fileName, id, size, url, uploadId, uploadProgress }) => {
   const getState = () => {
     if (typeof downloads[id] !== 'undefined') return 'downloading';
+    if (id === uploadId) return 'uploading';
 
     return 'default';
   };
@@ -154,9 +155,8 @@ const FileRow = ({ downloads, downloadFile, fileName, id, size, url }) => {
   const fileIcon = getFileIcon();
 
   const renderInfoSection = () => {
-    if (state === 'downloading') {
-      return <Progressbar progress={downloads[id].progress} action={state} />
-    }
+    if (state === 'downloading') return <Progressbar progress={downloads[id].progress} action={state} />;
+    if (state === 'uploading') return <Progressbar progress={uploadProgress} action={state} />;
 
     return (
       <Fragment>
@@ -211,7 +211,9 @@ FileRow.propTypes = {
   url: string.isRequired,
   downloads: object.isRequired, // eslint-disable-line
   downloadFile: func.isRequired,
-  id: string.isRequired
+  id: string.isRequired,
+  uploadId: string.isRequired,
+  uploadProgress: number.isRequired
 };
 
 export default FileRow;

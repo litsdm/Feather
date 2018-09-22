@@ -1,5 +1,5 @@
 import React from 'react';
-import { arrayOf, bool, func, string, object } from 'prop-types';
+import { arrayOf, bool, func, number, string, object } from 'prop-types';
 import { fileType } from '../propTypes';
 import styles from './Home.scss';
 
@@ -16,7 +16,9 @@ const Home = ({
   userId,
   isFetching,
   downloadFile,
-  downloads
+  downloads,
+  uploadId,
+  uploadProgress
 }) => (
   <div className={styles.container}>
     <DragBox
@@ -29,7 +31,13 @@ const Home = ({
     {
       isFetching
         ? <Loader />
-        : <FileList files={files} downloadFile={downloadFile} downloads={downloads} />
+        : <FileList
+          files={files}
+          downloadFile={downloadFile}
+          downloads={downloads}
+          uploadId={uploadId}
+          uploadProgress={uploadProgress}
+        />
     }
   </div>
 );
@@ -43,7 +51,9 @@ Home.propTypes = {
   userId: string.isRequired,
   isFetching: bool.isRequired,
   downloadFile: func.isRequired,
-  downloads: object.isRequired // eslint-disable-line react/forbid-prop-types
+  downloads: object.isRequired, // eslint-disable-line react/forbid-prop-types
+  uploadId: string.isRequired,
+  uploadProgress: number.isRequired
 };
 
 export default Home;
