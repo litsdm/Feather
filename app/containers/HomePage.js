@@ -5,7 +5,7 @@ import { fileType } from '../propTypes';
 
 import Home from '../components/Home';
 
-import { addFile, finishUpload, updateProgress } from '../actions/file';
+import { addFile, finishUpload, updateProgress, removeFile } from '../actions/file';
 import { downloadFile } from '../actions/download';
 
 const mapStateToProps = ({ file: { isUploading, files, isFetching, uploadId, progress }, user, downloads }) => (
@@ -21,51 +21,55 @@ const mapStateToProps = ({ file: { isUploading, files, isFetching, uploadId, pro
 );
 
 const mapDispatchToProps = dispatch => ({
-  hUpdateProgress: progress => dispatch(updateProgress(progress)),
-  hAddFile: (file, upload) => dispatch(addFile(file, upload)),
-  hFinishUpload: () => dispatch(finishUpload()),
-  hDownloadFile: (fileId, url, filename, path = null) => dispatch(downloadFile(fileId, url, filename, path))
+  dUpdateProgress: progress => dispatch(updateProgress(progress)),
+  dAddFile: (file, upload) => dispatch(addFile(file, upload)),
+  dFinishUpload: () => dispatch(finishUpload()),
+  dDownloadFile: (fileId, url, filename, path = null) => dispatch(downloadFile(fileId, url, filename, path)),
+  dRemoveFile: index => dispatch(removeFile(index))
 });
 
 const HomePage = ({
   isUploading,
-  hAddFile,
-  hFinishUpload,
-  hUpdateProgress,
+  dAddFile,
+  dFinishUpload,
+  dUpdateProgress,
   files,
   userId,
   isFetching,
-  hDownloadFile,
+  dDownloadFile,
   downloads,
   uploadId,
-  uploadProgress
+  uploadProgress,
+  dRemoveFile
 }) =>
   <Home
     isUploading={isUploading}
-    addFile={hAddFile}
-    finishUpload={hFinishUpload}
-    updateProgress={hUpdateProgress}
+    addFile={dAddFile}
+    finishUpload={dFinishUpload}
+    updateProgress={dUpdateProgress}
     files={files}
     userId={userId}
     isFetching={isFetching}
-    downloadFile={hDownloadFile}
+    downloadFile={dDownloadFile}
     downloads={downloads}
     uploadId={uploadId}
     uploadProgress={uploadProgress}
+    removeFile={dRemoveFile}
   />
 
 HomePage.propTypes = {
   isUploading: bool.isRequired,
-  hAddFile: func.isRequired,
-  hFinishUpload: func.isRequired,
-  hUpdateProgress: func.isRequired,
+  dAddFile: func.isRequired,
+  dFinishUpload: func.isRequired,
+  dUpdateProgress: func.isRequired,
   files: arrayOf(fileType).isRequired,
   userId: string.isRequired,
   isFetching: bool.isRequired,
-  hDownloadFile: func.isRequired,
+  dDownloadFile: func.isRequired,
   downloads: object.isRequired, // eslint-disable-line react/forbid-prop-types
   uploadId: string.isRequired,
-  uploadProgress: number.isRequired
+  uploadProgress: number.isRequired,
+  dRemoveFile: func.isRequired
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(HomePage);

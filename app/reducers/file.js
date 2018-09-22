@@ -1,4 +1,4 @@
-import { ADD_FILE, FINISH_UPLOAD, UPDATE_UPLOAD_PROGRESS, REQUEST_FILES, RECEIVE_FILES } from '../actions/file';
+import { ADD_FILE, FINISH_UPLOAD, UPDATE_UPLOAD_PROGRESS, REQUEST_FILES, RECEIVE_FILES, REMOVE_FILE } from '../actions/file';
 
 const initialState = {
   isUploading: false,
@@ -8,7 +8,7 @@ const initialState = {
   files: []
 };
 
-export default function counter(state = initialState, { type, file, upload, progress, files }) {
+export default function counter(state = initialState, { type, file, upload, progress, files, index }) {
   switch (type) {
     case ADD_FILE:
       return {
@@ -38,6 +38,11 @@ export default function counter(state = initialState, { type, file, upload, prog
         ...state,
         files: [...files, ...state.files],
         isFetching: false
+      }
+    case REMOVE_FILE:
+      return {
+        ...state,
+        files: [...state.files.slice(0, index), ...state.files.slice(index + 1)]
       }
     default:
       return state;

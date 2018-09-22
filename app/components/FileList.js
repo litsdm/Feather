@@ -6,12 +6,12 @@ import styles from './FileList.scss';
 
 import FileRow from './FileRow';
 
-const FileList = ({ downloadFile, downloads, files, uploadId, uploadProgress }) => {
+const FileList = ({ downloadFile, downloads, files, uploadId, uploadProgress, userId, removeFile }) => {
   const renderFiles = () =>
-    files.map(({ name, size, createdAt, s3Url, _id }) =>
+    files.map(({ name, size, createdAt, s3Url, _id }, index) =>
       <FileRow
         key={uuid()}
-        fileName={name}
+        filename={name}
         size={size}
         date={createdAt}
         url={s3Url}
@@ -20,6 +20,9 @@ const FileList = ({ downloadFile, downloads, files, uploadId, uploadProgress }) 
         downloadFile={downloadFile}
         uploadId={uploadId}
         uploadProgress={uploadProgress}
+        index={index}
+        userId={userId}
+        removeFile={removeFile}
       />);
 
   return (
@@ -47,7 +50,9 @@ FileList.propTypes = {
   downloads: object.isRequired, // eslint-disable-line react/forbid-prop-types
   files: arrayOf(fileType).isRequired,
   uploadId: string.isRequired,
-  uploadProgress: number.isRequired
+  uploadProgress: number.isRequired,
+  userId: string.isRequired,
+  removeFile: func.isRequired
 };
 
 export default FileList;

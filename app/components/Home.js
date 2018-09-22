@@ -18,7 +18,8 @@ const Home = ({
   downloadFile,
   downloads,
   uploadId,
-  uploadProgress
+  uploadProgress,
+  removeFile
 }) => (
   <div className={styles.container}>
     <DragBox
@@ -37,6 +38,8 @@ const Home = ({
           downloads={downloads}
           uploadId={uploadId}
           uploadProgress={uploadProgress}
+          removeFile={removeFile}
+          userId={userId}
         />
     }
   </div>
@@ -53,7 +56,8 @@ Home.propTypes = {
   downloadFile: func.isRequired,
   downloads: object.isRequired, // eslint-disable-line react/forbid-prop-types
   uploadId: string.isRequired,
-  uploadProgress: number.isRequired
+  uploadProgress: number.isRequired,
+  removeFile: func.isRequired
 };
 
 export default Home;

@@ -6,6 +6,7 @@ export const FINISH_UPLOAD = 'FINISH_UPLOAD';
 export const UPDATE_UPLOAD_PROGRESS = 'UPDATE_UPLOAD_PROGRESS';
 export const REQUEST_FILES = 'REQUEST_FILES';
 export const RECEIVE_FILES = 'RECEIVE_FILES';
+export const REMOVE_FILE = 'REMOVE_FILE';
 
 export function addFile(file, upload) {
   return {
@@ -13,6 +14,13 @@ export function addFile(file, upload) {
     upload,
     type: ADD_FILE
   };
+}
+
+export function removeFile(index) {
+  return {
+    index,
+    type: REMOVE_FILE
+  }
 }
 
 export function updateProgress(progress) {
@@ -61,7 +69,6 @@ function shouldFetchFiles({ file: { files, isFetching } }) {
 export function fetchFilesIfNeeded() {
   return (dispatch, getState) => {
     const state = getState();
-    console.log(state);
     if (shouldFetchFiles(state)) {
       return dispatch(fetchFiles(state.user.id));
     }

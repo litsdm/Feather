@@ -2,9 +2,23 @@ import React, { Fragment } from 'react';
 import { object, func, number, string } from 'prop-types';
 import styles from './FileRow.scss';
 
+import callApi from '../helpers/apiCaller';
+
 import Progressbar from './Progressbar';
 
-const FileRow = ({ downloads, downloadFile, fileName, id, size, url, uploadId, uploadProgress }) => {
+const FileRow = ({
+  downloads,
+  downloadFile,
+  filename,
+  id,
+  size,
+  url,
+  uploadId,
+  uploadProgress,
+  userId,
+  removeFile,
+  index
+}) => {
   const getState = () => {
     if (typeof downloads[id] !== 'undefined') return 'downloading';
     if (id === uploadId) return 'uploading';
@@ -13,7 +27,7 @@ const FileRow = ({ downloads, downloadFile, fileName, id, size, url, uploadId, u
   };
 
   const getFileIcon = () => {
-    const extension = fileName.slice((Math.max(0, fileName.lastIndexOf(".")) || Infinity) + 1);
+    const extension = filename.slice((Math.max(0, filename.lastIndexOf(".")) || Infinity) + 1);
 
     switch (extension.toLowerCase()) {
       // Audio Files
@@ -151,6 +165,17 @@ const FileRow = ({ downloads, downloadFile, fileName, id, size, url, uploadId, u
     return `${bytes.toFixed(1)} ${units[u]}`;
   }
 
+  const handleDelete = () => {
+    callApi(`${userId}/files/${id}`, {}, 'DELETE')
+    callApi('delete-s3', { filename }, 'POST')
+      .then(({ status }) => {
+        if (status !== 200) return Promise.reject();
+        removeFile(index);
+        return Promise.resolve();
+      })
+      .catch(() => console.log('error'))
+  }
+
   const state = getState();
   const fileIcon = getFileIcon();
 
@@ -176,7 +201,7 @@ const FileRow = ({ downloads, downloadFile, fileName, id, size, url, uploadId, u
         <div className={styles.info}>
           <i className={fileIcon.icon} style={{ color: fileIcon.color }} />
           <p className={styles.name}>
-            {fileName}
+            {filename}
           </p>
         </div>
         {
@@ -186,11 +211,11 @@ const FileRow = ({ downloads, downloadFile, fileName, id, size, url, uploadId, u
                 <button
                   type="button"
                   className={styles.download}
-                  onClick={() => downloadFile(id, url, fileName)}
+                  onClick={() => downloadFile(id, url, filename)}
                 >
                   <i className="fa fa-download" />
                 </button>
-                <button type="button" className={styles.delete}>
+                <button type="button" className={styles.delete} onClick={handleDelete}>
                   <i className="fa fa-trash-alt" />
                 </button>
               </div>
@@ -206,14 +231,17 @@ const FileRow = ({ downloads, downloadFile, fileName, id, size, url, uploadId, u
 }
 
 FileRow.propTypes = {
-  fileName: string.isRequired,
+  filename: string.isRequired,
   size: number.isRequired,
   url: string.isRequired,
   downloads: object.isRequired, // eslint-disable-line
   downloadFile: func.isRequired,
   id: string.isRequired,
   uploadId: string.isRequired,
-  uploadProgress: number.isRequired
+  uploadProgress: number.isRequired,
+  userId: string.isRequired,
+  removeFile: func.isRequired,
+  index: number.isRequired
 };
 
 export default FileRow;
