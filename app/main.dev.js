@@ -65,7 +65,9 @@ const showWindow = () => {
   const position = getWindowPosition();
   mainWindow.setPosition(position.x, position.y, false);
   mainWindow.show();
+  mainWindow.setVisibleOnAllWorkspaces(true);
   mainWindow.focus();
+  mainWindow.setVisibleOnAllWorkspaces(false);
 }
 
 const getWindowPosition = () => {
