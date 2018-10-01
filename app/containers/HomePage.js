@@ -24,7 +24,7 @@ const mapDispatchToProps = dispatch => ({
   dUpdateProgress: progress => dispatch(updateProgress(progress)),
   dAddFile: (file, upload) => dispatch(addFile(file, upload)),
   dFinishUpload: () => dispatch(finishUpload()),
-  dDownloadFile: (fileId, url, filename, path = null) => dispatch(downloadFile(fileId, url, filename, path)),
+  dDownloadFile: (fileId, url, filename) => dispatch(downloadFile(fileId, url, filename)),
   dRemoveFile: index => dispatch(removeFile(index))
 });
 

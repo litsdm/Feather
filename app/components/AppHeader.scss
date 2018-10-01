@@ -10,3 +10,22 @@
 .name {
   color: white;
 }
+
+.rightActions {
+  align-items: center;
+  bottom: 0;
+  display: flex;
+  justify-content: center;
+  position: absolute;
+  right: 12px;
+  top: 0;
+}
+
+.settings {
+  cursor: pointer;
+  outline: none;
+
+  i {
+    pointer-events: none;
+  }
+}

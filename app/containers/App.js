@@ -51,7 +51,7 @@ class App extends React.Component {
     const { children, location: { pathname } } = this.props;
     return (
       <React.Fragment>
-        {pathname !== '/auth' ? <AppHeader /> : null}
+        {pathname === '/' ? <AppHeader /> : null}
         {children}
       </React.Fragment>
     );

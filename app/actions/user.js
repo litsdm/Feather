@@ -1,5 +1,5 @@
 export const ADD_USER = 'ADD_USER';
-export const REMOVE_USER = 'REMOVE_USER';
+export const USER_LOGOUT = 'USER_LOGOUT';
 
 export const addUser = (user) => (
   {
@@ -8,8 +8,8 @@ export const addUser = (user) => (
   }
 );
 
-export const removeUser = () => (
+export const logoutUser = () => (
   {
-    type: REMOVE_USER
+    type: USER_LOGOUT
   }
-);
+)

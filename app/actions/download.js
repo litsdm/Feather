@@ -11,9 +11,10 @@ function addDownload(fileId) {
   }
 }
 
-export function downloadFile(fileId, url, filename, path = null) {
+export function downloadFile(fileId, url, filename) {
+  const localPath = JSON.parse(localStorage.getItem('localConfig')).downloadPath || null
   return dispatch => {
-    ipcRenderer.send('download-file', { fileId, url, filename, localPath: path });
+    ipcRenderer.send('download-file', { fileId, url, filename, localPath });
     dispatch(addDownload(fileId));
   }
 }

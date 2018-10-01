@@ -5,11 +5,18 @@ import file from './file';
 import user from './user';
 import downloads from './download';
 
-const rootReducer = combineReducers({
+import { USER_LOGOUT } from '../actions/user';
+
+const appReducer = combineReducers({
   downloads,
   file,
   router,
   user
 });
+
+const rootReducer = (state, action) => {
+  const appState = action.type === USER_LOGOUT ? undefined : state
+  return appReducer(appState, action)
+}
 
 export default rootReducer;
