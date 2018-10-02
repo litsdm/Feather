@@ -110,6 +110,10 @@ ipcMain.on('download-file', (e, { url, filename, fileId, localPath }) => {
   downloadFile(url, filename, fileId, downloadPath, e.sender);
 });
 
+ipcMain.on('show-window', () => {
+  showWindow();
+});
+
 app.on('window-all-closed', () => {
   app.quit();
 });

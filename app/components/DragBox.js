@@ -4,6 +4,7 @@ import { bool, func, string } from 'prop-types';
 import styles from './DragBox.scss';
 
 import callApi, { uploadFile } from '../helpers/apiCaller';
+import notify from '../helpers/notifications';
 import { emit } from '../socketClient';
 
 let uploadQueue = [];
@@ -41,8 +42,14 @@ const DragBox = ({ addFile, isUploading, finishUpload, updateProgress, userId })
       .then(({ file: dbFile }) => {
         addFile(dbFile, true);
         uploadFile(rawFile, signedReq, updateProgress, () => {
+          const localConfig = JSON.parse(localStorage.getItem('localConfig'));
+
           emit('sendFile', { userId, file: dbFile });
           handleFinish();
+
+          if (localConfig.notifyUpload) {
+            notify({ title: 'File Uploaded', body: `${dbFile.name} has finished uploading.` })
+          }
         });
         return Promise.resolve();
       })

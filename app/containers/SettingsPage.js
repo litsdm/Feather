@@ -9,9 +9,10 @@ import { logoutUser } from '../actions/user';
 
 import Settings from '../components/Settings';
 
-const mapStateToProps = ({ user: { email } }) => (
+const mapStateToProps = ({ user: { email, username } }) => (
   {
-    email
+    email,
+    username
   }
 );
 
@@ -26,7 +27,8 @@ const mapDispatchToProps = dispatch => ({
 class SettingsPage extends Component {
   state = {
     downloadPath: '',
-    notifySent: true,
+    notifyDownload: true,
+    notifyUpload: true,
     notifyReceived: true,
     username: ''
   };
@@ -36,12 +38,14 @@ class SettingsPage extends Component {
   }
 
   loadState = () => {
+    const { username } = this.props;
     const localConfig = localStorage.getItem('localConfig');
+
     if (localConfig) {
       const parsedConfig = JSON.parse(localConfig);
       const downloadPath = parsedConfig.downloadPath || remote.app.getPath('downloads');
 
-      this.setState({ ...parsedConfig, downloadPath });
+      this.setState({ ...parsedConfig, downloadPath, username });
     }
   }
 
@@ -49,7 +53,13 @@ class SettingsPage extends Component {
 
   goToPath = (path) => {
     const { history } = this.props;
+    const { username } = this.state;
+    const oldConfig = JSON.parse(localStorage.getItem('localConfig'));
     const localConfig = JSON.stringify(this.state);
+
+    if (oldConfig.username !== username) {
+      // update username on backend
+    }
 
     localStorage.setItem('localConfig', localConfig);
 
@@ -57,13 +67,14 @@ class SettingsPage extends Component {
   }
 
   render() {
-    const { downloadPath, notifySent, notifyReceived, username } = this.state;
+    const { downloadPath, notifyDownload, notifyUpload, notifyReceived, username } = this.state;
     const { email, logout } = this.props;
     return (
       <Settings
         downloadPath={downloadPath}
         email={email}
-        notifySent={notifySent}
+        notifyDownload={notifyDownload}
+        notifyUpload={notifyUpload}
         notifyReceived={notifyReceived}
         username={username}
         setState={this.receiveStateFromChild}
@@ -77,7 +88,8 @@ class SettingsPage extends Component {
 SettingsPage.propTypes = {
   email: string.isRequired,
   history: object.isRequired, // eslint-disable-line
-  logout: func.isRequired
+  logout: func.isRequired,
+  username: string.isRequired
 }
 
 export default connect(mapStateToProps, mapDispatchToProps)(SettingsPage);

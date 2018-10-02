@@ -5,7 +5,8 @@ import styles from './Settings.scss';
 const Settings = ({
   downloadPath,
   email,
-  notifySent,
+  notifyDownload,
+  notifyUpload,
   notifyReceived,
   username,
   setState,
@@ -65,6 +66,21 @@ const Settings = ({
         </p>
         <div className={styles.switchContainer}>
           <p>
+            Notify on file download
+          </p>
+          <label htmlFor="notifyDownload" className={styles.switch}>
+            <input
+              id="notifyDownload"
+              name="notifyDownload"
+              type="checkbox"
+              checked={notifyDownload}
+              onChange={handleChange}
+            />
+            <span className={styles.slider} />
+          </label>
+        </div>
+        <div className={styles.switchContainer}>
+          <p>
             Notify on file received
           </p>
           <label htmlFor="notifyReceived" className={styles.switch}>
@@ -80,14 +96,14 @@ const Settings = ({
         </div>
         <div className={`${styles.switchContainer} ${styles.last}`}>
           <p>
-            Notify on file sent
+            Notify on file upload
           </p>
-          <label htmlFor="notifySent" className={styles.switch}>
+          <label htmlFor="notifyUpload" className={styles.switch}>
             <input
-              id="notifySent"
-              name="notifySent"
+              id="notifyUpload"
+              name="notifyUpload"
               type="checkbox"
-              checked={notifySent}
+              checked={notifyUpload}
               onChange={handleChange}
             />
             <span className={styles.slider} />
@@ -125,8 +141,9 @@ const Settings = ({
 Settings.propTypes = {
   downloadPath: string.isRequired,
   email: string.isRequired,
+  notifyDownload: bool.isRequired,
   notifyReceived: bool.isRequired,
-  notifySent: bool.isRequired,
+  notifyUpload: bool.isRequired,
   username: string.isRequired,
   setState: func.isRequired,
   goToPath: func.isRequired,

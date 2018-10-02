@@ -6,6 +6,8 @@ import { withRouter } from 'react-router';
 import jwtDecode from 'jwt-decode';
 import socket, { emit } from '../socketClient';
 
+import notify from '../helpers/notifications';
+
 import { fetchFilesIfNeeded, addFile } from '../actions/file'
 import { finishDownload, updateDownloadProgress } from '../actions/download';
 
@@ -27,6 +29,9 @@ class App extends React.Component {
     const { history, location: { pathname }, fetchFiles } = this.props;
     const { user } = this.state;
     const token = localStorage.getItem('tempoToken');
+    const localConfig = localStorage.getItem('localConfig');
+
+    if (!localConfig) localStorage.setItem('localConfig', JSON.stringify({ notifyUpload: true, notifyRecieve: true, notifyDownload: true }));
 
     if (!user && !token && pathname !== '/auth') history.push('/auth');
 
@@ -41,11 +46,16 @@ class App extends React.Component {
 
   setupListeners = () => {
     const { dAddFile } = this.props;
+    const localConfig = JSON.parse(localStorage.getItem('localConfig'));
 
     ipcRenderer.on('download-progress', this.handleDownloadProgress);
     ipcRenderer.on('download-finish', this.handleDownloadFinish);
     socket.on('recieveFile', (file) => {
       dAddFile(file);
+
+      if (localConfig.notifyReceived) {
+        notify({ title: 'File Recieved', body: `You can now download ${file.name} on this device.` });
+      }
     });
   }
 
@@ -54,9 +64,15 @@ class App extends React.Component {
     dUpdateDownloadProgress(fileId, progress);
   }
 
-  handleDownloadFinish = (e, { fileId }) => {
+  handleDownloadFinish = (e, { fileId, filename }) => {
     const { dFinishDownload } = this.props;
-    dFinishDownload(fileId)
+    const localConfig = JSON.parse(localStorage.getItem('localConfig'));
+
+    dFinishDownload(fileId);
+
+    if (localConfig.notifyDownload) {
+      notify({ title: 'Download Complete', body: `${filename} has finished downloading.` });
+    }
   }
 
   render() {
