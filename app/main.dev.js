@@ -18,7 +18,7 @@ import MenuBuilder from './menu';
 let mainWindow = null;
 let tray = null;
 
-app.dock.hide();
+if (process.platform === 'darwin') app.dock.hide();
 
 if (process.env.NODE_ENV === 'production') {
   const sourceMapSupport = require('source-map-support');

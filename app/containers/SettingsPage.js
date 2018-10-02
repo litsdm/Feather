@@ -3,6 +3,8 @@ import { remote } from 'electron';
 import { connect } from 'react-redux';
 import { func, object, string } from 'prop-types';
 
+import { emit } from '../socketClient';
+
 import { logoutUser } from '../actions/user';
 
 import Settings from '../components/Settings';
@@ -15,6 +17,7 @@ const mapStateToProps = ({ user: { email } }) => (
 
 const mapDispatchToProps = dispatch => ({
   logout: () => {
+    emit('logout');
     localStorage.removeItem('tempoToken');
     dispatch(logoutUser());
   }

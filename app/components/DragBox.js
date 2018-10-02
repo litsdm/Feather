@@ -4,6 +4,7 @@ import { bool, func, string } from 'prop-types';
 import styles from './DragBox.scss';
 
 import callApi, { uploadFile } from '../helpers/apiCaller';
+import { emit } from '../socketClient';
 
 let uploadQueue = [];
 
@@ -39,7 +40,10 @@ const DragBox = ({ addFile, isUploading, finishUpload, updateProgress, userId })
       .then(res => res.json())
       .then(({ file: dbFile }) => {
         addFile(dbFile, true);
-        uploadFile(rawFile, signedReq, updateProgress, handleFinish);
+        uploadFile(rawFile, signedReq, updateProgress, () => {
+          emit('sendFile', { userId, file: dbFile });
+          handleFinish();
+        });
         return Promise.resolve();
       })
       .catch(() => {

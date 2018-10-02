@@ -3,6 +3,8 @@ import { connect } from 'react-redux';
 import { func, object } from 'prop-types';
 import jwtDecode from 'jwt-decode';
 
+import { emit } from '../socketClient';
+
 import Login from '../components/Login';
 import Signup from '../components/Signup';
 import Banner from '../components/Banner';
@@ -10,7 +12,11 @@ import Banner from '../components/Banner';
 import { addUser } from '../actions/user';
 
 const mapDispatchToProps = dispatch => ({
-  addUserFromToken: token => dispatch(addUser(jwtDecode(token))),
+  addUserFromToken: token => {
+    const user = jwtDecode(token);
+    emit('connectUser', user.id);
+    dispatch(addUser(user));
+  },
 });
 
 class AuthPage extends Component {

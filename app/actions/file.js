@@ -8,7 +8,7 @@ export const REQUEST_FILES = 'REQUEST_FILES';
 export const RECEIVE_FILES = 'RECEIVE_FILES';
 export const REMOVE_FILE = 'REMOVE_FILE';
 
-export function addFile(file, upload) {
+export function addFile(file, upload = false) {
   return {
     file,
     upload,
