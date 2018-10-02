@@ -10,6 +10,7 @@ import Signup from '../components/Signup';
 import Banner from '../components/Banner';
 
 import { addUser } from '../actions/user';
+import { fetchFilesIfNeeded } from '../actions/file';
 
 const mapDispatchToProps = dispatch => ({
   addUserFromToken: token => {
@@ -17,6 +18,7 @@ const mapDispatchToProps = dispatch => ({
     emit('connectUser', user.id);
     dispatch(addUser(user));
   },
+  fetchFiles: () => dispatch(fetchFilesIfNeeded()),
 });
 
 class AuthPage extends Component {
@@ -36,7 +38,7 @@ class AuthPage extends Component {
 
   render() {
     const { username, email, isNew, password, bannerMessage } = this.state;
-    const { addUserFromToken, history } = this.props;
+    const { addUserFromToken, fetchFiles, history } = this.props;
     return (
       <Fragment>
         <Banner message={bannerMessage} setHide={this.setHide} time={5000} />
@@ -49,6 +51,7 @@ class AuthPage extends Component {
               setState={this.setStateProperty}
               displayBanner={this.displayBanner}
               addUser={addUserFromToken}
+              fetchFiles={fetchFiles}
               goToHome={() => history.push('/')}
             />
             : <Login
@@ -57,6 +60,7 @@ class AuthPage extends Component {
               setState={this.setStateProperty}
               displayBanner={this.displayBanner}
               addUser={addUserFromToken}
+              fetchFiles={fetchFiles}
               goToHome={() => history.push('/')}
             />
         }
@@ -67,6 +71,7 @@ class AuthPage extends Component {
 
 AuthPage.propTypes = {
   addUserFromToken: func.isRequired,
+  fetchFiles: func.isRequired,
   history: object.isRequired // eslint-disable-line
 };
 

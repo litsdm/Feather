@@ -4,7 +4,7 @@ import styles from './Auth.scss';
 
 import callApi from '../helpers/apiCaller';
 
-const Signup = ({ email, password, username, setState, displayBanner, addUser, goToHome }) => {
+const Signup = ({ email, password, username, setState, displayBanner, addUser, goToHome, fetchFiles }) => {
   const switchPage = () => setState('isNew', false);
 
   const handleChange = ({ target: { name, value } }) => setState(name, value);
@@ -38,6 +38,7 @@ const Signup = ({ email, password, username, setState, displayBanner, addUser, g
 
         localStorage.setItem('tempoToken', token);
         addUser(token);
+        fetchFiles();
         goToHome();
         return token;
       })
@@ -75,6 +76,7 @@ Signup.propTypes = {
   setState: func.isRequired,
   displayBanner: func.isRequired,
   addUser: func.isRequired,
+  fetchFiles: func.isRequired,
   goToHome: func.isRequired
 }
 

@@ -114,7 +114,7 @@ const Settings = ({
             onChange={handleChange}
           />
         </label>
-        <button type="button" className={styles.logout} onClick={() => logout()}>
+        <button type="button" className={styles.logout} onClick={() => { logout(); goToPath('/auth'); }}>
           <i className="fa fa-sign-out-alt" />Logout
         </button>
       </div>
