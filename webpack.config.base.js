@@ -45,6 +45,11 @@ export default {
             cacheDirectory: true
           }
         }
+      },
+      // Common Image Formats
+      {
+        test: /\.(?:ico|gif|png|jpg|jpeg|webp)$/,
+        use: 'url-loader'
       }
     ]
   },

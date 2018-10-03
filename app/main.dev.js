@@ -10,7 +10,7 @@
  *
  * @flow
  */
-import { app, BrowserWindow, Tray, ipcMain } from 'electron';
+import { app, BrowserWindow, Tray, ipcMain, nativeImage } from 'electron';
 import { download } from 'electron-dl';
 import path from 'path';
 import MenuBuilder from './menu';
@@ -45,7 +45,11 @@ const installExtensions = async () => {
 };
 
 const createTray = () => {
-  tray = new Tray(path.join(__dirname, '../resources/feather.png'));
+  const iconPath = path.join(__dirname, `./assets/iconTemplate.${process.platform === 'darwin' ? 'png' : 'ico'}`)
+  const image = nativeImage.createFromPath(iconPath);
+  image.setTemplateImage(true);
+
+  tray = new Tray(image);
   tray.on('right-click', toggleWindow);
   tray.on('double-click', toggleWindow);
   tray.on('click', () => {
