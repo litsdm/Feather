@@ -160,11 +160,11 @@ app.on('ready', async () => {
     }
   });
 
-  mainWindow.on('blur', () => {
+  /* mainWindow.on('blur', () => {
     if (!mainWindow.webContents.isDevToolsOpened()) {
       mainWindow.hide();
     }
-  })
+  }) */
 
   mainWindow.on('closed', () => {
     mainWindow = null;

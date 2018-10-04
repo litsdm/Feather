@@ -37,7 +37,7 @@ class App extends React.Component {
 
     if (user || token) {
       const userId = user ? user.id : jwtDecode(token).id;
-      emit('connectUser', userId);
+      emit('userConnection', userId);
       fetchFiles();
     }
 
@@ -51,6 +51,7 @@ class App extends React.Component {
     ipcRenderer.on('download-progress', this.handleDownloadProgress);
     ipcRenderer.on('download-finish', this.handleDownloadFinish);
     socket.on('recieveFile', (file) => {
+      console.log('received file', file);
       dAddFile(file);
 
       if (localConfig.notifyReceived) {

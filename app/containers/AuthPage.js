@@ -15,7 +15,7 @@ import { fetchFilesIfNeeded } from '../actions/file';
 const mapDispatchToProps = dispatch => ({
   addUserFromToken: token => {
     const user = jwtDecode(token);
-    emit('connectUser', user.id);
+    emit('userConnection', user.id);
     dispatch(addUser(user));
   },
   fetchFiles: () => dispatch(fetchFilesIfNeeded()),
