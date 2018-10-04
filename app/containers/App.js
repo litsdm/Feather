@@ -8,7 +8,7 @@ import socket, { emit } from '../socketClient';
 
 import notify from '../helpers/notifications';
 
-import { fetchFilesIfNeeded, addFile } from '../actions/file'
+import { fetchFilesIfNeeded, addFile, removeFile } from '../actions/file';
 import { finishDownload, updateDownloadProgress } from '../actions/download';
 
 import AppHeader from '../components/AppHeader';
@@ -16,22 +16,36 @@ import AppHeader from '../components/AppHeader';
 const mapDispatchToProps = dispatch => ({
   fetchFiles: () => dispatch(fetchFilesIfNeeded()),
   dFinishDownload: fileId => dispatch(finishDownload(fileId)),
-  dUpdateDownloadProgress: (fileId, progress) => dispatch(updateDownloadProgress(fileId, progress)),
-  dAddFile: file => dispatch(addFile(file))
+  dUpdateDownloadProgress: (fileId, progress) =>
+    dispatch(updateDownloadProgress(fileId, progress)),
+  dAddFile: file => dispatch(addFile(file)),
+  dRemoveFile: index => dispatch(removeFile(index))
 });
 
 class App extends React.Component {
   state = {
     user: null
-  }
+  };
 
   componentDidMount() {
-    const { history, location: { pathname }, fetchFiles } = this.props;
+    const {
+      history,
+      location: { pathname },
+      fetchFiles
+    } = this.props;
     const { user } = this.state;
     const token = localStorage.getItem('tempoToken');
     const localConfig = localStorage.getItem('localConfig');
 
-    if (!localConfig) localStorage.setItem('localConfig', JSON.stringify({ notifyUpload: true, notifyRecieve: true, notifyDownload: true }));
+    if (!localConfig)
+      localStorage.setItem(
+        'localConfig',
+        JSON.stringify({
+          notifyUpload: true,
+          notifyRecieve: true,
+          notifyDownload: true
+        })
+      );
 
     if (!user && !token && pathname !== '/auth') history.push('/auth');
 
@@ -45,25 +59,30 @@ class App extends React.Component {
   }
 
   setupListeners = () => {
-    const { dAddFile } = this.props;
+    const { dAddFile, dRemoveFile } = this.props;
     const localConfig = JSON.parse(localStorage.getItem('localConfig'));
 
     ipcRenderer.on('download-progress', this.handleDownloadProgress);
     ipcRenderer.on('download-finish', this.handleDownloadFinish);
-    socket.on('recieveFile', (file) => {
-      console.log('received file', file);
+    socket.on('recieveFile', file => {
       dAddFile(file);
 
       if (localConfig.notifyReceived) {
-        notify({ title: 'File Recieved', body: `You can now download ${file.name} on this device.` });
+        notify({
+          title: 'File Recieved',
+          body: `You can now download ${file.name} on this device.`
+        });
       }
     });
-  }
+    socket.on('removeFile', index => {
+      dRemoveFile(index);
+    });
+  };
 
   handleDownloadProgress = (e, { progress, fileId }) => {
     const { dUpdateDownloadProgress } = this.props;
     dUpdateDownloadProgress(fileId, progress);
-  }
+  };
 
   handleDownloadFinish = (e, { fileId, filename }) => {
     const { dFinishDownload } = this.props;
@@ -72,12 +91,18 @@ class App extends React.Component {
     dFinishDownload(fileId);
 
     if (localConfig.notifyDownload) {
-      notify({ title: 'Download Complete', body: `${filename} has finished downloading.` });
+      notify({
+        title: 'Download Complete',
+        body: `${filename} has finished downloading.`
+      });
     }
-  }
+  };
 
   render() {
-    const { children, location: { pathname } } = this.props;
+    const {
+      children,
+      location: { pathname }
+    } = this.props;
     return (
       <React.Fragment>
         {pathname === '/' ? <AppHeader /> : null}
@@ -94,7 +119,13 @@ App.propTypes = {
   fetchFiles: func.isRequired,
   dFinishDownload: func.isRequired,
   dUpdateDownloadProgress: func.isRequired,
-  dAddFile: func.isRequired
+  dAddFile: func.isRequired,
+  dRemoveFile: func.isRequired
 };
 
-export default withRouter(connect(null, mapDispatchToProps)(App));
+export default withRouter(
+  connect(
+    null,
+    mapDispatchToProps
+  )(App)
+);

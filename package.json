@@ -1,6 +1,6 @@
 {
-  "name": "tempo-file-share",
-  "productName": "Tempo Share",
+  "name": "feather",
+  "productName": "Feather",
   "version": "0.14.0",
   "description": "Easy file share tray application.",
   "scripts": {
@@ -46,8 +46,8 @@
     ]
   },
   "build": {
-    "productName": "Tempo Share",
-    "appId": "com.cdiezmoran.TempoShare",
+    "productName": "Feather",
+    "appId": "com.cdiezmoran.Feather",
     "files": [
       "dist/",
       "node_modules/",
@@ -219,6 +219,7 @@
     "react-dom": "^16.4.1",
     "react-dropzone": "^5.0.2",
     "react-hot-loader": "^4.3.4",
+    "react-moment-proptypes": "^1.6.0",
     "react-redux": "^5.0.7",
     "react-router": "^4.3.1",
     "react-router-dom": "^4.3.1",

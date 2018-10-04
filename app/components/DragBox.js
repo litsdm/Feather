@@ -9,18 +9,24 @@ import { emit } from '../socketClient';
 
 let uploadQueue = [];
 
-const DragBox = ({ addFile, isUploading, finishUpload, updateProgress, userId }) => {
-  const onDrop = (acceptedFiles) => {
+const DragBox = ({
+  addFile,
+  isUploading,
+  finishUpload,
+  updateProgress,
+  userId
+}) => {
+  const onDrop = acceptedFiles => {
     acceptedFiles.forEach(file => {
-        const reader = new FileReader();
-        reader.onload = () => {
-          uploadQueue = [...uploadQueue, file];
-          if (!isUploading) uploadFromQueue();
-        };
-        reader.onabort = () => console.log('file reading was aborted');
-        reader.onerror = () => console.log('file reading has failed');
+      const reader = new FileReader();
+      reader.onload = () => {
+        uploadQueue = [...uploadQueue, file];
+        if (!isUploading) uploadFromQueue();
+      };
+      reader.onabort = () => console.log('file reading was aborted');
+      reader.onerror = () => console.log('file reading has failed');
 
-        reader.readAsDataURL(file);
+      reader.readAsDataURL(file);
     });
   };
 
@@ -31,7 +37,9 @@ const DragBox = ({ addFile, isUploading, finishUpload, updateProgress, userId })
     let signedReq;
 
     // save file object to DB;
-    callApi(`sign-s3?file-name=${rawFile.name}&file-type=${type}&folder-name=Files`)
+    callApi(
+      `sign-s3?file-name=${rawFile.name}&file-type=${type}&folder-name=Files`
+    )
       .then(res => res.json())
       .then(({ signedRequest, url }) => {
         file.s3Url = url;
@@ -44,11 +52,14 @@ const DragBox = ({ addFile, isUploading, finishUpload, updateProgress, userId })
         uploadFile(rawFile, signedReq, updateProgress, () => {
           const localConfig = JSON.parse(localStorage.getItem('localConfig'));
 
-          emit('sendFile', { userId, file: dbFile });
+          emit('sendFile', { roomId: userId, file: dbFile });
           handleFinish();
 
           if (localConfig.notifyUpload) {
-            notify({ title: 'File Uploaded', body: `${dbFile.name} has finished uploading.` })
+            notify({
+              title: 'File Uploaded',
+              body: `${dbFile.name} has finished uploading.`
+            });
           }
         });
         return Promise.resolve();
@@ -56,14 +67,14 @@ const DragBox = ({ addFile, isUploading, finishUpload, updateProgress, userId })
       .catch(() => {
         console.log('upload error');
       });
-  }
+  };
 
   const handleFinish = () => {
     finishUpload();
     if (uploadQueue.length > 0) {
       uploadFromQueue();
     }
-  }
+  };
 
   const constructFile = ({ name, size }) => ({
     name,
@@ -80,9 +91,7 @@ const DragBox = ({ addFile, isUploading, finishUpload, updateProgress, userId })
         activeClassName={styles.dropZoneActive}
         maxSize={2147483648}
       >
-        <b style={{ marginRight: '4px' }}>
-          Choose a file
-        </b>
+        <b style={{ marginRight: '4px' }}>Choose a file</b>
         or drag it here.
       </Dropzone>
     </div>
@@ -95,6 +104,6 @@ DragBox.propTypes = {
   updateProgress: func.isRequired,
   isUploading: bool.isRequired,
   userId: string.isRequired
-}
+};
 
 export default DragBox;

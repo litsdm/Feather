@@ -45,7 +45,10 @@ const installExtensions = async () => {
 };
 
 const createTray = () => {
-  const iconPath = path.join(__dirname, `./assets/iconTemplate.${process.platform === 'darwin' ? 'png' : 'ico'}`)
+  const iconPath = path.join(
+    __dirname,
+    `./assets/iconTemplate.${process.platform === 'darwin' ? 'png' : 'ico'}`
+  );
   const image = nativeImage.createFromPath(iconPath);
   image.setTemplateImage(true);
 
@@ -54,56 +57,65 @@ const createTray = () => {
   tray.on('double-click', toggleWindow);
   tray.on('click', () => {
     toggleWindow();
-  })
+  });
 };
 
 const toggleWindow = () => {
   if (mainWindow.isVisible()) {
-    mainWindow.hide()
+    mainWindow.hide();
   } else {
-    showWindow()
+    showWindow();
   }
 };
 
 const showWindow = () => {
   const position = getWindowPosition();
-  mainWindow.setPosition(position.x, position.y, false);
+  if (process.platform === 'darwin')
+    mainWindow.setPosition(position.x, position.y, false);
   mainWindow.show();
   mainWindow.setVisibleOnAllWorkspaces(true);
   mainWindow.focus();
   mainWindow.setVisibleOnAllWorkspaces(false);
-}
+};
 
 const getWindowPosition = () => {
   const windowBounds = mainWindow.getBounds();
   const trayBounds = tray.getBounds();
 
   // Center window horizontally below the tray icon
-  const x = Math.round(trayBounds.x + (trayBounds.width / 2) - (windowBounds.width / 2));
+  const x = Math.round(
+    trayBounds.x + trayBounds.width / 2 - windowBounds.width / 2
+  );
 
   // Position window 4 pixels vertically below the tray icon
   const y = Math.round(trayBounds.y + trayBounds.height + 4);
 
   return { x, y };
-}
+};
 
 const downloadFile = (url, filename, fileId, dlPath, sender) => {
   download(mainWindow, url, {
     directory: dlPath,
-    onProgress: (progress) => sender.send('download-progress', { progress, fileId })
-  }).then(dl => {
-    const savePath = dl.getSavePath().split(' ').join('\\ ');
+    onProgress: progress =>
+      sender.send('download-progress', { progress, fileId })
+  })
+    .then(dl => {
+      const savePath = dl
+        .getSavePath()
+        .split(' ')
+        .join('\\ ');
 
-    const res = {
-      fileId,
-      filename,
-      savePath
-    };
+      const res = {
+        fileId,
+        filename,
+        savePath
+      };
 
-    sender.send('download-finish', res);
-    return dl;
-  }).catch((err) => console.log(err));
-}
+      sender.send('download-finish', res);
+      return dl;
+    })
+    .catch(err => console.log(err));
+};
 
 /**
  * Add event listeners...
