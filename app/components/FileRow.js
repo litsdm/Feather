@@ -1,8 +1,11 @@
 import React, { Fragment } from 'react';
+import moment from 'moment';
+import { momentObj } from 'react-moment-proptypes';
 import { object, func, number, string } from 'prop-types';
 import styles from './FileRow.scss';
 
 import callApi from '../helpers/apiCaller';
+import { emit } from '../socketClient';
 
 import Progressbar from './Progressbar';
 
@@ -10,6 +13,7 @@ const FileRow = ({
   downloads,
   downloadFile,
   filename,
+  expiresAt,
   id,
   size,
   url,
@@ -27,7 +31,9 @@ const FileRow = ({
   };
 
   const getFileIcon = () => {
-    const extension = filename.slice((Math.max(0, filename.lastIndexOf(".")) || Infinity) + 1);
+    const extension = filename.slice(
+      (Math.max(0, filename.lastIndexOf('.')) || Infinity) + 1
+    );
 
     switch (extension.toLowerCase()) {
       // Audio Files
@@ -147,101 +153,97 @@ const FileRow = ({
       default:
         return { icon: 'far fa-file', color: '#000' };
     }
-  }
+  };
 
   const humanFileSize = (bytes, si) => {
     const thresh = si ? 1000 : 1024;
-    if(Math.abs(bytes) < thresh) {
-        return `${bytes} B`;
+    if (Math.abs(bytes) < thresh) {
+      return `${bytes} B`;
     }
     const units = si
-        ? ['kB','MB','GB','TB','PB','EB','ZB','YB']
-        : ['KiB','MiB','GiB','TiB','PiB','EiB','ZiB','YiB'];
+      ? ['kB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB']
+      : ['KiB', 'MiB', 'GiB', 'TiB', 'PiB', 'EiB', 'ZiB', 'YiB'];
     let u = -1;
     do {
-        bytes /= thresh; // eslint-disable-line
-        ++u; // eslint-disable-line
-    } while(Math.abs(bytes) >= thresh && u < units.length - 1);
+      bytes /= thresh; // eslint-disable-line
+      ++u; // eslint-disable-line
+    } while (Math.abs(bytes) >= thresh && u < units.length - 1);
     return `${bytes.toFixed(1)} ${units[u]}`;
-  }
+  };
 
   const handleDelete = () => {
-    callApi(`${userId}/files/${id}`, {}, 'DELETE')
+    callApi(`${userId}/files/${id}`, {}, 'DELETE');
     callApi('delete-s3', { filename }, 'POST')
       .then(({ status }) => {
         if (status !== 200) return Promise.reject();
         removeFile(index);
+        emit('removeFileFromRoom', { roomId: userId, index });
         return Promise.resolve();
       })
-      .catch(() => console.log('error'))
-  }
+      .catch(() => console.log('error'));
+  };
 
   const state = getState();
   const fileIcon = getFileIcon();
 
   const renderInfoSection = () => {
-    if (state === 'downloading') return <Progressbar progress={downloads[id].progress} action={state} />;
-    if (state === 'uploading') return <Progressbar progress={uploadProgress} action={state} />;
+    if (state === 'downloading')
+      return <Progressbar progress={downloads[id].progress} action={state} />;
+    if (state === 'uploading')
+      return <Progressbar progress={uploadProgress} action={state} />;
 
     return (
       <Fragment>
-        <p className={styles.expiry}>
-          Expires in x hours
-        </p>
-        <p className={styles.size}>
-          {humanFileSize(size, true)}
-        </p>
+        <p className={styles.expiry}>Expires {moment().to(expiresAt)}</p>
+        <p className={styles.size}>{humanFileSize(size, true)}</p>
       </Fragment>
     );
-  }
+  };
 
   return (
     <div className={styles.row}>
       <div className={styles.top}>
         <div className={styles.info}>
           <i className={fileIcon.icon} style={{ color: fileIcon.color }} />
-          <p className={styles.name}>
-            {filename}
-          </p>
+          <p className={styles.name}>{filename}</p>
         </div>
-        {
-          state === 'default'
-            ? (
-              <div className={styles.actions}>
-                <button
-                  type="button"
-                  className={styles.download}
-                  onClick={() => downloadFile(id, url, filename)}
-                >
-                  <i className="fa fa-download" />
-                </button>
-                <button type="button" className={styles.delete} onClick={handleDelete}>
-                  <i className="fa fa-trash-alt" />
-                </button>
-              </div>
-            )
-            : null
-        }
+        {state === 'default' ? (
+          <div className={styles.actions}>
+            <button
+              type="button"
+              className={styles.download}
+              onClick={() => downloadFile(id, url, filename)}
+            >
+              <i className="fa fa-download" />
+            </button>
+            <button
+              type="button"
+              className={styles.delete}
+              onClick={handleDelete}
+            >
+              <i className="fa fa-trash-alt" />
+            </button>
+          </div>
+        ) : null}
       </div>
-      <div className={styles.bottom}>
-        {renderInfoSection()}
-      </div>
+      <div className={styles.bottom}>{renderInfoSection()}</div>
     </div>
   );
-}
+};
 
 FileRow.propTypes = {
-  filename: string.isRequired,
-  size: number.isRequired,
-  url: string.isRequired,
   downloads: object.isRequired, // eslint-disable-line
   downloadFile: func.isRequired,
+  expiresAt: momentObj.isRequired,
+  filename: string.isRequired,
   id: string.isRequired,
+  index: number.isRequired,
+  removeFile: func.isRequired,
+  size: number.isRequired,
   uploadId: string.isRequired,
   uploadProgress: number.isRequired,
   userId: string.isRequired,
-  removeFile: func.isRequired,
-  index: number.isRequired
+  url: string.isRequired
 };
 
 export default FileRow;
