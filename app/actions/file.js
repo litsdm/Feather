@@ -1,4 +1,5 @@
 // @flow
+import moment from 'moment';
 import callApi from '../helpers/apiCaller';
 
 export const ADD_FILE = 'ADD_FILE';
@@ -20,14 +21,14 @@ export function removeFile(index) {
   return {
     index,
     type: REMOVE_FILE
-  }
+  };
 }
 
 export function updateProgress(progress) {
   return {
     progress,
     type: UPDATE_UPLOAD_PROGRESS
-  }
+  };
 }
 
 export function finishUpload() {
@@ -39,7 +40,7 @@ export function finishUpload() {
 function requestFiles() {
   return {
     type: REQUEST_FILES
-  }
+  };
 }
 
 function receiveFiles(files) {
@@ -47,7 +48,7 @@ function receiveFiles(files) {
     type: RECEIVE_FILES,
     files,
     receivedAt: Date.now()
-  }
+  };
 }
 
 function fetchFiles(userId) {
@@ -55,8 +56,11 @@ function fetchFiles(userId) {
     dispatch(requestFiles());
     return callApi(`${userId}/files`)
       .then(res => res.json())
-      .then(({ files }) => dispatch(receiveFiles(files)))
-  }
+      .then(({ files }) => {
+        dispatch(removeFilesIfExpired(userId, files));
+        return dispatch(receiveFiles(files));
+      });
+  };
 }
 
 function shouldFetchFiles({ file: { files, isFetching } }) {
@@ -72,5 +76,22 @@ export function fetchFilesIfNeeded() {
     if (shouldFetchFiles(state)) {
       return dispatch(fetchFiles(state.user.id));
     }
-  }
+  };
+}
+
+function removeFilesIfExpired(userId, files) {
+  return dispatch => {
+    files.forEach(({ expiresAt, name, _id }, index) => {
+      if (moment().diff(expiresAt) > 0) {
+        callApi(`${userId}/files/${_id}`, {}, 'DELETE');
+        callApi('delete-s3', { filename: name }, 'POST')
+          .then(({ status }) => {
+            if (status !== 200) return Promise.reject();
+
+            return dispatch(removeFile(index));
+          })
+          .catch(() => console.log('error'));
+      }
+    });
+  };
 }

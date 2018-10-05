@@ -4,9 +4,7 @@ import styles from './AppHeader.scss';
 
 const AppHeader = () => (
   <div className={styles.header}>
-    <p className={styles.name}>
-      Tempo Share
-    </p>
+    <p className={styles.name}>Feather</p>
     <div className={styles.rightActions}>
       <Link to="/settings" className={styles.settings}>
         <i className="fa fa-cog" />
