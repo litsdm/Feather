@@ -7,7 +7,7 @@ const initialState = token ? jwtDecode(token) : {};
 const users = (state = initialState, { type, user }) => {
   switch (type) {
     case ADD_USER:
-      return { ...user };
+      return user;
     default:
       return state;
   }
