@@ -21,11 +21,37 @@
   top: 0;
 }
 
+.leftActions {
+  align-items: center;
+  bottom: 0;
+  display: flex;
+  justify-content: center;
+  position: absolute;
+  left: 12px;
+  top: 0;
+}
+
 .settings {
   cursor: pointer;
   outline: none;
 
   i {
     pointer-events: none;
+  }
+}
+
+.quit {
+  background: transparent;
+  border: none;
+  color: #fff;
+  cursor: pointer;
+  font-size: 16px;
+  height: 100%;
+  opacity: 0.75;
+  outline: none;
+  width: 30px;
+
+  &:hover {
+    opacity: 1;
   }
 }

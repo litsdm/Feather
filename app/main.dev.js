@@ -130,6 +130,10 @@ ipcMain.on('show-window', () => {
   showWindow();
 });
 
+ipcMain.on('quitApp', () => {
+  app.quit();
+});
+
 app.on('window-all-closed', () => {
   app.quit();
 });
