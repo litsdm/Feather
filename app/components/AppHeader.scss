@@ -32,6 +32,7 @@
 }
 
 .settings {
+  -webkit-app-region: no-drag;
   cursor: pointer;
   outline: none;
 
@@ -54,4 +55,69 @@
   &:hover {
     opacity: 1;
   }
+}
+
+.dragZone {
+  -webkit-app-region: drag;
+  align-items: center;
+  background-color: #607d8b;
+  display: flex;
+  justify-content: space-between;
+}
+
+.windowsControls {
+  -webkit-app-region: no-drag;
+  font-size: 10px;
+
+  button {
+    background-color: transparent;
+    border: none;
+    color: #fff;
+    cursor: pointer;
+    height: 32px;
+    outline: none;
+    transition: 0.2s ease all;
+    width: 46px;
+
+    span {
+      font-family: 'Segoe UI', sans-serif;
+    }
+
+    &:hover {
+      background-color: rgba(0, 0, 0, 0.1);
+    }
+  }
+}
+
+.close {
+  &:hover {
+    background-color: #f1707a !important;
+  }
+}
+
+.windowsTitle {
+  color: #fff;
+  font-size: 16px;
+  margin-left: 12px;
+
+  i {
+    margin-right: 6px;
+  }
+}
+
+.controls {
+  align-items: center;
+  display: flex;
+}
+
+.otherControls {
+  margin-right: 6px;
+}
+
+.divider {
+  background-color: #fff;
+  height: 18px;
+  margin: 0 6px;
+  opacity: 0.5;
+  width: 1px;
 }

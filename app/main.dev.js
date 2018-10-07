@@ -139,6 +139,19 @@ app.on('window-all-closed', () => {
 });
 
 app.on('ready', async () => {
+  const platformOptions =
+    process.platform === 'darwin'
+      ? {
+          width: 320,
+          height: 560,
+          transparent: true
+        }
+      : {
+          width: 400,
+          height: 560,
+          transparent: false
+        };
+
   if (
     process.env.NODE_ENV === 'development' ||
     process.env.DEBUG_PROD === 'true'
@@ -147,16 +160,14 @@ app.on('ready', async () => {
   }
 
   mainWindow = new BrowserWindow({
-    width: 320,
-    height: 560,
     show: false,
     frame: false,
     fullscreenable: false,
     resizable: false,
-    transparent: true,
     webPreferences: {
       backgroundThrottling: false
-    }
+    },
+    ...platformOptions
   });
 
   mainWindow.loadURL(`file://${__dirname}/app.html`);

@@ -4,6 +4,11 @@
  */
 @import '~@fortawesome/fontawesome-free/css/all.css';
 
+@font-face {
+  font-family: Segoe UI;
+  src: url(assets/fonts/segMDL2.ttf);
+}
+
 body {
   position: relative;
   color: black;
