@@ -1,13 +1,28 @@
 import React from 'react';
-import { func, string } from 'prop-types';
+import { func, string, bool } from 'prop-types';
 import styles from './Auth.scss';
 
 import callApi from '../helpers/apiCaller';
 
-const Login = ({ email, password, setState, displayBanner, addUser, goToHome, fetchFiles }) => {
+import Loader from './Loader';
+
+const Login = ({
+  email,
+  password,
+  setState,
+  displayBanner,
+  addUser,
+  goToHome,
+  fetchFiles,
+  authorizing
+}) => {
   const switchPage = () => setState('isNew', true);
 
   const handleChange = ({ target: { name, value } }) => setState(name, value);
+
+  const handleKeyPress = ({ key }) => {
+    if (key === 'Enter') login();
+  };
 
   const login = () => {
     const payload = {
@@ -24,6 +39,8 @@ const Login = ({ email, password, setState, displayBanner, addUser, goToHome, fe
       return;
     }
 
+    setState('authorizing', true);
+
     callApi('login', payload, 'POST')
       .then(res => res.json())
       .then(({ token, message }) => {
@@ -35,28 +52,54 @@ const Login = ({ email, password, setState, displayBanner, addUser, goToHome, fe
         goToHome();
         return token;
       })
-      .catch(err => displayBanner('error', err));
-  }
+      .catch(err => {
+        const message = typeof err === 'string' ? err : err.message;
+        setState('authorizing', false);
+        displayBanner('error', message);
+      });
+  };
 
   return (
     <div className={styles.container}>
       <label className={styles.inputLabel} htmlFor="emailInput">
         Email
-        <input name="email" type="email" id="emailInput" value={email} onChange={handleChange} />
+        <input
+          name="email"
+          type="email"
+          id="emailInput"
+          value={email}
+          onChange={handleChange}
+          onKeyPress={handleKeyPress}
+        />
       </label>
       <label className={styles.inputLabel} htmlFor="passwordInput">
         Password
-        <input name="password" type="password" id="passwordInput" value={password} onChange={handleChange} />
+        <input
+          name="password"
+          type="password"
+          id="passwordInput"
+          value={password}
+          onChange={handleChange}
+          onKeyPress={handleKeyPress}
+        />
       </label>
-      <button type="button" className={styles.primaryButton} onClick={login}>
-        Login
+      <button
+        type="button"
+        className={styles.primaryButton}
+        onClick={login}
+        disabled={authorizing}
+      >
+        {authorizing ? <Loader small /> : 'Login'}
       </button>
       <span>
-        New to Tempo? <button type="button" className={styles.switch} onClick={switchPage}>Signup</button>
+        New to Tempo?{' '}
+        <button type="button" className={styles.switch} onClick={switchPage}>
+          Signup
+        </button>
       </span>
     </div>
   );
-}
+};
 
 Login.propTypes = {
   email: string.isRequired,
@@ -65,7 +108,8 @@ Login.propTypes = {
   displayBanner: func.isRequired,
   addUser: func.isRequired,
   fetchFiles: func.isRequired,
-  goToHome: func.isRequired
+  goToHome: func.isRequired,
+  authorizing: bool.isRequired
 };
 
 export default Login;

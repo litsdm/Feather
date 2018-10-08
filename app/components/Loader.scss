@@ -5,14 +5,20 @@
   justify-content: center;
 }
 
-.idsEllipsis {
+.idsEllipsis,
+.smallEllipsis {
   display: inline-block;
   position: relative;
   width: 64px;
   height: 64px;
 }
 
-.idsEllipsis div {
+.smallEllipsis {
+  height: 18px !important;
+}
+
+.idsEllipsis div,
+.smallEllipsis div {
   position: absolute;
   top: 27px;
   width: 11px;
@@ -22,19 +28,27 @@
   animation-timing-function: cubic-bezier(0, 1, 1, 0);
 }
 
-.idsEllipsis div:nth-child(1) {
+.smallEllipsis div {
+  top: 4px !important;
+}
+
+.idsEllipsis div:nth-child(1),
+.smallEllipsis div:nth-child(1) {
   left: 6px;
   animation: idsEllipsis1 0.6s infinite;
 }
-.idsEllipsis div:nth-child(2) {
+.idsEllipsis div:nth-child(2),
+.smallEllipsis div:nth-child(2) {
   left: 6px;
   animation: idsEllipsis2 0.6s infinite;
 }
-.idsEllipsis div:nth-child(3) {
+.idsEllipsis div:nth-child(3),
+.smallEllipsis div:nth-child(3) {
   left: 26px;
   animation: idsEllipsis2 0.6s infinite;
 }
-.idsEllipsis div:nth-child(4) {
+.idsEllipsis div:nth-child(4),
+.smallEllipsis div:nth-child(4) {
   left: 45px;
   animation: idsEllipsis3 0.6s infinite;
 }

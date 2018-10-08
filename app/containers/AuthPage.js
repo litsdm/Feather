@@ -18,7 +18,7 @@ const mapDispatchToProps = dispatch => ({
     emit('userConnection', user.id);
     dispatch(addUser(user));
   },
-  fetchFiles: () => dispatch(fetchFilesIfNeeded()),
+  fetchFiles: () => dispatch(fetchFilesIfNeeded())
 });
 
 class AuthPage extends Component {
@@ -27,43 +27,54 @@ class AuthPage extends Component {
     username: '',
     email: '',
     isNew: false,
-    password: ''
+    password: '',
+    authorizing: false
   };
 
   setStateProperty = (property, value) => this.setState({ [property]: value });
 
-  displayBanner = (type, message) => this.setState({ bannerMessage: { type, text: message } });
+  displayBanner = (type, message) =>
+    this.setState({ bannerMessage: { type, text: message } });
 
   setHide = () => this.setState({ bannerMessage: null });
 
   render() {
-    const { username, email, isNew, password, bannerMessage } = this.state;
+    const {
+      username,
+      email,
+      isNew,
+      password,
+      bannerMessage,
+      authorizing
+    } = this.state;
     const { addUserFromToken, fetchFiles, history } = this.props;
     return (
       <Fragment>
         <Banner message={bannerMessage} setHide={this.setHide} time={5000} />
-        {
-          isNew
-            ? <Signup
-              username={username}
-              email={email}
-              password={password}
-              setState={this.setStateProperty}
-              displayBanner={this.displayBanner}
-              addUser={addUserFromToken}
-              fetchFiles={fetchFiles}
-              goToHome={() => history.push('/')}
-            />
-            : <Login
-              email={email}
-              password={password}
-              setState={this.setStateProperty}
-              displayBanner={this.displayBanner}
-              addUser={addUserFromToken}
-              fetchFiles={fetchFiles}
-              goToHome={() => history.push('/')}
-            />
-        }
+        {isNew ? (
+          <Signup
+            username={username}
+            email={email}
+            password={password}
+            setState={this.setStateProperty}
+            displayBanner={this.displayBanner}
+            addUser={addUserFromToken}
+            fetchFiles={fetchFiles}
+            goToHome={() => history.push('/')}
+            authorizing={authorizing}
+          />
+        ) : (
+          <Login
+            email={email}
+            password={password}
+            setState={this.setStateProperty}
+            displayBanner={this.displayBanner}
+            addUser={addUserFromToken}
+            fetchFiles={fetchFiles}
+            goToHome={() => history.push('/')}
+            authorizing={authorizing}
+          />
+        )}
       </Fragment>
     );
   }
@@ -75,4 +86,7 @@ AuthPage.propTypes = {
   history: object.isRequired // eslint-disable-line
 };
 
-export default connect(null, mapDispatchToProps)(AuthPage);
+export default connect(
+  null,
+  mapDispatchToProps
+)(AuthPage);
