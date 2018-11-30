@@ -16,16 +16,16 @@ const Settings = ({
   const handleChange = ({ target: { name, value, type, checked } }) => {
     const newValue = type === 'checkbox' ? checked : value;
     setState({ [name]: newValue });
-  }
+  };
 
   const handleDirectorySelect = ({ target: { name, files } }) => {
     setState({ [name]: files[0].path });
-  }
+  };
 
   const handleClose = () => {
-    // check if download path exists
+    // TODO: check if download path exists
     goToPath('/');
-  }
+  };
 
   return (
     <div className={styles.container}>
@@ -33,9 +33,7 @@ const Settings = ({
         <i className="fa fa-times" />
       </button>
       <div className={styles.section}>
-        <p className={styles.title}>
-          Downloads
-        </p>
+        <p className={styles.title}>Downloads</p>
         <div className={styles.inputWithButton}>
           <label className={styles.inputLabel} htmlFor="dlPathInput">
             Download Path
@@ -61,13 +59,9 @@ const Settings = ({
         </div>
       </div>
       <div className={styles.section}>
-        <p className={styles.title}>
-          Notifications
-        </p>
+        <p className={styles.title}>Notifications</p>
         <div className={styles.switchContainer}>
-          <p>
-            Notify on file download
-          </p>
+          <p>Notify on file download</p>
           <label htmlFor="notifyDownload" className={styles.switch}>
             <input
               id="notifyDownload"
@@ -80,9 +74,7 @@ const Settings = ({
           </label>
         </div>
         <div className={styles.switchContainer}>
-          <p>
-            Notify on file received
-          </p>
+          <p>Notify on file received</p>
           <label htmlFor="notifyReceived" className={styles.switch}>
             <input
               id="notifyReceived"
@@ -95,9 +87,7 @@ const Settings = ({
           </label>
         </div>
         <div className={`${styles.switchContainer} ${styles.last}`}>
-          <p>
-            Notify on file upload
-          </p>
+          <p>Notify on file upload</p>
           <label htmlFor="notifyUpload" className={styles.switch}>
             <input
               id="notifyUpload"
@@ -111,16 +101,15 @@ const Settings = ({
         </div>
       </div>
       <div className={styles.section}>
-        <p className={styles.title}>
-          Account
-        </p>
+        <p className={styles.title}>Account</p>
         <div className={styles.staticField}>
           <i className="fa fa-envelope" />
-          <p>
-            {email}
-          </p>
+          <p>{email}</p>
         </div>
-        <label className={`${styles.inputLabel} ${styles.icon}`} htmlFor="usernameInput">
+        <label
+          className={`${styles.inputLabel} ${styles.icon}`}
+          htmlFor="usernameInput"
+        >
           <i className="fa fa-user" />
           <input
             name="username"
@@ -130,8 +119,16 @@ const Settings = ({
             onChange={handleChange}
           />
         </label>
-        <button type="button" className={styles.logout} onClick={() => { logout(); goToPath('/auth'); }}>
-          <i className="fa fa-sign-out-alt" />Logout
+        <button
+          type="button"
+          className={styles.logout}
+          onClick={() => {
+            logout();
+            goToPath('/auth');
+          }}
+        >
+          <i className="fa fa-sign-out-alt" />
+          Logout
         </button>
       </div>
     </div>

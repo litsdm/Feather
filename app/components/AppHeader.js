@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { Fragment } from 'react';
 import { ipcRenderer, remote } from 'electron';
 import { Link } from 'react-router-dom';
 import styles from './AppHeader.scss';
@@ -14,10 +14,19 @@ const AppHeader = () => {
     win.minimize();
   };
 
-  const renderSettingsLink = () => (
-    <Link to="/settings" className={styles.settings}>
-      <i className="fa fa-cog" />
-    </Link>
+  const renderLinks = () => (
+    <Fragment>
+      <Link
+        to="/friends"
+        className={styles.settings}
+        style={{ marginRight: '12px' }}
+      >
+        <i className="fa fa-users" />
+      </Link>
+      <Link to="/settings" className={styles.settings}>
+        <i className="fa fa-cog" />
+      </Link>
+    </Fragment>
   );
 
   const renderHeader = () => (
@@ -32,7 +41,7 @@ const AppHeader = () => {
         </button>
       </div>
       <p className={styles.name}>Feather</p>
-      <div className={styles.rightActions}>{renderSettingsLink()}</div>
+      <div className={styles.rightActions}>{renderLinks()}</div>
     </div>
   );
 
@@ -46,7 +55,7 @@ const AppHeader = () => {
           Feather
         </p>
         <div className={styles.controls}>
-          <div className={styles.otherControls}>{renderSettingsLink()}</div>
+          <div className={styles.otherControls}>{renderLinks()}</div>
           <div className={styles.divider} />
           <div className={styles.windowsControls}>
             <button type="button" onClick={handleMinimize}>

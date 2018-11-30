@@ -1,14 +1,15 @@
 .header {
   align-items: center;
-  background-color: #607d8b;
+  background-color: #fff;
   display: flex;
-  height: 30px;
+  height: 42px;
   justify-content: center;
   position: relative;
 }
 
 .name {
-  color: white;
+  color: #000;
+  font-weight: 600;
 }
 
 .rightActions {
@@ -33,6 +34,7 @@
 
 .settings {
   -webkit-app-region: no-drag;
+  color: #000;
   cursor: pointer;
   outline: none;
 
@@ -44,7 +46,7 @@
 .quit {
   background: transparent;
   border: none;
-  color: #fff;
+  color: #000;
   cursor: pointer;
   font-size: 16px;
   height: 100%;
@@ -72,7 +74,7 @@
   button {
     background-color: transparent;
     border: none;
-    color: #fff;
+    color: #000;
     cursor: pointer;
     height: 32px;
     outline: none;
@@ -96,7 +98,7 @@
 }
 
 .windowsTitle {
-  color: #fff;
+  color: #000;
   font-size: 16px;
   margin-left: 12px;
 
