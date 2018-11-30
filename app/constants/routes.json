@@ -1,5 +1,6 @@
 {
   "HOME": "/",
   "AUTH": "/auth",
-  "SETTINGS": "/settings"
+  "SETTINGS": "/settings",
+  "FRIENDS": "/friends"
 }

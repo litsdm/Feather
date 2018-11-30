@@ -6,6 +6,7 @@ import App from './containers/App';
 import HomePage from './containers/HomePage';
 import AuthPage from './containers/AuthPage';
 import SettingsPage from './containers/SettingsPage';
+import FriendsPage from './containers/FriendsPage';
 
 export default () => (
   <App>
@@ -13,6 +14,7 @@ export default () => (
       <Route path={routes.HOME} component={HomePage} exact />
       <Route path={routes.AUTH} component={AuthPage} />
       <Route path={routes.SETTINGS} component={SettingsPage} />
+      <Route path={routes.FRIENDS} component={FriendsPage} />
     </Switch>
   </App>
 );
