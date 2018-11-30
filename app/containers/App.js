@@ -11,7 +11,7 @@ import notify from '../helpers/notifications';
 import { fetchFilesIfNeeded, addFile, removeFile } from '../actions/file';
 import { finishDownload, updateDownloadProgress } from '../actions/download';
 
-import AppHeader from '../components/AppHeader';
+import NavBar from '../components/NavBar';
 
 const mapDispatchToProps = dispatch => ({
   fetchFiles: () => dispatch(fetchFilesIfNeeded()),
@@ -101,11 +101,14 @@ class App extends React.Component {
   render() {
     const {
       children,
-      location: { pathname }
+      location: { pathname },
+      history
     } = this.props;
     return (
       <React.Fragment>
-        {pathname === '/' ? <AppHeader /> : null}
+        {pathname !== '/settings' && pathname !== '/auth' ? (
+          <NavBar pathname={pathname} history={history} />
+        ) : null}
         {children}
       </React.Fragment>
     );
