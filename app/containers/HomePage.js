@@ -1,31 +1,41 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import { arrayOf, bool, func, number, string, object } from 'prop-types';
-import { fileType } from '../propTypes';
+import { fileShape } from '../shapes';
 
 import Home from '../components/Home';
 
-import { addFile, finishUpload, updateProgress, removeFile } from '../actions/file';
+import {
+  addFile,
+  finishUpload,
+  updateProgress,
+  removeFile
+} from '../actions/file';
 import { downloadFile } from '../actions/download';
+import { awaitSendForFiles } from '../actions/upload';
 
-const mapStateToProps = ({ file: { isUploading, files, isFetching, uploadId, progress }, user, downloads }) => (
-  {
-    isUploading,
-    files,
-    userId: user.id,
-    isFetching,
-    downloads,
-    uploadId,
-    uploadProgress: progress
-  }
-);
+const mapStateToProps = ({
+  file: { isUploading, files, isFetching, uploadId, progress },
+  user,
+  downloads
+}) => ({
+  isUploading,
+  files,
+  userId: user.id,
+  isFetching,
+  downloads,
+  uploadId,
+  uploadProgress: progress
+});
 
 const mapDispatchToProps = dispatch => ({
   dUpdateProgress: progress => dispatch(updateProgress(progress)),
   dAddFile: (file, upload) => dispatch(addFile(file, upload)),
   dFinishUpload: () => dispatch(finishUpload()),
-  dDownloadFile: (fileId, url, filename) => dispatch(downloadFile(fileId, url, filename)),
-  dRemoveFile: index => dispatch(removeFile(index))
+  dDownloadFile: (fileId, url, filename) =>
+    dispatch(downloadFile(fileId, url, filename)),
+  dRemoveFile: index => dispatch(removeFile(index)),
+  dAwaitSendForFiles: files => dispatch(awaitSendForFiles(files))
 });
 
 const HomePage = ({
@@ -40,8 +50,9 @@ const HomePage = ({
   downloads,
   uploadId,
   uploadProgress,
-  dRemoveFile
-}) =>
+  dRemoveFile,
+  dAwaitSendForFiles
+}) => (
   <Home
     isUploading={isUploading}
     addFile={dAddFile}
@@ -55,21 +66,27 @@ const HomePage = ({
     uploadId={uploadId}
     uploadProgress={uploadProgress}
     removeFile={dRemoveFile}
+    awaitSendForFiles={dAwaitSendForFiles}
   />
+);
 
 HomePage.propTypes = {
   isUploading: bool.isRequired,
   dAddFile: func.isRequired,
   dFinishUpload: func.isRequired,
   dUpdateProgress: func.isRequired,
-  files: arrayOf(fileType).isRequired,
+  files: arrayOf(fileShape).isRequired,
   userId: string.isRequired,
   isFetching: bool.isRequired,
   dDownloadFile: func.isRequired,
   downloads: object.isRequired, // eslint-disable-line react/forbid-prop-types
   uploadId: string.isRequired,
   uploadProgress: number.isRequired,
-  dRemoveFile: func.isRequired
+  dRemoveFile: func.isRequired,
+  dAwaitSendForFiles: func.isRequired
 };
 
-export default connect(mapStateToProps, mapDispatchToProps)(HomePage);
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(HomePage);

@@ -1,6 +1,6 @@
 import React from 'react';
 import { arrayOf, bool, func, number, string, object } from 'prop-types';
-import { fileType } from '../propTypes';
+import { fileShape } from '../shapes';
 import styles from './Home.scss';
 
 import DragBox from './DragBox';
@@ -19,7 +19,8 @@ const Home = ({
   downloads,
   uploadId,
   uploadProgress,
-  removeFile
+  removeFile,
+  awaitSendForFiles
 }) => (
   <div className={styles.container}>
     <DragBox
@@ -28,20 +29,21 @@ const Home = ({
       updateProgress={updateProgress}
       finishUpload={finishUpload}
       userId={userId}
+      awaitSendForFiles={awaitSendForFiles}
     />
-    {
-      isFetching
-        ? <Loader />
-        : <FileList
-          files={files}
-          downloadFile={downloadFile}
-          downloads={downloads}
-          uploadId={uploadId}
-          uploadProgress={uploadProgress}
-          removeFile={removeFile}
-          userId={userId}
-        />
-    }
+    {isFetching ? (
+      <Loader />
+    ) : (
+      <FileList
+        files={files}
+        downloadFile={downloadFile}
+        downloads={downloads}
+        uploadId={uploadId}
+        uploadProgress={uploadProgress}
+        removeFile={removeFile}
+        userId={userId}
+      />
+    )}
   </div>
 );
 
@@ -50,14 +52,15 @@ Home.propTypes = {
   addFile: func.isRequired,
   finishUpload: func.isRequired,
   updateProgress: func.isRequired,
-  files: arrayOf(fileType).isRequired,
+  files: arrayOf(fileShape).isRequired,
   userId: string.isRequired,
   isFetching: bool.isRequired,
   downloadFile: func.isRequired,
   downloads: object.isRequired, // eslint-disable-line react/forbid-prop-types
   uploadId: string.isRequired,
   uploadProgress: number.isRequired,
-  removeFile: func.isRequired
+  removeFile: func.isRequired,
+  awaitSendForFiles: func.isRequired
 };
 
 export default Home;

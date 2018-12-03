@@ -2,7 +2,7 @@ import React from 'react';
 import uuid from 'uuid/v4';
 import moment from 'moment';
 import { arrayOf, func, number, object, string } from 'prop-types';
-import { fileType } from '../propTypes';
+import { fileShape } from '../shapes';
 import styles from './FileList.scss';
 
 import FileRow from './FileRow';
@@ -57,7 +57,7 @@ const FileList = ({
 FileList.propTypes = {
   downloadFile: func.isRequired,
   downloads: object.isRequired, // eslint-disable-line react/forbid-prop-types
-  files: arrayOf(fileType).isRequired,
+  files: arrayOf(fileShape).isRequired,
   uploadId: string.isRequired,
   uploadProgress: number.isRequired,
   userId: string.isRequired,

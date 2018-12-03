@@ -3,8 +3,8 @@ import moment from 'moment';
 import callApi from '../helpers/apiCaller';
 
 export const ADD_FILE = 'ADD_FILE';
-export const FINISH_UPLOAD = 'FINISH_UPLOAD';
-export const UPDATE_UPLOAD_PROGRESS = 'UPDATE_UPLOAD_PROGRESS';
+export const FINISH_PERSONAL_UPLOAD = 'FINISH_PERSONAL_UPLOAD';
+export const UPDATE_PU_PROGRESS = 'UPDATE_PU_PROGRESS';
 export const REQUEST_FILES = 'REQUEST_FILES';
 export const RECEIVE_FILES = 'RECEIVE_FILES';
 export const REMOVE_FILE = 'REMOVE_FILE';
@@ -27,13 +27,13 @@ export function removeFile(index) {
 export function updateProgress(progress) {
   return {
     progress,
-    type: UPDATE_UPLOAD_PROGRESS
+    type: UPDATE_PU_PROGRESS
   };
 }
 
 export function finishUpload() {
   return {
-    type: FINISH_UPLOAD
+    type: FINISH_PERSONAL_UPLOAD
   };
 }
 

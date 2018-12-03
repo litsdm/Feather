@@ -24,8 +24,16 @@ const Friends = () => (
         </div>
         <p className={styles.addText}>Add Friend</p>
       </button>
-      <FriendRow name="Juan Pablo" placeholderColor="#4CAF50" />
-      <FriendRow name="Kenny Lugo" placeholderColor="#03A9F4" />
+      <FriendRow
+        _id="43534598792834"
+        name="Juan Pablo"
+        placeholderColor="#4CAF50"
+      />
+      <FriendRow
+        _id="55897692023940"
+        name="Kenny Lugo"
+        placeholderColor="#03A9F4"
+      />
     </div>
   </div>
 );

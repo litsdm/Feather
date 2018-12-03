@@ -88,7 +88,7 @@ const getWindowPosition = () => {
   );
 
   // Position window 4 pixels vertically below the tray icon
-  const y = Math.round(trayBounds.y + trayBounds.height + 4);
+  const y = Math.round(trayBounds.y + trayBounds.height + 6);
 
   return { x, y };
 };
