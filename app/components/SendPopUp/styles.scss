@@ -31,7 +31,16 @@
 }
 
 .send {
-  color: #2091f3;
+  color: #000;
+  cursor: auto;
+  opacity: 0.5;
+  transition: 0.2s ease all;
+
+  &.active {
+    color: #2091f3;
+    cursor: pointer;
+    opacity: 1;
+  }
 }
 
 .selectedFriends {

@@ -22,6 +22,10 @@
 
 .name {
   margin-left: 12px;
+  max-width: 210px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .download,

@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import uuid from 'uuid/v4';
-import { arrayOf, bool, func } from 'prop-types';
+import { arrayOf, bool, func, string } from 'prop-types';
 import { userShape } from '../../shapes';
 import styles from './styles.scss';
 
@@ -23,6 +23,26 @@ class SendPopUp extends Component {
       if (firstElement._id === friendId) return i;
       if (lastElement._id === friendId) return j;
     }
+  };
+
+  handleSend = () => {
+    const { receivers } = this.state;
+    const { userId, uploadFiles } = this.props;
+
+    const send = {
+      to: receivers,
+      from: userId
+    };
+
+    uploadFiles(send);
+
+    this.setState({ receivers: [], selectedIndeces: {} });
+  };
+
+  handleBack = () => {
+    const { stopWaiting } = this.props;
+    stopWaiting();
+    this.setState({ receivers: [], selectedIndeces: {} });
   };
 
   handleAdd = index => () => {
@@ -89,16 +109,26 @@ class SendPopUp extends Component {
 
   render() {
     const { receivers } = this.state;
-    const { display, stopWaiting } = this.props;
+    const { display } = this.props;
+    const sendActive = receivers.length > 0;
 
     return (
       <div className={`${styles.popUp} ${display ? styles.active : ''}`}>
         <div className={styles.header}>
-          <button type="button" className={styles.back} onClick={stopWaiting}>
+          <button
+            type="button"
+            className={styles.back}
+            onClick={this.handleBack}
+          >
             <i className="fa fa-arrow-left" />
           </button>
           <p className={styles.title}>Send To</p>
-          <button type="button" className={styles.send}>
+          <button
+            type="button"
+            className={`${styles.send} ${sendActive ? styles.active : ''}`}
+            disabled={!sendActive}
+            onClick={this.handleSend}
+          >
             <i className="far fa-paper-plane" />
           </button>
         </div>
@@ -116,7 +146,9 @@ class SendPopUp extends Component {
 SendPopUp.propTypes = {
   display: bool,
   stopWaiting: func.isRequired,
-  friends: arrayOf(userShape).isRequired
+  friends: arrayOf(userShape).isRequired,
+  userId: string.isRequired,
+  uploadFiles: func.isRequired
 };
 
 SendPopUp.defaultProps = {

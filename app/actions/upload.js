@@ -41,7 +41,7 @@ const handleFinish = () => (dispatch, getState) => {
     upload: { queue }
   } = getState();
   dispatch(finishUpload());
-  if (queue.length > 0) dispatch(uploadFromQueue(dispatch, queue));
+  if (queue.length > 0) dispatch(uploadFromQueue());
 };
 
 const updateProgress = progress => ({
@@ -49,14 +49,17 @@ const updateProgress = progress => ({
   type: UPDATE_UPLOAD_PROGRESS
 });
 
-const uploadFromQueue = (dispatch, queue) => {
+const uploadFromQueue = () => (dispatch, getState) => {
+  const {
+    upload: { queue }
+  } = getState();
   const rawFile = queue[0];
   const file = {
     name: rawFile.name,
     size: rawFile.size,
     s3Url: '',
-    sender: rawFile.send.from,
-    receivers: rawFile.send.to,
+    from: rawFile.send.from,
+    to: rawFile.send.to,
     type: rawFile.type.replace('+', '%2B')
   };
   let signedReq;
@@ -76,7 +79,7 @@ const uploadFromQueue = (dispatch, queue) => {
       uploadFile(rawFile, signedReq, updateProgress, () => {
         const localConfig = JSON.parse(localStorage.getItem('localConfig'));
 
-        file.receivers.forEach(receiver =>
+        file.to.forEach(receiver =>
           emit('sendFile', { roomId: receiver, file: dbFile })
         );
 
@@ -99,13 +102,15 @@ const uploadFromQueue = (dispatch, queue) => {
 export function addFilesToQueue(files, send) {
   return (dispatch, getState) => {
     const {
-      upload: { isUploading, queue }
+      upload: { isUploading }
     } = getState();
     files.forEach(rawFile => {
       const reader = new FileReader();
       reader.onload = () => {
-        dispatch(addFileToQueue({ ...rawFile, send }));
-        if (!isUploading) dispatch(uploadFromQueue(dispatch, queue, send));
+        const loadedFile = rawFile;
+        loadedFile.send = send;
+        dispatch(addFileToQueue(loadedFile));
+        if (!isUploading) dispatch(uploadFromQueue());
       };
       reader.onabort = () => console.log('file reading was aborted');
       reader.onerror = () => console.log('file reading has failed');

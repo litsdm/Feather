@@ -3,7 +3,7 @@ import { ipcRenderer } from 'electron';
 import { connect } from 'react-redux';
 import { withRouter } from 'react-router';
 import jwtDecode from 'jwt-decode';
-import { arrayOf, bool, func, object, node } from 'prop-types';
+import { arrayOf, bool, func, object, node, string } from 'prop-types';
 import { userShape, friendRequestShape } from '../shapes';
 import socket, { emit } from '../socketClient';
 
@@ -43,7 +43,7 @@ const mapDispatchToProps = dispatch => ({
   dAddFile: file => dispatch(addFile(file)),
   dRemoveFile: index => dispatch(removeFile(index)),
   dStopWaiting: () => dispatch(stopWaiting()),
-  dUploadWithSend: send => dispatch(uploadWithSend(send)),
+  uploadFiles: send => dispatch(uploadWithSend(send)),
   addReceivedFriendRequest: friendRequest =>
     dispatch(addFriendRequest(friendRequest))
 });
@@ -143,9 +143,10 @@ class App extends React.Component {
       history,
       isWaiting,
       dStopWaiting,
-      dUploadWithSend,
+      uploadFiles,
       friends,
-      friendRequests
+      friendRequests,
+      userId
     } = this.props;
     return (
       <React.Fragment>
@@ -160,7 +161,8 @@ class App extends React.Component {
         <SendPopUp
           display={isWaiting}
           stopWaiting={dStopWaiting}
-          uploadWithSend={dUploadWithSend}
+          uploadFiles={uploadFiles}
+          userId={userId}
           friends={friends}
         />
       </React.Fragment>
@@ -179,17 +181,19 @@ App.propTypes = {
   dRemoveFile: func.isRequired,
   isWaiting: bool.isRequired,
   dStopWaiting: func.isRequired,
-  dUploadWithSend: func.isRequired,
+  uploadFiles: func.isRequired,
   fetchFriends: func.isRequired,
   fetchFriendRequests: func.isRequired,
   addReceivedFriendRequest: func.isRequired,
   friends: arrayOf(userShape),
-  friendRequests: arrayOf(friendRequestShape)
+  friendRequests: arrayOf(friendRequestShape),
+  userId: string
 };
 
 App.defaultProps = {
   friends: [],
-  friendRequests: []
+  friendRequests: [],
+  userId: ''
 };
 
 export default withRouter(
