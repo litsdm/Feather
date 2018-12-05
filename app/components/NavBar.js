@@ -1,10 +1,10 @@
 import React, { Fragment } from 'react';
 import { ipcRenderer, remote } from 'electron';
 import { Link } from 'react-router-dom';
-import { string, object } from 'prop-types';
+import { bool, string, object } from 'prop-types';
 import styles from './NavBar.scss';
 
-const NavBar = ({ pathname, history }) => {
+const NavBar = ({ pathname, history, requestIndicator }) => {
   const handleClose = () => {
     const win = remote.getCurrentWindow();
     win.close();
@@ -39,8 +39,9 @@ const NavBar = ({ pathname, history }) => {
       <Link
         to="/friends"
         className={styles.settings}
-        style={{ marginRight: '12px' }}
+        style={{ marginRight: '12px', position: 'relative' }}
       >
+        {requestIndicator ? <div className={styles.indicator} /> : null}
         <i className="fa fa-users" />
       </Link>
       <Link to="/settings" className={styles.settings}>
@@ -106,6 +107,7 @@ const NavBar = ({ pathname, history }) => {
 
 NavBar.propTypes = {
   pathname: string.isRequired,
+  requestIndicator: bool.isRequired,
   history: object.isRequired // eslint-disable-line react/forbid-prop-types
 };
 

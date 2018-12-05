@@ -4,7 +4,7 @@ import { connect } from 'react-redux';
 import { withRouter } from 'react-router';
 import jwtDecode from 'jwt-decode';
 import { arrayOf, bool, func, object, node } from 'prop-types';
-import { userShape } from '../shapes';
+import { userShape, friendRequestShape } from '../shapes';
 import socket, { emit } from '../socketClient';
 
 import notify from '../helpers/notifications';
@@ -21,11 +21,13 @@ import SendPopUp from '../components/SendPopUp';
 const mapStateToProps = ({
   upload: { isWaiting },
   user,
-  friend: { friends }
+  friend: { friends },
+  friendRequest: { friendRequests }
 }) => ({
   isWaiting,
   userId: user.id,
-  friends
+  friends,
+  friendRequests
 });
 
 const mapDispatchToProps = dispatch => ({
@@ -129,12 +131,17 @@ class App extends React.Component {
       isWaiting,
       dStopWaiting,
       dUploadWithSend,
-      friends
+      friends,
+      friendRequests
     } = this.props;
     return (
       <React.Fragment>
         {pathname !== '/settings' && pathname !== '/auth' ? (
-          <NavBar pathname={pathname} history={history} />
+          <NavBar
+            pathname={pathname}
+            history={history}
+            requestIndicator={friendRequests.length > 0}
+          />
         ) : null}
         {children}
         <SendPopUp
@@ -162,11 +169,13 @@ App.propTypes = {
   dUploadWithSend: func.isRequired,
   fetchFriends: func.isRequired,
   fetchFriendRequests: func.isRequired,
-  friends: arrayOf(userShape)
+  friends: arrayOf(userShape),
+  friendRequests: arrayOf(friendRequestShape)
 };
 
 App.defaultProps = {
-  friends: []
+  friends: [],
+  friendRequests: []
 };
 
 export default withRouter(
