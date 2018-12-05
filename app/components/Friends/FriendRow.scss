@@ -4,6 +4,7 @@
   border: none;
   cursor: pointer;
   display: flex;
+  justify-content: space-between;
   outline: none;
   padding: 12px;
 
@@ -44,4 +45,38 @@
 
 .fileInput {
   display: none;
+}
+
+.reject,
+.accept {
+  background-color: transparent;
+  border: none;
+  border-radius: 50%;
+  cursor: pointer;
+  margin-right: 12px;
+  opacity: 0.7;
+  outline: none;
+  transition: 0.2s ease all;
+
+  &:hover {
+    opacity: 1;
+  }
+}
+
+.reject {
+  color: #f44336;
+  padding: 6px 8px;
+
+  &:hover {
+    background-color: rgba(244, 67, 54, 0.2);
+  }
+}
+
+.accept {
+  color: #4caf50;
+  padding: 6px 7px;
+
+  &:hover {
+    background-color: rgba(76, 175, 80, 0.2);
+  }
 }

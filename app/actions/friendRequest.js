@@ -37,7 +37,7 @@ function receiveFriendRequests(friendRequests) {
 function fetchFriendRequests(userId) {
   return dispatch => {
     dispatch(requestFriendRequests());
-    return callApi(`friendRequests/${userId}`)
+    return callApi(`friendRequest/${userId}`)
       .then(res => res.json())
       .then(({ friendRequests }) =>
         dispatch(receiveFriendRequests(friendRequests))

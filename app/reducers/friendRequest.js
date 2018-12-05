@@ -18,7 +18,7 @@ export default function counter(
     case ADD_FRIEND_REQUEST:
       return {
         ...state,
-        friendRequests: [...friendRequests, friendRequest]
+        friendRequests: [...state.friendRequests, friendRequest]
       };
 
     case REQUEST_FRIEND_REQUESTS:

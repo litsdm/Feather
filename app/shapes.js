@@ -13,7 +13,16 @@ export const historyShape = shape({
 });
 
 export const userShape = shape({
+  _id: string,
   email: string,
   password: string,
-  username: string
+  username: string,
+  placeholderColor: string
+});
+
+export const friendRequestShape = shape({
+  createdAt: string,
+  updatedAt: string,
+  from: userShape,
+  to: string
 });

@@ -18,7 +18,7 @@ export default function counter(
     case ADD_FRIEND:
       return {
         ...state,
-        friends: [...friends, friend]
+        friends: [...state.friends, friend]
       };
 
     case REQUEST_FRIENDS:

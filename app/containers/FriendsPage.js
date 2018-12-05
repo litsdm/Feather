@@ -1,15 +1,30 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import { arrayOf, string } from 'prop-types';
-import { userShape } from '../shapes';
+import { arrayOf, bool, func, string } from 'prop-types';
+import { userShape, friendRequestShape } from '../shapes';
 
 import callApi from '../helpers/apiCaller';
+import { addFriend } from '../actions/friend';
+import { removeFriendRequest } from '../actions/friendRequest';
 
 import Friends from '../components/Friends';
+import Loader from '../components/Loader';
 
-const mapStateToProps = ({ user: { id }, friend: { friends } }) => ({
+const mapStateToProps = ({
+  user: { id },
+  friend: { friends, isFetching },
+  friendRequest
+}) => ({
   userId: id,
-  friends
+  friends,
+  isFriendFetching: isFetching,
+  friendRequests: friendRequest.friendRequests,
+  isFriendRequestFetching: friendRequest.isFetching
+});
+
+const mapDispatchToProps = dispatch => ({
+  removeRequest: index => dispatch(removeFriendRequest(index)),
+  addAcceptedFriend: friend => dispatch(addFriend(friend))
 });
 
 class FriendsPage extends Component {
@@ -25,6 +40,24 @@ class FriendsPage extends Component {
     const element = document.getElementById('addFriendModal');
     if (!element) return;
     element.style.display = 'flex';
+  };
+
+  resolveRequest = (_id, index, type) => () => {
+    const { removeRequest, friendRequests, addAcceptedFriend } = this.props;
+    const { from: friend } = friendRequests[index];
+    callApi(`friendRequest/${_id}/${type}`, {}, 'DELETE')
+      .then(({ status }) => {
+        if (status !== 200)
+          return Promise.reject(
+            new Error(
+              'Looks like something went wrong. Please double check your internet connection.'
+            )
+          );
+        if (type === 'accept') addAcceptedFriend(friend);
+        removeRequest(index);
+        return Promise.resolve();
+      })
+      .catch(err => console.error(err));
   };
 
   sendRequest = () => {
@@ -52,8 +85,15 @@ class FriendsPage extends Component {
 
   render() {
     const { friendTag, requestMessage } = this.state;
-    const { friends } = this.props;
-    return (
+    const {
+      friends,
+      friendRequests,
+      isFriendFetching,
+      isFriendRequestFetching
+    } = this.props;
+    return isFriendFetching || isFriendRequestFetching ? (
+      <Loader />
+    ) : (
       <Friends
         friendTag={friendTag}
         handleChange={this.handleChange}
@@ -61,6 +101,8 @@ class FriendsPage extends Component {
         sendRequest={this.sendRequest}
         requestMessage={requestMessage}
         friends={friends}
+        friendRequests={friendRequests}
+        resolveRequest={this.resolveRequest}
       />
     );
   }
@@ -68,15 +110,21 @@ class FriendsPage extends Component {
 
 FriendsPage.propTypes = {
   userId: string,
-  friends: arrayOf(userShape)
+  friends: arrayOf(userShape),
+  friendRequests: arrayOf(friendRequestShape),
+  isFriendFetching: bool.isRequired,
+  isFriendRequestFetching: bool.isRequired,
+  removeRequest: func.isRequired,
+  addAcceptedFriend: func.isRequired
 };
 
 FriendsPage.defaultProps = {
   userId: '',
-  friends: []
+  friends: [],
+  friendRequests: []
 };
 
 export default connect(
   mapStateToProps,
-  null
+  mapDispatchToProps
 )(FriendsPage);
