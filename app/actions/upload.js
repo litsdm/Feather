@@ -104,13 +104,17 @@ export function addFilesToQueue(files, send) {
     const {
       upload: { isUploading }
     } = getState();
+    let uploadFlag = false;
     files.forEach(rawFile => {
       const reader = new FileReader();
       reader.onload = () => {
         const loadedFile = rawFile;
         loadedFile.send = send;
         dispatch(addFileToQueue(loadedFile));
-        if (!isUploading) dispatch(uploadFromQueue());
+        if (!isUploading && !uploadFlag) {
+          dispatch(uploadFromQueue());
+          uploadFlag = true;
+        }
       };
       reader.onabort = () => console.log('file reading was aborted');
       reader.onerror = () => console.log('file reading has failed');
