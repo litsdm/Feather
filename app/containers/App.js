@@ -13,7 +13,10 @@ import { fetchFilesIfNeeded, addFile, removeFile } from '../actions/file';
 import { finishDownload, updateDownloadProgress } from '../actions/download';
 import { stopWaiting, uploadWithSend } from '../actions/upload';
 import { fetchFriendsIfNeeded } from '../actions/friend';
-import { fetchFriendRequestsIfNeeded } from '../actions/friendRequest';
+import {
+  fetchFriendRequestsIfNeeded,
+  addFriendRequest
+} from '../actions/friendRequest';
 
 import NavBar from '../components/NavBar';
 import SendPopUp from '../components/SendPopUp';
@@ -40,7 +43,9 @@ const mapDispatchToProps = dispatch => ({
   dAddFile: file => dispatch(addFile(file)),
   dRemoveFile: index => dispatch(removeFile(index)),
   dStopWaiting: () => dispatch(stopWaiting()),
-  dUploadWithSend: send => dispatch(uploadWithSend(send))
+  dUploadWithSend: send => dispatch(uploadWithSend(send)),
+  addReceivedFriendRequest: friendRequest =>
+    dispatch(addFriendRequest(friendRequest))
 });
 
 class App extends React.Component {
@@ -84,7 +89,7 @@ class App extends React.Component {
   }
 
   setupListeners = () => {
-    const { dAddFile, dRemoveFile } = this.props;
+    const { dAddFile, dRemoveFile, addReceivedFriendRequest } = this.props;
     const localConfig = JSON.parse(localStorage.getItem('localConfig'));
 
     ipcRenderer.on('download-progress', this.handleDownloadProgress);
@@ -101,6 +106,14 @@ class App extends React.Component {
     });
     socket.on('removeFile', index => {
       dRemoveFile(index);
+    });
+    socket.on('receiveFriendRequest', friendRequest => {
+      addReceivedFriendRequest(friendRequest);
+
+      notify({
+        title: `${friendRequest.from.username} sent a friend request!`,
+        body: 'You can see this request on your friends page.'
+      });
     });
   };
 
@@ -169,6 +182,7 @@ App.propTypes = {
   dUploadWithSend: func.isRequired,
   fetchFriends: func.isRequired,
   fetchFriendRequests: func.isRequired,
+  addReceivedFriendRequest: func.isRequired,
   friends: arrayOf(userShape),
   friendRequests: arrayOf(friendRequestShape)
 };

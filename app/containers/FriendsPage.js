@@ -1,9 +1,10 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import { arrayOf, bool, func, string } from 'prop-types';
+import { arrayOf, bool, func } from 'prop-types';
 import { userShape, friendRequestShape } from '../shapes';
 
 import callApi from '../helpers/apiCaller';
+import { emit } from '../socketClient';
 import { addFriend } from '../actions/friend';
 import { removeFriendRequest } from '../actions/friendRequest';
 
@@ -11,11 +12,11 @@ import Friends from '../components/Friends';
 import Loader from '../components/Loader';
 
 const mapStateToProps = ({
-  user: { id },
+  user,
   friend: { friends, isFetching },
   friendRequest
 }) => ({
-  userId: id,
+  user,
   friends,
   isFriendFetching: isFetching,
   friendRequests: friendRequest.friendRequests,
@@ -62,14 +63,26 @@ class FriendsPage extends Component {
 
   sendRequest = () => {
     const { friendTag } = this.state;
-    const { userId } = this.props;
+    const { user } = this.props;
 
     this.setState({ requestMessage: null });
 
-    callApi('friendRequest', { tag: friendTag, from: userId }, 'POST')
+    callApi('friendRequest', { tag: friendTag, from: user.id }, 'POST')
       .then(res => res.json())
-      .then(({ message }) => {
+      .then(({ friendRequest, message }) => {
         if (message) return Promise.reject(message);
+
+        const formatRequest = {
+          ...friendRequest,
+          from: {
+            _id: user.id,
+            username: user.username,
+            placeholderColor: user.placeholderColor
+          }
+        };
+
+        emit('sendRequest', formatRequest);
+
         this.setState({
           requestMessage: {
             text: 'Your friend request is on the way!',
@@ -109,7 +122,7 @@ class FriendsPage extends Component {
 }
 
 FriendsPage.propTypes = {
-  userId: string,
+  user: userShape,
   friends: arrayOf(userShape),
   friendRequests: arrayOf(friendRequestShape),
   isFriendFetching: bool.isRequired,
@@ -119,7 +132,7 @@ FriendsPage.propTypes = {
 };
 
 FriendsPage.defaultProps = {
-  userId: '',
+  user: {},
   friends: [],
   friendRequests: []
 };
