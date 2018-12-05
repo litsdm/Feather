@@ -1,5 +1,7 @@
 import React from 'react';
-import { func, string, shape } from 'prop-types';
+import uuid from 'uuid/v4';
+import { arrayOf, func, string, shape } from 'prop-types';
+import { userShape } from '../../shapes';
 import styles from './styles.scss';
 import rowStyles from './FriendRow.scss';
 
@@ -11,46 +13,50 @@ const Friends = ({
   handleChange,
   openModal,
   requestMessage,
-  sendRequest
-}) => (
-  <div className={styles.friends}>
-    <div className={styles.searchWrapper}>
-      <label htmlFor="searchInput" className={styles.searchLabel}>
-        <i className="fa fa-search" />
-        <input
-          id="searchInput"
-          name="search"
-          type="text"
-          placeholder="Search for friends"
-        />
-      </label>
-    </div>
-    <div className={styles.list}>
-      <button type="button" className={rowStyles.row} onClick={openModal}>
-        <div className={styles.addIcon}>
-          <i className="fa fa-user-plus" />
-        </div>
-        <p className={styles.addText}>Add Friend</p>
-      </button>
+  sendRequest,
+  friends
+}) => {
+  const renderFriends = () =>
+    friends.map(({ _id, username, placeholderColor }) => (
       <FriendRow
-        _id="43534598792834"
-        name="Juan Pablo"
-        placeholderColor="#4CAF50"
+        key={uuid()}
+        _id={_id}
+        username={username}
+        placeholderColor={placeholderColor}
       />
-      <FriendRow
-        _id="55897692023940"
-        name="Kenny Lugo"
-        placeholderColor="#03A9F4"
+    ));
+
+  return (
+    <div className={styles.friends}>
+      <div className={styles.searchWrapper}>
+        <label htmlFor="searchInput" className={styles.searchLabel}>
+          <i className="fa fa-search" />
+          <input
+            id="searchInput"
+            name="search"
+            type="text"
+            placeholder="Search for friends"
+          />
+        </label>
+      </div>
+      <div className={styles.list}>
+        <button type="button" className={rowStyles.row} onClick={openModal}>
+          <div className={styles.addIcon}>
+            <i className="fa fa-user-plus" />
+          </div>
+          <p className={styles.addText}>Add Friend</p>
+        </button>
+        {renderFriends()}
+      </div>
+      <AddFriendModal
+        friendTag={friendTag}
+        handleChange={handleChange}
+        sendRequest={sendRequest}
+        requestMessage={requestMessage}
       />
     </div>
-    <AddFriendModal
-      friendTag={friendTag}
-      handleChange={handleChange}
-      sendRequest={sendRequest}
-      requestMessage={requestMessage}
-    />
-  </div>
-);
+  );
+};
 
 Friends.propTypes = {
   friendTag: string.isRequired,
@@ -60,11 +66,13 @@ Friends.propTypes = {
   requestMessage: shape({
     text: string,
     type: string
-  })
+  }),
+  friends: arrayOf(userShape)
 };
 
 Friends.defaultProps = {
-  requestMessage: null
+  requestMessage: null,
+  friends: []
 };
 
 export default Friends;

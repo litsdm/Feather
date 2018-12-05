@@ -1,9 +1,10 @@
 import * as React from 'react';
 import { ipcRenderer } from 'electron';
-import { bool, func, object, node } from 'prop-types';
 import { connect } from 'react-redux';
 import { withRouter } from 'react-router';
 import jwtDecode from 'jwt-decode';
+import { arrayOf, bool, func, object, node } from 'prop-types';
+import { userShape } from '../shapes';
 import socket, { emit } from '../socketClient';
 
 import notify from '../helpers/notifications';
@@ -11,35 +12,26 @@ import notify from '../helpers/notifications';
 import { fetchFilesIfNeeded, addFile, removeFile } from '../actions/file';
 import { finishDownload, updateDownloadProgress } from '../actions/download';
 import { stopWaiting, uploadWithSend } from '../actions/upload';
+import { fetchFriendsIfNeeded } from '../actions/friend';
+import { fetchFriendRequestsIfNeeded } from '../actions/friendRequest';
 
 import NavBar from '../components/NavBar';
 import SendPopUp from '../components/SendPopUp';
 
-const tempFriends = [
-  {
-    _id: '1',
-    name: 'Carlos Diez',
-    placeholderColor: '#FF5252'
-  },
-  {
-    _id: '2',
-    name: 'Pamela Aridjis',
-    placeholderColor: '#FFC107'
-  },
-  {
-    _id: '3',
-    name: 'Mikeldi Moran',
-    placeholderColor: '#607D8B'
-  }
-];
-
-const mapStateToProps = ({ upload: { isWaiting }, user }) => ({
+const mapStateToProps = ({
+  upload: { isWaiting },
+  user,
+  friend: { friends }
+}) => ({
   isWaiting,
-  userId: user.id
+  userId: user.id,
+  friends
 });
 
 const mapDispatchToProps = dispatch => ({
   fetchFiles: () => dispatch(fetchFilesIfNeeded()),
+  fetchFriends: () => dispatch(fetchFriendsIfNeeded()),
+  fetchFriendRequests: () => dispatch(fetchFriendRequestsIfNeeded()),
   dFinishDownload: fileId => dispatch(finishDownload(fileId)),
   dUpdateDownloadProgress: (fileId, progress) =>
     dispatch(updateDownloadProgress(fileId, progress)),
@@ -58,7 +50,9 @@ class App extends React.Component {
     const {
       history,
       location: { pathname },
-      fetchFiles
+      fetchFiles,
+      fetchFriends,
+      fetchFriendRequests
     } = this.props;
     const { user } = this.state;
     const token = localStorage.getItem('tempoToken');
@@ -80,6 +74,8 @@ class App extends React.Component {
       const userId = user ? user.id : jwtDecode(token).id;
       emit('userConnection', userId);
       fetchFiles();
+      fetchFriends();
+      fetchFriendRequests();
     }
 
     this.setupListeners();
@@ -132,7 +128,8 @@ class App extends React.Component {
       history,
       isWaiting,
       dStopWaiting,
-      dUploadWithSend
+      dUploadWithSend,
+      friends
     } = this.props;
     return (
       <React.Fragment>
@@ -144,7 +141,7 @@ class App extends React.Component {
           display={isWaiting}
           stopWaiting={dStopWaiting}
           uploadWithSend={dUploadWithSend}
-          friends={tempFriends}
+          friends={friends}
         />
       </React.Fragment>
     );
@@ -162,7 +159,14 @@ App.propTypes = {
   dRemoveFile: func.isRequired,
   isWaiting: bool.isRequired,
   dStopWaiting: func.isRequired,
-  dUploadWithSend: func.isRequired
+  dUploadWithSend: func.isRequired,
+  fetchFriends: func.isRequired,
+  fetchFriendRequests: func.isRequired,
+  friends: arrayOf(userShape)
+};
+
+App.defaultProps = {
+  friends: []
 };
 
 export default withRouter(

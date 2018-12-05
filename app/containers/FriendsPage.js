@@ -1,12 +1,15 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import { string } from 'prop-types';
+import { arrayOf, string } from 'prop-types';
+import { userShape } from '../shapes';
+
 import callApi from '../helpers/apiCaller';
 
 import Friends from '../components/Friends';
 
-const mapStateToProps = ({ user }) => ({
-  userId: user.id
+const mapStateToProps = ({ user: { id }, friend: { friends } }) => ({
+  userId: id,
+  friends
 });
 
 class FriendsPage extends Component {
@@ -49,6 +52,7 @@ class FriendsPage extends Component {
 
   render() {
     const { friendTag, requestMessage } = this.state;
+    const { friends } = this.props;
     return (
       <Friends
         friendTag={friendTag}
@@ -56,13 +60,20 @@ class FriendsPage extends Component {
         openModal={this.openModal}
         sendRequest={this.sendRequest}
         requestMessage={requestMessage}
+        friends={friends}
       />
     );
   }
 }
 
 FriendsPage.propTypes = {
-  userId: string.isRequired
+  userId: string,
+  friends: arrayOf(userShape)
+};
+
+FriendsPage.defaultProps = {
+  userId: '',
+  friends: []
 };
 
 export default connect(

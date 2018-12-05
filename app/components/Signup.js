@@ -14,7 +14,7 @@ const Signup = ({
   displayBanner,
   addUser,
   goToHome,
-  fetchFiles,
+  fetchNeeded,
   authorizing
 }) => {
   const switchPage = () => setState('isNew', false);
@@ -57,7 +57,7 @@ const Signup = ({
 
         localStorage.setItem('tempoToken', token);
         addUser(token);
-        fetchFiles();
+        fetchNeeded();
         goToHome();
         return token;
       })
@@ -128,7 +128,7 @@ Signup.propTypes = {
   setState: func.isRequired,
   displayBanner: func.isRequired,
   addUser: func.isRequired,
-  fetchFiles: func.isRequired,
+  fetchNeeded: func.isRequired,
   goToHome: func.isRequired,
   authorizing: bool.isRequired
 };

@@ -11,6 +11,8 @@ import Banner from '../components/Banner';
 
 import { addUser } from '../actions/user';
 import { fetchFilesIfNeeded } from '../actions/file';
+import { fetchFriendsIfNeeded } from '../actions/friend';
+import { fetchFriendRequestsIfNeeded } from '../actions/friendRequest';
 
 const mapDispatchToProps = dispatch => ({
   addUserFromToken: token => {
@@ -18,7 +20,9 @@ const mapDispatchToProps = dispatch => ({
     emit('userConnection', user.id);
     dispatch(addUser(user));
   },
-  fetchFiles: () => dispatch(fetchFilesIfNeeded())
+  fetchFiles: () => dispatch(fetchFilesIfNeeded()),
+  fetchFriends: () => dispatch(fetchFriendsIfNeeded()),
+  fetchFriendRequests: () => dispatch(fetchFriendRequestsIfNeeded())
 });
 
 class AuthPage extends Component {
@@ -32,6 +36,13 @@ class AuthPage extends Component {
   };
 
   setStateProperty = (property, value) => this.setState({ [property]: value });
+
+  fetchNeededOnAuth = () => {
+    const { fetchFiles, fetchFriends, fetchFriendRequests } = this.props;
+    fetchFiles();
+    fetchFriends();
+    fetchFriendRequests();
+  };
 
   displayBanner = (type, message) =>
     this.setState({ bannerMessage: { type, text: message } });
@@ -47,7 +58,7 @@ class AuthPage extends Component {
       bannerMessage,
       authorizing
     } = this.state;
-    const { addUserFromToken, fetchFiles, history } = this.props;
+    const { addUserFromToken, history } = this.props;
     return (
       <Fragment>
         <Banner message={bannerMessage} setHide={this.setHide} time={5000} />
@@ -59,7 +70,7 @@ class AuthPage extends Component {
             setState={this.setStateProperty}
             displayBanner={this.displayBanner}
             addUser={addUserFromToken}
-            fetchFiles={fetchFiles}
+            fetchNeeded={this.fetchNeededOnAuth}
             goToHome={() => history.push('/')}
             authorizing={authorizing}
           />
@@ -70,7 +81,7 @@ class AuthPage extends Component {
             setState={this.setStateProperty}
             displayBanner={this.displayBanner}
             addUser={addUserFromToken}
-            fetchFiles={fetchFiles}
+            fetchNeeded={this.fetchNeededOnAuth}
             goToHome={() => history.push('/')}
             authorizing={authorizing}
           />
@@ -83,6 +94,8 @@ class AuthPage extends Component {
 AuthPage.propTypes = {
   addUserFromToken: func.isRequired,
   fetchFiles: func.isRequired,
+  fetchFriends: func.isRequired,
+  fetchFriendRequests: func.isRequired,
   history: object.isRequired // eslint-disable-line
 };
 

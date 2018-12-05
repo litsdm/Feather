@@ -5,25 +5,30 @@ import styles from './ProfilePic.scss';
 import { initials } from '../helpers/string';
 
 const ProfilePic = ({
-  name,
+  username,
   placeholderColor,
   profilePic,
   picStyle,
   phStyle
 }) =>
   profilePic ? (
-    <img src={profilePic} alt={name} className={styles.img} style={picStyle} />
+    <img
+      src={profilePic}
+      alt={username}
+      className={styles.img}
+      style={picStyle}
+    />
   ) : (
     <div
       className={styles.imgPlaceholder}
       style={{ backgroundColor: placeholderColor, ...picStyle }}
     >
-      <p style={phStyle}>{initials(name)}</p>
+      <p style={phStyle}>{initials(username)}</p>
     </div>
   );
 
 ProfilePic.propTypes = {
-  name: string,
+  username: string,
   placeholderColor: string.isRequired,
   profilePic: string,
   picStyle: object, // eslint-disable-line react/forbid-prop-types
@@ -31,7 +36,7 @@ ProfilePic.propTypes = {
 };
 
 ProfilePic.defaultProps = {
-  name: '',
+  username: '',
   profilePic: '',
   picStyle: {},
   phStyle: {}

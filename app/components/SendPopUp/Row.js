@@ -5,7 +5,7 @@ import styles from './Row.scss';
 import ProfilePic from '../ProfilePic';
 
 const Row = ({
-  name,
+  username,
   profilePic,
   placeholderColor,
   isSelected,
@@ -16,11 +16,11 @@ const Row = ({
   <div className={styles.row}>
     <div className={styles.left}>
       <ProfilePic
-        name={name}
+        username={username}
         profilePic={profilePic}
         placeholderColor={placeholderColor}
       />
-      <p className={styles.name}>{name}</p>
+      <p className={styles.name}>{username}</p>
     </div>
     <div className={styles.right}>
       {isSelected ? (
@@ -41,7 +41,7 @@ const Row = ({
 );
 
 Row.propTypes = {
-  name: string.isRequired,
+  username: string.isRequired,
   profilePic: string,
   placeholderColor: string,
   isSelected: bool,

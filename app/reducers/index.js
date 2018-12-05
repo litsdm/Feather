@@ -5,6 +5,8 @@ import file from './file';
 import user from './user';
 import downloads from './download';
 import upload from './upload';
+import friend from './friend';
+import friendRequest from './friendRequest';
 
 import { USER_LOGOUT } from '../actions/user';
 
@@ -13,6 +15,8 @@ const appReducer = combineReducers({
   file,
   router,
   upload,
+  friend,
+  friendRequest,
   user
 });
 
