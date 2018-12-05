@@ -14,8 +14,9 @@ body {
   color: black;
   height: 100vh;
   background-color: #fff;
-  font-family: Arial, Helvetica, Helvetica Neue, serif;
+  font-family: 'Open Sans', sans-serif;
   margin: 0;
+  overflow: hidden;
 }
 
 h2 {

@@ -3,8 +3,8 @@ import { ipcRenderer } from 'electron';
 import { connect } from 'react-redux';
 import { withRouter } from 'react-router';
 import jwtDecode from 'jwt-decode';
-import { arrayOf, bool, func, object, node, string } from 'prop-types';
-import { userShape, friendRequestShape } from '../shapes';
+import { arrayOf, bool, func, object, node, number, string } from 'prop-types';
+import { userShape, friendRequestShape, fileShape } from '../shapes';
 import socket, { emit } from '../socketClient';
 
 import notify from '../helpers/notifications';
@@ -20,9 +20,10 @@ import {
 
 import NavBar from '../components/NavBar';
 import SendPopUp from '../components/SendPopUp';
+import UploadQueue from '../components/UploadQueue';
 
 const mapStateToProps = ({
-  upload: { isWaiting },
+  upload: { isWaiting, queue, file, progress },
   user,
   friend: { friends },
   friendRequest: { friendRequests }
@@ -30,7 +31,10 @@ const mapStateToProps = ({
   isWaiting,
   userId: user.id,
   friends,
-  friendRequests
+  friendRequests,
+  queue,
+  uploadFile: file,
+  uploadProgress: progress
 });
 
 const mapDispatchToProps = dispatch => ({
@@ -146,7 +150,10 @@ class App extends React.Component {
       uploadFiles,
       friends,
       friendRequests,
-      userId
+      userId,
+      queue,
+      uploadFile,
+      uploadProgress
     } = this.props;
     return (
       <React.Fragment>
@@ -164,6 +171,11 @@ class App extends React.Component {
           uploadFiles={uploadFiles}
           userId={userId}
           friends={friends}
+        />
+        <UploadQueue
+          queue={queue}
+          file={uploadFile}
+          progress={uploadProgress}
         />
       </React.Fragment>
     );
@@ -187,13 +199,19 @@ App.propTypes = {
   addReceivedFriendRequest: func.isRequired,
   friends: arrayOf(userShape),
   friendRequests: arrayOf(friendRequestShape),
-  userId: string
+  userId: string,
+  queue: arrayOf(fileShape),
+  uploadFile: fileShape,
+  uploadProgress: number
 };
 
 App.defaultProps = {
   friends: [],
   friendRequests: [],
-  userId: ''
+  userId: '',
+  queue: [],
+  uploadFile: null,
+  uploadProgress: 0
 };
 
 export default withRouter(

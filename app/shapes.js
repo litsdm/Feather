@@ -1,11 +1,12 @@
-import { func, number, shape, string } from 'prop-types';
+import { arrayOf, func, number, shape, string } from 'prop-types';
 
 export const fileShape = shape({
   _id: string,
   name: string,
   s3Url: string,
-  sender: string,
-  size: number
+  from: string,
+  size: number,
+  to: arrayOf(string)
 });
 
 export const historyShape = shape({

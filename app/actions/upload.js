@@ -76,22 +76,27 @@ const uploadFromQueue = () => (dispatch, getState) => {
     .then(res => res.json())
     .then(({ file: dbFile }) => {
       dispatch(startUpload(dbFile));
-      uploadFile(rawFile, signedReq, updateProgress, () => {
-        const localConfig = JSON.parse(localStorage.getItem('localConfig'));
+      uploadFile(
+        rawFile,
+        signedReq,
+        progress => dispatch(updateProgress(progress)),
+        () => {
+          const localConfig = JSON.parse(localStorage.getItem('localConfig'));
 
-        file.to.forEach(receiver =>
-          emit('sendFile', { roomId: receiver, file: dbFile })
-        );
+          file.to.forEach(receiver =>
+            emit('sendFile', { roomId: receiver, file: dbFile })
+          );
 
-        dispatch(handleFinish());
+          dispatch(handleFinish());
 
-        if (localConfig.notifyUpload) {
-          notify({
-            title: 'File Uploaded',
-            body: `${dbFile.name} has finished uploading.`
-          });
+          if (localConfig.notifyUpload) {
+            notify({
+              title: 'File Uploaded',
+              body: `${dbFile.name} has finished uploading.`
+            });
+          }
         }
-      });
+      );
       return Promise.resolve();
     })
     .catch(() => {
