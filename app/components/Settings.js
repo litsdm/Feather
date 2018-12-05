@@ -2,6 +2,8 @@ import React from 'react';
 import { bool, func, string } from 'prop-types';
 import styles from './Settings.scss';
 
+import ProfilePic from './ProfilePic';
+
 const Settings = ({
   downloadPath,
   email,
@@ -11,7 +13,10 @@ const Settings = ({
   username,
   setState,
   goToPath,
-  logout
+  logout,
+  profilePic,
+  placeholderColor,
+  discriminator
 }) => {
   const handleChange = ({ target: { name, value, type, checked } }) => {
     const newValue = type === 'checkbox' ? checked : value;
@@ -32,6 +37,31 @@ const Settings = ({
       <button type="button" className={styles.close} onClick={handleClose}>
         <i className="fa fa-times" />
       </button>
+      <div className={styles.section}>
+        <p className={styles.title}>Account</p>
+        <div className={styles.user}>
+          <ProfilePic
+            username={username}
+            profilePic={profilePic}
+            placeholderColor={placeholderColor}
+            picStyle={{ width: '48px', height: '48px' }}
+          />
+          <label className={styles.usernameLabel} htmlFor="usernameInput">
+            <input
+              name="username"
+              type="text"
+              id="usernameInput"
+              value={username}
+              onChange={handleChange}
+            />
+            {`#${discriminator}`}
+          </label>
+        </div>
+        <div className={styles.staticField}>
+          <i className="fa fa-envelope" />
+          <p>{email}</p>
+        </div>
+      </div>
       <div className={styles.section}>
         <p className={styles.title}>Downloads</p>
         <div className={styles.inputWithButton}>
@@ -101,24 +131,6 @@ const Settings = ({
         </div>
       </div>
       <div className={styles.section}>
-        <p className={styles.title}>Account</p>
-        <div className={styles.staticField}>
-          <i className="fa fa-envelope" />
-          <p>{email}</p>
-        </div>
-        <label
-          className={`${styles.inputLabel} ${styles.icon}`}
-          htmlFor="usernameInput"
-        >
-          <i className="fa fa-user" />
-          <input
-            name="username"
-            type="text"
-            id="usernameInput"
-            value={username}
-            onChange={handleChange}
-          />
-        </label>
         <button
           type="button"
           className={styles.logout}
@@ -144,7 +156,14 @@ Settings.propTypes = {
   username: string.isRequired,
   setState: func.isRequired,
   goToPath: func.isRequired,
-  logout: func.isRequired
+  logout: func.isRequired,
+  discriminator: string.isRequired,
+  profilePic: string,
+  placeholderColor: string.isRequired
+};
+
+Settings.defaultProps = {
+  profilePic: ''
 };
 
 export default Settings;

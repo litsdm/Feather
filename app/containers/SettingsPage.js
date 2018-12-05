@@ -1,8 +1,9 @@
 import React, { Component } from 'react';
 import { remote } from 'electron';
 import { connect } from 'react-redux';
-import { func, object, string } from 'prop-types';
 import jwtDecode from 'jwt-decode';
+import { func, object, string } from 'prop-types';
+import { userShape } from '../shapes';
 
 import { emit } from '../socketClient';
 import { logoutUser, addUser } from '../actions/user';
@@ -10,10 +11,9 @@ import callApi from '../helpers/apiCaller';
 
 import Settings from '../components/Settings';
 
-const mapStateToProps = ({ user: { id, email, username } }) => ({
-  email,
-  username,
-  userId: id
+const mapStateToProps = ({ user }) => ({
+  user,
+  userId: user.id
 });
 
 const mapDispatchToProps = dispatch => ({
@@ -39,7 +39,9 @@ class SettingsPage extends Component {
   }
 
   loadState = () => {
-    const { username } = this.props;
+    const {
+      user: { username }
+    } = this.props;
     const localConfig = localStorage.getItem('localConfig');
 
     if (localConfig) {
@@ -85,29 +87,31 @@ class SettingsPage extends Component {
       notifyReceived,
       username
     } = this.state;
-    const { email, logout } = this.props;
+    const {
+      user: { username: unused, ...rest },
+      logout
+    } = this.props;
     return (
       <Settings
         downloadPath={downloadPath}
-        email={email}
         notifyDownload={notifyDownload}
         notifyUpload={notifyUpload}
         notifyReceived={notifyReceived}
-        username={username}
         setState={this.receiveStateFromChild}
         goToPath={this.goToPath}
         logout={logout}
+        username={username}
+        {...rest}
       />
     );
   }
 }
 
 SettingsPage.propTypes = {
-  email: string.isRequired,
   history: object.isRequired, // eslint-disable-line
   logout: func.isRequired,
-  username: string.isRequired,
   userId: string.isRequired,
+  user: userShape.isRequired,
   replaceUserFromToken: func.isRequired
 };
 
