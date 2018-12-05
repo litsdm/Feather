@@ -11,7 +11,11 @@ import notify from '../helpers/notifications';
 
 import { fetchFilesIfNeeded, addFile, removeFile } from '../actions/file';
 import { finishDownload, updateDownloadProgress } from '../actions/download';
-import { stopWaiting, uploadWithSend } from '../actions/upload';
+import {
+  stopWaiting,
+  uploadWithSend,
+  awaitSendForFiles
+} from '../actions/upload';
 import { fetchFriendsIfNeeded } from '../actions/friend';
 import {
   fetchFriendRequestsIfNeeded,
@@ -49,7 +53,8 @@ const mapDispatchToProps = dispatch => ({
   dStopWaiting: () => dispatch(stopWaiting()),
   uploadFiles: send => dispatch(uploadWithSend(send)),
   addReceivedFriendRequest: friendRequest =>
-    dispatch(addFriendRequest(friendRequest))
+    dispatch(addFriendRequest(friendRequest)),
+  waitForRecipients: files => dispatch(awaitSendForFiles(files))
 });
 
 class App extends React.Component {
@@ -98,6 +103,7 @@ class App extends React.Component {
 
     ipcRenderer.on('download-progress', this.handleDownloadProgress);
     ipcRenderer.on('download-finish', this.handleDownloadFinish);
+    ipcRenderer.on('upload-from-tray', this.handleTrayUpload);
     socket.on('recieveFile', file => {
       dAddFile(file);
 
@@ -119,6 +125,12 @@ class App extends React.Component {
         body: 'You can see this request on your friends page.'
       });
     });
+  };
+
+  handleTrayUpload = (e, files) => {
+    const { waitForRecipients } = this.props;
+    console.log(files);
+    waitForRecipients(files);
   };
 
   handleDownloadProgress = (e, { progress, fileId }) => {
@@ -197,6 +209,7 @@ App.propTypes = {
   fetchFriends: func.isRequired,
   fetchFriendRequests: func.isRequired,
   addReceivedFriendRequest: func.isRequired,
+  waitForRecipients: func.isRequired,
   friends: arrayOf(userShape),
   friendRequests: arrayOf(friendRequestShape),
   userId: string,

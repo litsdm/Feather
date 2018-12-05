@@ -1,3 +1,5 @@
+import fs from 'fs';
+import mime from 'mime-types';
 import callApi, { uploadFile } from '../helpers/apiCaller';
 import notify from '../helpers/notifications';
 import { emit } from '../socketClient';
@@ -110,7 +112,9 @@ export function addFilesToQueue(files, send) {
       upload: { isUploading }
     } = getState();
     let uploadFlag = false;
-    files.forEach(rawFile => {
+    files.forEach(file => {
+      const rawFile = typeof file === 'string' ? getFileFromPath(file) : file;
+      console.log(rawFile);
       const reader = new FileReader();
       reader.onload = () => {
         const loadedFile = rawFile;
@@ -132,3 +136,15 @@ export function addFilesToQueue(files, send) {
 export const finishUpload = () => ({
   type: FINISH_UPLOAD
 });
+
+const getFileFromPath = path => {
+  const data = fs.readFileSync(path);
+  const pathParts = path.split('/');
+  const filename = pathParts[pathParts.length - 1];
+
+  const file = new File([data], filename, { type: mime.lookup(filename) });
+
+  console.log(file);
+
+  return file;
+};

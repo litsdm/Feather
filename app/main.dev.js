@@ -58,6 +58,7 @@ const createTray = () => {
   tray.on('click', () => {
     toggleWindow();
   });
+  tray.on('drop-files', uploadFiles);
 };
 
 const toggleWindow = () => {
@@ -91,6 +92,16 @@ const getWindowPosition = () => {
   const y = Math.round(trayBounds.y + trayBounds.height + 6);
 
   return { x, y };
+};
+
+const uploadFiles = (e, files) => {
+  if (mainWindow.isVisible()) {
+    mainWindow.focus();
+  } else {
+    showWindow();
+  }
+
+  mainWindow.webContents.send('upload-from-tray', files);
 };
 
 const downloadFile = (url, filename, fileId, dlPath, sender) => {
