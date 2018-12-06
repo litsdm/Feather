@@ -32,8 +32,10 @@ class SendPopUp extends Component {
       uploadFiles
     } = this.props;
 
+    const to = receivers.map(({ _id }) => _id);
+
     const send = {
-      to: receivers,
+      to,
       from: id
     };
 
@@ -105,7 +107,6 @@ class SendPopUp extends Component {
         addFriend={this.handleAdd}
         removeFriend={this.handleRemove}
         index={index}
-        displayUsername={index === 0 ? 'Yourself' : ''}
         {...friend}
       />
     ));

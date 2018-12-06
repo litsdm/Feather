@@ -11,8 +11,7 @@ const Row = ({
   isSelected,
   addFriend,
   removeFriend,
-  index,
-  displayUsername
+  index
 }) => (
   <div className={styles.row}>
     <div className={styles.left}>
@@ -21,7 +20,7 @@ const Row = ({
         profilePic={profilePic}
         placeholderColor={placeholderColor}
       />
-      <p className={styles.name}>{displayUsername || username}</p>
+      <p className={styles.name}>{username}</p>
     </div>
     <div className={styles.right}>
       {isSelected ? (
@@ -48,15 +47,13 @@ Row.propTypes = {
   isSelected: bool,
   addFriend: func.isRequired,
   removeFriend: func.isRequired,
-  index: number.isRequired,
-  displayUsername: string
+  index: number.isRequired
 };
 
 Row.defaultProps = {
   profilePic: '',
   placeholderColor: '',
-  isSelected: false,
-  displayUsername: ''
+  isSelected: false
 };
 
 export default Row;
