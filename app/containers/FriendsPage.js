@@ -44,7 +44,12 @@ class FriendsPage extends Component {
   };
 
   resolveRequest = (_id, index, type) => () => {
-    const { removeRequest, friendRequests, addAcceptedFriend } = this.props;
+    const {
+      removeRequest,
+      friendRequests,
+      addAcceptedFriend,
+      user
+    } = this.props;
     const { from: friend } = friendRequests[index];
     callApi(`friendRequest/${_id}/${type}`, {}, 'DELETE')
       .then(({ status }) => {
@@ -54,7 +59,15 @@ class FriendsPage extends Component {
               'Looks like something went wrong. Please double check your internet connection.'
             )
           );
-        if (type === 'accept') addAcceptedFriend(friend);
+        if (type === 'accept') {
+          const sendFriend = {
+            _id: user.id,
+            username: user.username,
+            placeholderColor: user.placeholderColor
+          };
+          addAcceptedFriend(friend);
+          emit('acceptRequest', { roomId: friend._id, friend: sendFriend });
+        }
         removeRequest(index);
         return Promise.resolve();
       })
@@ -81,7 +94,10 @@ class FriendsPage extends Component {
           }
         };
 
-        emit('sendRequest', formatRequest);
+        emit('sendRequest', {
+          roomId: friendRequest.to,
+          friendRequest: formatRequest
+        });
 
         this.setState({
           requestMessage: {

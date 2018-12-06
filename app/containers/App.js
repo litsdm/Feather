@@ -16,7 +16,7 @@ import {
   uploadWithSend,
   awaitSendForFiles
 } from '../actions/upload';
-import { fetchFriendsIfNeeded } from '../actions/friend';
+import { fetchFriendsIfNeeded, addFriend } from '../actions/friend';
 import {
   fetchFriendRequestsIfNeeded,
   addFriendRequest
@@ -54,7 +54,8 @@ const mapDispatchToProps = dispatch => ({
   uploadFiles: (send, addToUser) => dispatch(uploadWithSend(send, addToUser)),
   addReceivedFriendRequest: friendRequest =>
     dispatch(addFriendRequest(friendRequest)),
-  waitForRecipients: files => dispatch(awaitSendForFiles(files))
+  waitForRecipients: files => dispatch(awaitSendForFiles(files)),
+  addNewFriend: friend => dispatch(addFriend(friend))
 });
 
 class App extends React.Component {
@@ -98,7 +99,12 @@ class App extends React.Component {
   }
 
   setupListeners = () => {
-    const { dAddFile, dRemoveFile, addReceivedFriendRequest } = this.props;
+    const {
+      dAddFile,
+      dRemoveFile,
+      addReceivedFriendRequest,
+      addNewFriend
+    } = this.props;
     const localConfig = JSON.parse(localStorage.getItem('localConfig'));
 
     ipcRenderer.on('download-progress', this.handleDownloadProgress);
@@ -116,6 +122,9 @@ class App extends React.Component {
     });
     socket.on('removeFile', index => {
       dRemoveFile(index);
+    });
+    socket.on('newFriend', friend => {
+      addNewFriend(friend);
     });
     socket.on('receiveFriendRequest', friendRequest => {
       addReceivedFriendRequest(friendRequest);
@@ -209,6 +218,7 @@ App.propTypes = {
   fetchFriendRequests: func.isRequired,
   addReceivedFriendRequest: func.isRequired,
   waitForRecipients: func.isRequired,
+  addNewFriend: func.isRequired,
   friends: arrayOf(userShape),
   friendRequests: arrayOf(friendRequestShape),
   queue: arrayOf(fileShape),

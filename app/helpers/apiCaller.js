@@ -1,29 +1,34 @@
 const callApi = (endpoint, body, method = 'GET') => {
   const token = localStorage.getItem('tempoToken') || null;
-  const apiUrl = process.env.NODE_ENV === 'production'
-    ? 'https://tempo-share-web.herokuapp.com'
-    : 'localhost:8080';
-  const urlScheme = apiUrl === 'localhost:8080' ? 'http://' : '';
+  const apiUrl = getApiUrl();
 
-  return fetch(`${urlScheme}${apiUrl}/api/${endpoint}`, {
+  return fetch(`${apiUrl}/api/${endpoint}`, {
     method,
     headers: {
       'Content-Type': 'application/json',
       Authorization: `Bearer ${token}`
     },
-    body: JSON.stringify(body),
+    body: JSON.stringify(body)
   });
 };
 
 export const uploadFile = (file, signedRequest, progressCb, finishCb) => {
   const oReq = new XMLHttpRequest();
   oReq.addEventListener('load', finishCb);
-  oReq.upload.addEventListener('progress', ({ loaded, total, lengthComputable }) => {
-    if (lengthComputable) progressCb(loaded / total);
-  });
-  oReq.addEventListener('error', (e) => console.log(e));
+  oReq.upload.addEventListener(
+    'progress',
+    ({ loaded, total, lengthComputable }) => {
+      if (lengthComputable) progressCb(loaded / total);
+    }
+  );
+  oReq.addEventListener('error', e => console.log(e));
   oReq.open('PUT', signedRequest);
   oReq.send(file);
-}
+};
+
+export const getApiUrl = () =>
+  process.env.NODE_ENV === 'production'
+    ? 'https://tempo-share-web.herokuapp.com'
+    : 'http://localhost:8080';
 
 export default callApi;
