@@ -4,6 +4,8 @@ import callApi, { uploadFile } from '../helpers/apiCaller';
 import notify from '../helpers/notifications';
 import { emit } from '../socketClient';
 
+import { addFile } from './file';
+
 export const START_UPLOAD = 'START_UPLOAD';
 export const FINISH_UPLOAD = 'FINISH_UPLOAD';
 export const UPDATE_UPLOAD_PROGRESS = 'UPDATE_UPLOAD_PROGRESS';
@@ -16,15 +18,16 @@ export const awaitSendForFiles = waitFiles => ({
   type: AWAIT_SEND_FOR_FILES
 });
 
-export const uploadWithSend = send => (dispatch, getState) => {
+export const uploadWithSend = (send, addToUser) => (dispatch, getState) => {
   const {
     upload: { waitFiles }
   } = getState();
-  dispatch(stopWaiting());
+  dispatch(stopWaiting(addToUser));
   dispatch(addFilesToQueue(waitFiles, send));
 };
 
-export const stopWaiting = () => ({
+export const stopWaiting = (addToUser = false) => ({
+  addToUser,
   type: STOP_WAITING
 });
 
@@ -53,7 +56,7 @@ const updateProgress = progress => ({
 
 const uploadFromQueue = () => (dispatch, getState) => {
   const {
-    upload: { queue }
+    upload: { queue, addToUser }
   } = getState();
   const rawFile = queue[0];
   const file = {
@@ -89,6 +92,7 @@ const uploadFromQueue = () => (dispatch, getState) => {
             emit('sendFile', { roomId: receiver, file: dbFile })
           );
 
+          if (addToUser) dispatch(addFile(dbFile));
           dispatch(handleFinish());
 
           if (localConfig.notifyUpload) {
@@ -114,7 +118,6 @@ export function addFilesToQueue(files, send) {
     let uploadFlag = false;
     files.forEach(file => {
       const rawFile = typeof file === 'string' ? getFileFromPath(file) : file;
-      console.log(rawFile);
       const reader = new FileReader();
       reader.onload = () => {
         const loadedFile = rawFile;
@@ -143,8 +146,6 @@ const getFileFromPath = path => {
   const filename = pathParts[pathParts.length - 1];
 
   const file = new File([data], filename, { type: mime.lookup(filename) });
-
-  console.log(file);
 
   return file;
 };

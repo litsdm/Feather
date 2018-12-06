@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import uuid from 'uuid/v4';
-import { arrayOf, bool, func, string } from 'prop-types';
+import { arrayOf, bool, func } from 'prop-types';
 import { userShape } from '../../shapes';
 import styles from './styles.scss';
 
@@ -26,15 +26,18 @@ class SendPopUp extends Component {
   };
 
   handleSend = () => {
-    const { receivers } = this.state;
-    const { userId, uploadFiles } = this.props;
+    const { receivers, selectedIndeces } = this.state;
+    const {
+      user: { id },
+      uploadFiles
+    } = this.props;
 
     const send = {
       to: receivers,
-      from: userId
+      from: id
     };
 
-    uploadFiles(send);
+    uploadFiles(send, selectedIndeces[0]);
 
     this.setState({ receivers: [], selectedIndeces: {} });
   };
@@ -102,6 +105,7 @@ class SendPopUp extends Component {
         addFriend={this.handleAdd}
         removeFriend={this.handleRemove}
         index={index}
+        displayUsername={index === 0 ? 'Yourself' : ''}
         {...friend}
       />
     ));
@@ -147,12 +151,13 @@ SendPopUp.propTypes = {
   display: bool,
   stopWaiting: func.isRequired,
   friends: arrayOf(userShape).isRequired,
-  userId: string.isRequired,
-  uploadFiles: func.isRequired
+  uploadFiles: func.isRequired,
+  user: userShape
 };
 
 SendPopUp.defaultProps = {
-  display: false
+  display: false,
+  user: {}
 };
 
 export default SendPopUp;

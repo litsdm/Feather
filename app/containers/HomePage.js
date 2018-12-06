@@ -80,10 +80,14 @@ HomePage.propTypes = {
   isFetching: bool.isRequired,
   dDownloadFile: func.isRequired,
   downloads: object.isRequired, // eslint-disable-line react/forbid-prop-types
-  uploadId: string.isRequired,
+  uploadId: string,
   uploadProgress: number.isRequired,
   dRemoveFile: func.isRequired,
   dAwaitSendForFiles: func.isRequired
+};
+
+HomePage.defaultProps = {
+  uploadId: ''
 };
 
 export default connect(

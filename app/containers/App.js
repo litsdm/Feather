@@ -3,7 +3,7 @@ import { ipcRenderer } from 'electron';
 import { connect } from 'react-redux';
 import { withRouter } from 'react-router';
 import jwtDecode from 'jwt-decode';
-import { arrayOf, bool, func, object, node, number, string } from 'prop-types';
+import { arrayOf, bool, func, object, node, number } from 'prop-types';
 import { userShape, friendRequestShape, fileShape } from '../shapes';
 import socket, { emit } from '../socketClient';
 
@@ -33,7 +33,7 @@ const mapStateToProps = ({
   friendRequest: { friendRequests }
 }) => ({
   isWaiting,
-  userId: user.id,
+  user,
   friends,
   friendRequests,
   queue,
@@ -51,7 +51,7 @@ const mapDispatchToProps = dispatch => ({
   dAddFile: file => dispatch(addFile(file)),
   dRemoveFile: index => dispatch(removeFile(index)),
   dStopWaiting: () => dispatch(stopWaiting()),
-  uploadFiles: send => dispatch(uploadWithSend(send)),
+  uploadFiles: (send, addToUser) => dispatch(uploadWithSend(send, addToUser)),
   addReceivedFriendRequest: friendRequest =>
     dispatch(addFriendRequest(friendRequest)),
   waitForRecipients: files => dispatch(awaitSendForFiles(files))
@@ -129,7 +129,6 @@ class App extends React.Component {
 
   handleTrayUpload = (e, files) => {
     const { waitForRecipients } = this.props;
-    console.log(files);
     waitForRecipients(files);
   };
 
@@ -162,7 +161,7 @@ class App extends React.Component {
       uploadFiles,
       friends,
       friendRequests,
-      userId,
+      user,
       queue,
       uploadFile,
       uploadProgress
@@ -181,8 +180,8 @@ class App extends React.Component {
           display={isWaiting}
           stopWaiting={dStopWaiting}
           uploadFiles={uploadFiles}
-          userId={userId}
-          friends={friends}
+          user={user}
+          friends={[{ ...user, _id: user.id }, ...friends]}
         />
         <UploadQueue
           queue={queue}
@@ -212,19 +211,19 @@ App.propTypes = {
   waitForRecipients: func.isRequired,
   friends: arrayOf(userShape),
   friendRequests: arrayOf(friendRequestShape),
-  userId: string,
   queue: arrayOf(fileShape),
   uploadFile: fileShape,
-  uploadProgress: number
+  uploadProgress: number,
+  user: userShape
 };
 
 App.defaultProps = {
   friends: [],
   friendRequests: [],
-  userId: '',
   queue: [],
   uploadFile: null,
-  uploadProgress: 0
+  uploadProgress: 0,
+  user: {}
 };
 
 export default withRouter(

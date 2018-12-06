@@ -13,12 +13,13 @@ const initialState = {
   file: null,
   queue: [],
   waitFiles: [],
-  isWaiting: false
+  isWaiting: false,
+  addToUser: false
 };
 
 const downloads = (
   state = initialState,
-  { type, file, progress, waitFiles }
+  { type, file, progress, waitFiles, addToUser }
 ) => {
   switch (type) {
     case ADD_FILE_TO_QUEUE:
@@ -60,7 +61,8 @@ const downloads = (
       return {
         ...state,
         isWaiting: false,
-        waitFiles: []
+        waitFiles: [],
+        addToUser
       };
 
     default:
