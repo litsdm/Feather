@@ -48,15 +48,28 @@ const FileRow = ({
   };
 
   const handleDelete = () => {
-    callApi(`${userId}/files/${id}`, {}, 'DELETE');
-    callApi('delete-s3', { filename }, 'POST')
-      .then(({ status }) => {
-        if (status !== 200) return Promise.reject();
-        removeFile(index);
-        emit('removeFileFromRoom', { roomId: userId, index });
+    callApi(`${userId}/files/${id}`, {}, 'DELETE')
+      .then(res => res.json())
+      .then(({ message, shouldDeleteS3 }) => {
+        if (message) return Promise.reject(new Error(message));
+
+        if (shouldDeleteS3) {
+          callApi('delete-s3', { filename }, 'POST')
+            .then(({ status }) => {
+              if (status !== 200) return Promise.reject();
+              removeFile(index);
+              emit('removeFileFromRoom', { roomId: userId, index });
+              return Promise.resolve();
+            })
+            .catch(err => console.error(err.message));
+        } else {
+          removeFile(index);
+          emit('removeFileFromRoom', { roomId: userId, index });
+        }
+
         return Promise.resolve();
       })
-      .catch(() => console.log('error'));
+      .catch(err => console.error(err.message));
   };
 
   const state = getState();
