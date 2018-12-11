@@ -21,6 +21,11 @@
   padding: 12px;
 }
 
+.list {
+  height: calc(100vh - 47px);
+  overflow-y: scroll;
+}
+
 .back,
 .send {
   background-color: transparent;
