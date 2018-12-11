@@ -12,6 +12,7 @@ export const UPDATE_UPLOAD_PROGRESS = 'UPDATE_UPLOAD_PROGRESS';
 export const ADD_FILE_TO_QUEUE = 'ADD_FILE_TO_QUEUE';
 export const AWAIT_SEND_FOR_FILES = 'AWAIT_SEND_FOR_FILES';
 export const STOP_WAITING = 'STOP_WAITING';
+export const SET_ADD_FLAG = 'SET_ADD_FLAG';
 
 export const awaitSendForFiles = waitFiles => ({
   waitFiles,
@@ -25,6 +26,16 @@ export const uploadWithSend = (send, addToUser) => (dispatch, getState) => {
   dispatch(stopWaiting(addToUser));
   dispatch(addFilesToQueue(waitFiles, send));
 };
+
+export const uploadDirectly = (files, send, addToUser = false) => dispatch => {
+  dispatch(setAddFlag(addToUser));
+  dispatch(addFilesToQueue(files, send));
+};
+
+const setAddFlag = addToUser => ({
+  addToUser,
+  type: SET_ADD_FLAG
+});
 
 export const stopWaiting = (addToUser = false) => ({
   addToUser,

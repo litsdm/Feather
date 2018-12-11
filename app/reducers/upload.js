@@ -4,7 +4,8 @@ import {
   FINISH_UPLOAD,
   UPDATE_UPLOAD_PROGRESS,
   AWAIT_SEND_FOR_FILES,
-  STOP_WAITING
+  STOP_WAITING,
+  SET_ADD_FLAG
 } from '../actions/upload';
 
 const initialState = {
@@ -62,6 +63,12 @@ const downloads = (
         ...state,
         isWaiting: false,
         waitFiles: [],
+        addToUser
+      };
+
+    case SET_ADD_FLAG:
+      return {
+        ...state,
         addToUser
       };
 

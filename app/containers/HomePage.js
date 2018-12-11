@@ -12,7 +12,7 @@ import {
   removeFile
 } from '../actions/file';
 import { downloadFile } from '../actions/download';
-import { awaitSendForFiles } from '../actions/upload';
+import { awaitSendForFiles, uploadDirectly } from '../actions/upload';
 
 const mapStateToProps = ({
   file: { isUploading, files, isFetching, uploadId, progress },
@@ -35,7 +35,9 @@ const mapDispatchToProps = dispatch => ({
   dDownloadFile: (fileId, url, filename) =>
     dispatch(downloadFile(fileId, url, filename)),
   dRemoveFile: index => dispatch(removeFile(index)),
-  dAwaitSendForFiles: files => dispatch(awaitSendForFiles(files))
+  dAwaitSendForFiles: files => dispatch(awaitSendForFiles(files)),
+  uploadToPersonal: (files, send, addToUser = true) =>
+    dispatch(uploadDirectly(files, send, addToUser))
 });
 
 const HomePage = ({
@@ -51,7 +53,8 @@ const HomePage = ({
   uploadId,
   uploadProgress,
   dRemoveFile,
-  dAwaitSendForFiles
+  dAwaitSendForFiles,
+  uploadToPersonal
 }) => (
   <Home
     isUploading={isUploading}
@@ -67,6 +70,7 @@ const HomePage = ({
     uploadProgress={uploadProgress}
     removeFile={dRemoveFile}
     awaitSendForFiles={dAwaitSendForFiles}
+    uploadToPersonal={uploadToPersonal}
   />
 );
 
@@ -83,7 +87,8 @@ HomePage.propTypes = {
   uploadId: string,
   uploadProgress: number.isRequired,
   dRemoveFile: func.isRequired,
-  dAwaitSendForFiles: func.isRequired
+  dAwaitSendForFiles: func.isRequired,
+  uploadToPersonal: func.isRequired
 };
 
 HomePage.defaultProps = {

@@ -218,7 +218,7 @@
     "moment": "^2.22.2",
     "react": "^16.4.1",
     "react-dom": "^16.4.1",
-    "react-dropzone": "^5.0.2",
+    "react-dropzone": "^8.0.0",
     "react-hot-loader": "^4.3.4",
     "react-moment-proptypes": "^1.6.0",
     "react-redux": "^5.0.7",

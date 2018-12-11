@@ -2,6 +2,8 @@
   background-color: #f9f9fb;
   height: 360px;
   overflow-y: scroll;
+  outline: none;
+  position: relative;
 }
 
 .title {
@@ -13,7 +15,31 @@
   background-color: #f9f9fb;
   font-size: 14px;
   height: 312px;
-  opacity: 0.6;
   padding: 24px;
   text-align: center;
+
+  p {
+    opacity: 0.6;
+  }
+}
+
+.dropOverlay {
+  align-items: center;
+  background-color: rgba(255, 255, 255, 0.8); // rgba(0, 0, 0, 0.6);
+  bottom: 0;
+  display: none;
+  justify-content: center;
+  left: 0;
+  position: absolute;
+  right: 0;
+  top: 0;
+  z-index: 1;
+
+  p {
+    // color: #fff;
+  }
+
+  b {
+    color: #2091f3;
+  }
 }

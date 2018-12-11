@@ -20,7 +20,8 @@ const Home = ({
   uploadId,
   uploadProgress,
   removeFile,
-  awaitSendForFiles
+  awaitSendForFiles,
+  uploadToPersonal
 }) => (
   <div className={styles.container}>
     <DragBox
@@ -42,6 +43,7 @@ const Home = ({
         uploadProgress={uploadProgress}
         removeFile={removeFile}
         userId={userId}
+        uploadToPersonal={uploadToPersonal}
       />
     )}
   </div>
@@ -60,7 +62,8 @@ Home.propTypes = {
   uploadId: string.isRequired,
   uploadProgress: number.isRequired,
   removeFile: func.isRequired,
-  awaitSendForFiles: func.isRequired
+  awaitSendForFiles: func.isRequired,
+  uploadToPersonal: func.isRequired
 };
 
 export default Home;

@@ -47,6 +47,10 @@ const FileRow = ({
     return `${bytes.toFixed(1)} ${units[u]}`;
   };
 
+  const handleDownload = () => {
+    downloadFile(id, url, filename);
+  };
+
   const handleDelete = () => {
     callApi(`${userId}/files/${id}`, {}, 'DELETE')
       .then(res => res.json())
@@ -101,7 +105,7 @@ const FileRow = ({
             <button
               type="button"
               className={styles.download}
-              onClick={() => downloadFile(id, url, filename)}
+              onClick={handleDownload}
             >
               <i className="fa fa-download" />
             </button>

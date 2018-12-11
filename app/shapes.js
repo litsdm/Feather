@@ -1,4 +1,12 @@
-import { arrayOf, func, number, shape, string } from 'prop-types';
+import {
+  arrayOf,
+  func,
+  number,
+  node,
+  oneOfType,
+  shape,
+  string
+} from 'prop-types';
 
 export const fileShape = shape({
   _id: string,
@@ -27,3 +35,5 @@ export const friendRequestShape = shape({
   from: userShape,
   to: string
 });
+
+export const childrenShape = oneOfType([arrayOf(node), node]);
