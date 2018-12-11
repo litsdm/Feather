@@ -34,7 +34,9 @@ const mapDispatchToProps = dispatch => ({
 class FriendsPage extends Component {
   state = {
     friendTag: '',
-    requestMessage: null
+    requestMessage: null,
+    searchTerm: '',
+    filteredFriends: []
   };
 
   sendFiles = (acceptedFiles, to) => {
@@ -48,7 +50,23 @@ class FriendsPage extends Component {
   };
 
   handleChange = ({ target: { name, value } }) =>
-    this.setState({ [name]: value });
+    this.setState({ [name]: value }, () => {
+      if (name === 'searchTerm') this.filterFriends();
+    });
+
+  filterFriends = () => {
+    const { searchTerm } = this.state;
+    const { friends } = this.props;
+
+    const filtered =
+      searchTerm !== ''
+        ? friends.filter(friend =>
+            friend.username.toLowerCase().startsWith(searchTerm.toLowerCase())
+          )
+        : [];
+
+    this.setState({ filteredFriends: filtered });
+  };
 
   openModal = () => {
     const element = document.getElementById('addFriendModal');
@@ -126,7 +144,12 @@ class FriendsPage extends Component {
   };
 
   render() {
-    const { friendTag, requestMessage } = this.state;
+    const {
+      friendTag,
+      requestMessage,
+      searchTerm,
+      filteredFriends
+    } = this.state;
     const {
       friends,
       friendRequests,
@@ -146,6 +169,8 @@ class FriendsPage extends Component {
         friendRequests={friendRequests}
         resolveRequest={this.resolveRequest}
         sendFiles={this.sendFiles}
+        searchTerm={searchTerm}
+        filteredFriends={filteredFriends}
       />
     );
   }

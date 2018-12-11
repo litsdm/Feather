@@ -17,7 +17,9 @@ const Friends = ({
   friends,
   resolveRequest,
   friendRequests,
-  sendFiles
+  sendFiles,
+  searchTerm,
+  filteredFriends
 }) => {
   const renderFriendRequests = () =>
     friendRequests.map(({ from, _id }, index) => (
@@ -31,8 +33,11 @@ const Friends = ({
       />
     ));
 
-  const renderFriends = () =>
-    friends.map(({ _id, username, placeholderColor }) => (
+  const renderFriends = () => {
+    const friendsToRender =
+      filteredFriends.length > 0 ? filteredFriends : friends;
+
+    return friendsToRender.map(({ _id, username, placeholderColor }) => (
       <FriendRow
         key={uuid()}
         _id={_id}
@@ -41,6 +46,7 @@ const Friends = ({
         sendFiles={sendFiles}
       />
     ));
+  };
 
   return (
     <div className={styles.friends}>
@@ -49,9 +55,11 @@ const Friends = ({
           <i className="fa fa-search" />
           <input
             id="searchInput"
-            name="search"
+            name="searchTerm"
+            value={searchTerm}
             type="text"
             placeholder="Search for friends"
+            onChange={handleChange}
           />
         </label>
       </div>
@@ -95,13 +103,17 @@ Friends.propTypes = {
   }),
   friends: arrayOf(userShape),
   friendRequests: arrayOf(friendRequestShape),
-  sendFiles: func.isRequired
+  sendFiles: func.isRequired,
+  searchTerm: string,
+  filteredFriends: arrayOf(userShape)
 };
 
 Friends.defaultProps = {
+  searchTerm: '',
   requestMessage: null,
   friends: [],
-  friendRequests: []
+  friendRequests: [],
+  filteredFriends: []
 };
 
 export default Friends;
