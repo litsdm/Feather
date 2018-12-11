@@ -7,9 +7,14 @@
   justify-content: space-between;
   outline: none;
   padding: 12px;
+  transition: 0.3s ease all;
 
   &:hover {
     background-color: #fdfdff;
+  }
+
+  &.active {
+    background-color: rgba(32, 145, 243, 0.1);
   }
 }
 

@@ -7,6 +7,7 @@ import callApi from '../helpers/apiCaller';
 import { emit } from '../socketClient';
 import { addFriend } from '../actions/friend';
 import { removeFriendRequest } from '../actions/friendRequest';
+import { uploadDirectly } from '../actions/upload';
 
 import Friends from '../components/Friends';
 import Loader from '../components/Loader';
@@ -25,13 +26,25 @@ const mapStateToProps = ({
 
 const mapDispatchToProps = dispatch => ({
   removeRequest: index => dispatch(removeFriendRequest(index)),
-  addAcceptedFriend: friend => dispatch(addFriend(friend))
+  addAcceptedFriend: friend => dispatch(addFriend(friend)),
+  uploadFiles: (files, send, addToUser = false) =>
+    dispatch(uploadDirectly(files, send, addToUser))
 });
 
 class FriendsPage extends Component {
   state = {
     friendTag: '',
     requestMessage: null
+  };
+
+  sendFiles = (acceptedFiles, to) => {
+    const { user, uploadFiles } = this.props;
+    const send = {
+      from: user.id,
+      to
+    };
+
+    uploadFiles(acceptedFiles, send);
   };
 
   handleChange = ({ target: { name, value } }) =>
@@ -132,6 +145,7 @@ class FriendsPage extends Component {
         friends={friends}
         friendRequests={friendRequests}
         resolveRequest={this.resolveRequest}
+        sendFiles={this.sendFiles}
       />
     );
   }
@@ -144,7 +158,8 @@ FriendsPage.propTypes = {
   isFriendFetching: bool.isRequired,
   isFriendRequestFetching: bool.isRequired,
   removeRequest: func.isRequired,
-  addAcceptedFriend: func.isRequired
+  addAcceptedFriend: func.isRequired,
+  uploadFiles: func.isRequired
 };
 
 FriendsPage.defaultProps = {

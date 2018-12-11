@@ -16,7 +16,8 @@ const Friends = ({
   sendRequest,
   friends,
   resolveRequest,
-  friendRequests
+  friendRequests,
+  sendFiles
 }) => {
   const renderFriendRequests = () =>
     friendRequests.map(({ from, _id }, index) => (
@@ -37,6 +38,7 @@ const Friends = ({
         _id={_id}
         username={username}
         placeholderColor={placeholderColor}
+        sendFiles={sendFiles}
       />
     ));
 
@@ -92,7 +94,8 @@ Friends.propTypes = {
     type: string
   }),
   friends: arrayOf(userShape),
-  friendRequests: arrayOf(friendRequestShape)
+  friendRequests: arrayOf(friendRequestShape),
+  sendFiles: func.isRequired
 };
 
 Friends.defaultProps = {
