@@ -70,6 +70,11 @@ const Signup = ({
 
   return (
     <div className={styles.container}>
+      <img
+        src="https://s3-us-west-1.amazonaws.com/tempo-tray-bucket/Feather.png"
+        alt="feather logo"
+        className={styles.img}
+      />
       <label className={styles.inputLabel} htmlFor="usernameInput">
         Username
         <input

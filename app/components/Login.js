@@ -61,6 +61,11 @@ const Login = ({
 
   return (
     <div className={styles.container}>
+      <img
+        src="https://s3-us-west-1.amazonaws.com/tempo-tray-bucket/Feather.png"
+        alt="feather logo"
+        className={styles.img}
+      />
       <label className={styles.inputLabel} htmlFor="emailInput">
         Email
         <input
@@ -92,7 +97,7 @@ const Login = ({
         {authorizing ? <Loader small /> : 'Login'}
       </button>
       <span>
-        New to Tempo?{' '}
+        New to Feather?{' '}
         <button type="button" className={styles.switch} onClick={switchPage}>
           Signup
         </button>
