@@ -21,14 +21,17 @@ const FriendRow = ({
   };
 
   return (
-    <Dropzone onDrop={onDrop}>
+    <Dropzone
+      onDrop={onDrop}
+      disabled={reqId === '' || reqId === null || reqId === undefined}
+    >
       {({ getRootProps, getInputProps, isDragActive }) => (
         <div
           className={`${styles.row} ${isDragActive ? styles.active : ''}`}
           style={reqId ? { cursor: 'auto' } : {}}
           {...getRootProps()}
         >
-          <input {...getInputProps()} />
+          {reqId ? null : <input {...getInputProps()} />}
           <div className={styles.left}>
             <ProfilePic
               username={username}

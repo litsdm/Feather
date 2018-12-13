@@ -37,15 +37,18 @@ const Friends = ({
     const friendsToRender =
       filteredFriends.length > 0 ? filteredFriends : friends;
 
-    return friendsToRender.map(({ _id, username, placeholderColor }) => (
-      <FriendRow
-        key={uuid()}
-        _id={_id}
-        username={username}
-        placeholderColor={placeholderColor}
-        sendFiles={sendFiles}
-      />
-    ));
+    return friendsToRender.map(
+      ({ _id, username, profilePic, placeholderColor }) => (
+        <FriendRow
+          key={uuid()}
+          _id={_id}
+          profilePic={profilePic}
+          username={username}
+          placeholderColor={placeholderColor}
+          sendFiles={sendFiles}
+        />
+      )
+    );
   };
 
   return (

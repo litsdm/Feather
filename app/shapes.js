@@ -26,7 +26,8 @@ export const userShape = shape({
   email: string,
   password: string,
   username: string,
-  placeholderColor: string
+  placeholderColor: string,
+  profilePic: string
 });
 
 export const friendRequestShape = shape({
