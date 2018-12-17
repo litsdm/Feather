@@ -1,7 +1,7 @@
 {
   "name": "feather",
   "productName": "Feather",
-  "version": "0.14.0",
+  "version": "0.1.0",
   "description": "Easy file share tray application.",
   "scripts": {
     "build": "concurrently \"yarn build-main\" \"yarn build-renderer\"",
@@ -25,6 +25,9 @@
     "postlint-fix": "prettier --ignore-path .eslintignore --single-quote --write '**/*.js'",
     "precommit": "lint-staged",
     "prestart": "yarn build",
+    "ship": "npm run build && build -p always",
+    "ship-win": "npm run build && build --win --x64 -p always",
+    "ship-all": "npm run build && build --mac --win --x64 -p always",
     "start": "cross-env NODE_ENV=production electron ./app/",
     "start-main-dev": "cross-env HOT=1 NODE_ENV=development electron -r babel-register ./app/main.dev.js",
     "start-renderer-dev": "cross-env NODE_ENV=development node --trace-warnings -r babel-register ./node_modules/webpack-dev-server/bin/webpack-dev-server --config webpack.config.renderer.dev.js",
@@ -90,16 +93,16 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/chentsulin/electron-react-boilerplate.git"
+    "url": "git+https://github.com/cdiezmoran/Feather.git"
   },
   "author": {
-    "name": "C. T. Lin",
-    "email": "chentsulin@gmail.com",
-    "url": "https://github.com/chentsulin"
+    "name": "Carlos Diez",
+    "email": "cdiezmoran@gmail.com",
+    "url": "https://github.com/cdiezmoran"
   },
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/chentsulin/electron-react-boilerplate/issues"
+    "url": "https://github.com/cdiezmoran/Feather/issues"
   },
   "keywords": [
     "electron",
@@ -112,7 +115,7 @@
     "hot",
     "reload"
   ],
-  "homepage": "https://github.com/chentsulin/electron-react-boilerplate#readme",
+  "homepage": "https://github.com/cdiezmoran/Feather#readme",
   "jest": {
     "testURL": "http://localhost/",
     "moduleNameMapper": {
@@ -212,6 +215,7 @@
     "devtron": "^1.4.0",
     "electron-debug": "^2.0.0",
     "electron-dl": "^1.12.0",
+    "electron-updater": "^4.0.6",
     "history": "^4.7.2",
     "jwt-decode": "^2.2.0",
     "mime-types": "^2.1.21",

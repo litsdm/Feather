@@ -60,7 +60,8 @@ const mapDispatchToProps = dispatch => ({
 
 class App extends React.Component {
   state = {
-    user: null
+    user: null,
+    updateAvailable: false
   };
 
   componentDidMount() {
@@ -110,6 +111,9 @@ class App extends React.Component {
     ipcRenderer.on('download-progress', this.handleDownloadProgress);
     ipcRenderer.on('download-finish', this.handleDownloadFinish);
     ipcRenderer.on('upload-from-tray', this.handleTrayUpload);
+    ipcRenderer.on('updateReady', () =>
+      this.setState({ updateAvailable: true })
+    );
     socket.on('recieveFile', file => {
       dAddFile(file);
 
@@ -175,6 +179,7 @@ class App extends React.Component {
       uploadFile,
       uploadProgress
     } = this.props;
+    const { updateAvailable } = this.state;
     return (
       <React.Fragment>
         {pathname !== '/settings' && pathname !== '/auth' ? (
@@ -182,6 +187,7 @@ class App extends React.Component {
             pathname={pathname}
             history={history}
             requestIndicator={friendRequests.length > 0}
+            updateAvailable={updateAvailable}
           />
         ) : null}
         {children}

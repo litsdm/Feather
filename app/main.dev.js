@@ -12,6 +12,7 @@
  */
 import { app, BrowserWindow, Tray, ipcMain, nativeImage } from 'electron';
 import { download } from 'electron-dl';
+import { autoUpdater } from 'electron-updater';
 import path from 'path';
 import MenuBuilder from './menu';
 
@@ -145,6 +146,14 @@ ipcMain.on('quitApp', () => {
   app.quit();
 });
 
+autoUpdater.on('update-downloaded', () => {
+  mainWindow.webContents.send('updateReady');
+});
+
+ipcMain.on('quitAndInstall', () => {
+  autoUpdater.quitAndInstall();
+});
+
 app.on('window-all-closed', () => {
   app.quit();
 });
@@ -168,6 +177,10 @@ app.on('ready', async () => {
     process.env.DEBUG_PROD === 'true'
   ) {
     await installExtensions();
+  }
+
+  if (process.env.NODE_ENV === 'production') {
+    autoUpdater.checkForUpdates();
   }
 
   mainWindow = new BrowserWindow({

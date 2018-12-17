@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom';
 import { bool, string, object } from 'prop-types';
 import styles from './NavBar.scss';
 
-const NavBar = ({ pathname, history, requestIndicator }) => {
+const NavBar = ({ pathname, history, requestIndicator, updateAvailable }) => {
   const handleClose = () => {
     const win = remote.getCurrentWindow();
     win.close();
@@ -36,6 +36,16 @@ const NavBar = ({ pathname, history, requestIndicator }) => {
 
   const renderMainControls = () => (
     <Fragment>
+      {updateAvailable ? (
+        <button
+          type="button"
+          className={styles.update}
+          onClick={() => ipcRenderer.send('quitAndInstall')}
+        >
+          <i className="fas fa-long-arrow-alt-down" />
+          <div />
+        </button>
+      ) : null}
       <Link
         to="/friends"
         className={styles.settings}
@@ -108,6 +118,7 @@ const NavBar = ({ pathname, history, requestIndicator }) => {
 NavBar.propTypes = {
   pathname: string.isRequired,
   requestIndicator: bool.isRequired,
+  updateAvailable: bool.isRequired,
   history: object.isRequired // eslint-disable-line react/forbid-prop-types
 };
 
