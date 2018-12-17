@@ -1,7 +1,7 @@
 {
   "name": "Feather",
   "productName": "Feather",
-  "version": "1.0.0",
+  "version": "0.1.0",
   "description": "Easy file share tray application.",
   "main": "./main.prod.js",
   "author": {
