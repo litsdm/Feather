@@ -8,6 +8,7 @@ export const UPDATE_PU_PROGRESS = 'UPDATE_PU_PROGRESS';
 export const REQUEST_FILES = 'REQUEST_FILES';
 export const RECEIVE_FILES = 'RECEIVE_FILES';
 export const REMOVE_FILE = 'REMOVE_FILE';
+export const REQUEST_FAILED = 'REQUEST_FAILED';
 
 export function addFile(file, upload = false) {
   return {
@@ -51,17 +52,20 @@ function receiveFiles(files) {
   };
 }
 
-function fetchFiles(userId) {
-  return dispatch => {
-    dispatch(requestFiles());
-    return callApi(`${userId}/files`)
-      .then(res => res.json())
-      .then(({ files }) => {
-        dispatch(removeFilesIfExpired(userId, files));
-        return dispatch(receiveFiles(files));
-      });
-  };
-}
+const requestFailed = () => ({
+  type: REQUEST_FAILED
+});
+
+const fetchFiles = userId => dispatch => {
+  dispatch(requestFiles());
+  return callApi(`${userId}/files`)
+    .then(res => res.json())
+    .then(({ files }) => {
+      dispatch(removeFilesIfExpired(userId, files));
+      return dispatch(receiveFiles(files));
+    })
+    .catch(() => dispatch(requestFailed()));
+};
 
 function shouldFetchFiles({ file: { files, isFetching } }) {
   if (!files || files.length <= 0) return true;

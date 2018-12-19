@@ -4,7 +4,8 @@ import {
   UPDATE_PU_PROGRESS,
   REQUEST_FILES,
   RECEIVE_FILES,
-  REMOVE_FILE
+  REMOVE_FILE,
+  REQUEST_FAILED
 } from '../actions/file';
 
 const initialState = {
@@ -12,7 +13,8 @@ const initialState = {
   uploadId: '',
   progress: 0,
   isFetching: false,
-  files: []
+  files: [],
+  failed: false
 };
 
 export default function counter(
@@ -49,12 +51,19 @@ export default function counter(
       return {
         ...state,
         files: [...files, ...state.files],
-        isFetching: false
+        isFetching: false,
+        failed: false
       };
     case REMOVE_FILE:
       return {
         ...state,
         files: [...state.files.slice(0, index), ...state.files.slice(index + 1)]
+      };
+    case REQUEST_FAILED:
+      return {
+        ...state,
+        isFetching: false,
+        failed: true
       };
     default:
       return state;

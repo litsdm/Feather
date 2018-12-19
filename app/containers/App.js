@@ -25,12 +25,14 @@ import {
 import NavBar from '../components/NavBar';
 import SendPopUp from '../components/SendPopUp';
 import UploadQueue from '../components/UploadQueue';
+import DisconnectedModal from '../components/DisconnectedModal';
 
 const mapStateToProps = ({
   upload: { isWaiting, queue, file, progress },
   user,
   friend: { friends },
-  friendRequest: { friendRequests }
+  friendRequest: { friendRequests },
+  file: { failed, isFetching: isFetchingFiles }
 }) => ({
   isWaiting,
   user,
@@ -38,7 +40,9 @@ const mapStateToProps = ({
   friendRequests,
   queue,
   uploadFile: file,
-  uploadProgress: progress
+  uploadProgress: progress,
+  failed,
+  isFetchingFiles
 });
 
 const mapDispatchToProps = dispatch => ({
@@ -67,10 +71,7 @@ class App extends React.Component {
   componentDidMount() {
     const {
       history,
-      location: { pathname },
-      fetchFiles,
-      fetchFriends,
-      fetchFriendRequests
+      location: { pathname }
     } = this.props;
     const { user } = this.state;
     const token = localStorage.getItem('tempoToken');
@@ -91,13 +92,18 @@ class App extends React.Component {
     if (user || token) {
       const userId = user ? user.id : jwtDecode(token).id;
       emit('userConnection', userId);
-      fetchFiles();
-      fetchFriends();
-      fetchFriendRequests();
+      this.fetchData();
     }
 
     this.setupListeners();
   }
+
+  fetchData = () => {
+    const { fetchFiles, fetchFriends, fetchFriendRequests } = this.props;
+    fetchFiles();
+    fetchFriends();
+    fetchFriendRequests();
+  };
 
   setupListeners = () => {
     const {
@@ -177,7 +183,9 @@ class App extends React.Component {
       user,
       queue,
       uploadFile,
-      uploadProgress
+      uploadProgress,
+      failed,
+      isFetchingFiles
     } = this.props;
     const { updateAvailable } = this.state;
     return (
@@ -203,6 +211,12 @@ class App extends React.Component {
           file={uploadFile}
           progress={uploadProgress}
         />
+        {failed ? (
+          <DisconnectedModal
+            retry={this.fetchData}
+            isFetching={isFetchingFiles}
+          />
+        ) : null}
       </React.Fragment>
     );
   }
@@ -230,7 +244,9 @@ App.propTypes = {
   queue: arrayOf(fileShape),
   uploadFile: fileShape,
   uploadProgress: number,
-  user: userShape
+  user: userShape,
+  failed: bool.isRequired,
+  isFetchingFiles: bool.isRequired
 };
 
 App.defaultProps = {
