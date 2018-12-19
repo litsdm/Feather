@@ -32,6 +32,13 @@
   width: 36px;
 }
 
+.name {
+  max-width: 210px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 .imgPlaceholder {
   align-items: center;
   background-color: rgb(76, 175, 80);

@@ -38,7 +38,12 @@ const FriendRow = ({
               profilePic={profilePic}
               placeholderColor={placeholderColor}
             />
-            <p className={styles.name}>{username}</p>
+            <p
+              className={styles.name}
+              style={reqId ? { maxWidth: '168px' } : {}}
+            >
+              {username}
+            </p>
           </div>
           {reqId ? (
             <div className={styles.right}>

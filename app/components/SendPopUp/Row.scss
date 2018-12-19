@@ -18,6 +18,13 @@
   justify-content: space-between;
 }
 
+.name {
+  max-width: 186px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 .remove,
 .add {
   background-color: #2091f3;

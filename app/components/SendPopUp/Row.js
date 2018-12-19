@@ -20,7 +20,12 @@ const Row = ({
         profilePic={profilePic}
         placeholderColor={placeholderColor}
       />
-      <p className={styles.name}>{username}</p>
+      <p
+        className={styles.name}
+        style={isSelected ? { maxWidth: '168px' } : {}}
+      >
+        {username}
+      </p>
     </div>
     <div className={styles.right}>
       {isSelected ? (
