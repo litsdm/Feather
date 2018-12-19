@@ -88,19 +88,19 @@ export default class MenuBuilder {
           label: 'Select All',
           accelerator: 'Command+A',
           selector: 'selectAll:'
-        }
-      ]
-    };
-    const subMenuViewDev = {
-      label: 'View',
-      submenu: [
+        },
         {
           label: 'Reload',
           accelerator: 'Command+R',
           click: () => {
             this.mainWindow.webContents.reload();
           }
-        },
+        }
+      ]
+    };
+    const subMenuViewDev = {
+      label: 'View',
+      submenu: [
         {
           label: 'Toggle Full Screen',
           accelerator: 'Ctrl+Command+F',
