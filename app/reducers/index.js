@@ -7,6 +7,7 @@ import downloads from './download';
 import upload from './upload';
 import friend from './friend';
 import friendRequest from './friendRequest';
+import upgrade from './upgrade';
 
 import { USER_LOGOUT } from '../actions/user';
 
@@ -17,7 +18,8 @@ const appReducer = combineReducers({
   upload,
   friend,
   friendRequest,
-  user
+  user,
+  upgrade
 });
 
 const rootReducer = (state, action) => {

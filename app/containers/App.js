@@ -3,7 +3,16 @@ import { ipcRenderer } from 'electron';
 import { connect } from 'react-redux';
 import { withRouter } from 'react-router';
 import jwtDecode from 'jwt-decode';
-import { arrayOf, bool, func, object, node, number } from 'prop-types';
+import {
+  arrayOf,
+  bool,
+  func,
+  object,
+  node,
+  number,
+  shape,
+  string
+} from 'prop-types';
 import { userShape, friendRequestShape, fileShape } from '../shapes';
 import socket, { emit } from '../socketClient';
 
@@ -21,18 +30,22 @@ import {
   fetchFriendRequestsIfNeeded,
   addFriendRequest
 } from '../actions/friendRequest';
+import { addUserFromToken } from '../actions/user';
+import { hideUpgrade } from '../actions/upgrade';
 
 import NavBar from '../components/NavBar';
 import SendPopUp from '../components/SendPopUp';
 import UploadQueue from '../components/UploadQueue';
 import DisconnectedModal from '../components/DisconnectedModal';
+import UpgradeModal from '../components/UpgradeModal';
 
 const mapStateToProps = ({
   upload: { isWaiting, queue, file, progress },
   user,
   friend: { friends },
   friendRequest: { friendRequests },
-  file: { failed, isFetching: isFetchingFiles }
+  file: { failed, isFetching: isFetchingFiles },
+  upgrade
 }) => ({
   isWaiting,
   user,
@@ -42,7 +55,8 @@ const mapStateToProps = ({
   uploadFile: file,
   uploadProgress: progress,
   failed,
-  isFetchingFiles
+  isFetchingFiles,
+  upgrade
 });
 
 const mapDispatchToProps = dispatch => ({
@@ -59,7 +73,9 @@ const mapDispatchToProps = dispatch => ({
   addReceivedFriendRequest: friendRequest =>
     dispatch(addFriendRequest(friendRequest)),
   waitForRecipients: files => dispatch(awaitSendForFiles(files)),
-  addNewFriend: friend => dispatch(addFriend(friend))
+  addNewFriend: friend => dispatch(addFriend(friend)),
+  updateUser: token => dispatch(addUserFromToken(token)),
+  closeUpgrade: () => dispatch(hideUpgrade())
 });
 
 class App extends React.Component {
@@ -110,7 +126,8 @@ class App extends React.Component {
       dAddFile,
       dRemoveFile,
       addReceivedFriendRequest,
-      addNewFriend
+      addNewFriend,
+      updateUser
     } = this.props;
     const localConfig = JSON.parse(localStorage.getItem('localConfig'));
 
@@ -143,6 +160,9 @@ class App extends React.Component {
         title: `${friendRequest.from.username} sent a friend request!`,
         body: 'You can see this request on your friends page.'
       });
+    });
+    socket.on('updateUser', token => {
+      updateUser(token);
     });
   };
 
@@ -185,7 +205,9 @@ class App extends React.Component {
       uploadFile,
       uploadProgress,
       failed,
-      isFetchingFiles
+      isFetchingFiles,
+      upgrade,
+      closeUpgrade
     } = this.props;
     const { updateAvailable } = this.state;
     return (
@@ -211,6 +233,13 @@ class App extends React.Component {
           file={uploadFile}
           progress={uploadProgress}
         />
+        {upgrade.visible ? (
+          <UpgradeModal
+            type={upgrade.messageType}
+            close={closeUpgrade}
+            remainingBytes={user.remainingBytes || 0}
+          />
+        ) : null}
         {failed ? (
           <DisconnectedModal
             retry={this.fetchData}
@@ -235,6 +264,8 @@ App.propTypes = {
   dStopWaiting: func.isRequired,
   uploadFiles: func.isRequired,
   fetchFriends: func.isRequired,
+  updateUser: func.isRequired,
+  closeUpgrade: func.isRequired,
   fetchFriendRequests: func.isRequired,
   addReceivedFriendRequest: func.isRequired,
   waitForRecipients: func.isRequired,
@@ -246,7 +277,8 @@ App.propTypes = {
   uploadProgress: number,
   user: userShape,
   failed: bool.isRequired,
-  isFetchingFiles: bool.isRequired
+  isFetchingFiles: bool.isRequired,
+  upgrade: shape({ visible: bool, messageType: string }).isRequired
 };
 
 App.defaultProps = {

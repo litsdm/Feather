@@ -5,7 +5,8 @@ import {
   UPDATE_UPLOAD_PROGRESS,
   AWAIT_SEND_FOR_FILES,
   STOP_WAITING,
-  SET_ADD_FLAG
+  SET_ADD_FLAG,
+  FINISH_AND_CLEAN
 } from '../actions/upload';
 
 const initialState = {
@@ -71,6 +72,9 @@ const downloads = (
         ...state,
         addToUser
       };
+
+    case FINISH_AND_CLEAN:
+      return initialState;
 
     default:
       return state;

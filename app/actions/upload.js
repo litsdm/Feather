@@ -3,6 +3,8 @@ import mime from 'mime-types';
 import callApi, { uploadFile } from '../helpers/apiCaller';
 import notify from '../helpers/notifications';
 import { emit } from '../socketClient';
+import { updateUserProperty } from './user';
+import { displayUpgrade } from './upgrade';
 
 import { addFile } from './file';
 
@@ -13,6 +15,7 @@ export const ADD_FILE_TO_QUEUE = 'ADD_FILE_TO_QUEUE';
 export const AWAIT_SEND_FOR_FILES = 'AWAIT_SEND_FOR_FILES';
 export const STOP_WAITING = 'STOP_WAITING';
 export const SET_ADD_FLAG = 'SET_ADD_FLAG';
+export const FINISH_AND_CLEAN = 'FINISH_AND_CLEAN';
 
 export const awaitSendForFiles = waitFiles => ({
   waitFiles,
@@ -60,6 +63,10 @@ const handleFinish = () => (dispatch, getState) => {
   if (queue.length > 0) dispatch(uploadFromQueue());
 };
 
+const finishAndClean = () => ({
+  type: FINISH_AND_CLEAN
+});
+
 const updateProgress = progress => ({
   progress,
   type: UPDATE_UPLOAD_PROGRESS
@@ -67,7 +74,8 @@ const updateProgress = progress => ({
 
 const uploadFromQueue = () => (dispatch, getState) => {
   const {
-    upload: { queue, addToUser }
+    upload: { queue, addToUser },
+    user: { isPro, remainingBytes }
   } = getState();
   const rawFile = queue[0];
   const file = {
@@ -79,6 +87,23 @@ const uploadFromQueue = () => (dispatch, getState) => {
     type: rawFile.type.replace('+', '%2B')
   };
   let signedReq;
+
+  if (!isPro && file.size > 2147483648) {
+    dispatch(displayUpgrade('fileSize'));
+    dispatch(finishAndClean());
+    return;
+  }
+
+  if (file.size > remainingBytes) {
+    dispatch(displayUpgrade('remainingBytes'));
+    dispatch(finishAndClean());
+    return;
+  }
+
+  if (isPro && file.size > 10737418240) {
+    dispatch(finishAndClean());
+    return;
+  }
 
   callApi(
     `sign-s3?file-name=${file.name}&file-type=${file.type}&folder-name=Files`
@@ -105,6 +130,7 @@ const uploadFromQueue = () => (dispatch, getState) => {
 
           if (addToUser) dispatch(addFile(dbFile));
           dispatch(handleFinish());
+          dispatch(updateUserProperty('remainingBytes', file.size));
 
           if (localConfig.notifyUpload) {
             notify({
