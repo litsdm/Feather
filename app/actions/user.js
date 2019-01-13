@@ -17,7 +17,6 @@ export const logoutUser = () => ({
 export const addUserFromToken = token => dispatch => {
   const user = jwtDecode(token);
   localStorage.setItem('tempoToken', token);
-  console.log(user.remainingBytes);
   dispatch(addUser(user));
 };
 
@@ -26,9 +25,6 @@ export const updateUserProperty = (name, value) => (dispatch, getState) => {
     user: { id, remainingBytes }
   } = getState();
   const payload = { name, value: remainingBytes - value };
-  console.log('REMAINING BYTES ', remainingBytes);
-  console.log('SIZE ', value);
-  console.log('RESTA ', remainingBytes - value);
 
   return callApi(`${id}/update`, payload, 'PUT')
     .then(res => res.json())

@@ -5,7 +5,7 @@ import { object, func, number, string } from 'prop-types';
 import styles from './FileRow.scss';
 
 import callApi from '../helpers/apiCaller';
-import { getFileIcon } from '../helpers/file';
+import { getFileIcon, humanFileSize } from '../helpers/file';
 import { emit } from '../socketClient';
 
 import Progressbar from './Progressbar';
@@ -29,22 +29,6 @@ const FileRow = ({
     if (id === uploadId) return 'uploading';
 
     return 'default';
-  };
-
-  const humanFileSize = (bytes, si) => {
-    const thresh = si ? 1000 : 1024;
-    if (Math.abs(bytes) < thresh) {
-      return `${bytes} B`;
-    }
-    const units = si
-      ? ['kB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB']
-      : ['KiB', 'MiB', 'GiB', 'TiB', 'PiB', 'EiB', 'ZiB', 'YiB'];
-    let u = -1;
-    do {
-      bytes /= thresh; // eslint-disable-line
-      ++u; // eslint-disable-line
-    } while (Math.abs(bytes) >= thresh && u < units.length - 1);
-    return `${bytes.toFixed(1)} ${units[u]}`;
   };
 
   const handleDownload = () => {
