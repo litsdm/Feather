@@ -75,8 +75,9 @@ const updateProgress = progress => ({
 const uploadFromQueue = () => (dispatch, getState) => {
   const {
     upload: { queue, addToUser },
-    user: { isPro, remainingBytes }
+    user: { isPro, remainingBytes, remainingFiles }
   } = getState();
+  const unwrappedRemainingFiles = remainingFiles || 50;
   const rawFile = queue[0];
   const file = {
     name: rawFile.name,
@@ -90,6 +91,12 @@ const uploadFromQueue = () => (dispatch, getState) => {
 
   if (!isPro && file.size > 2147483648) {
     dispatch(displayUpgrade('fileSize'));
+    dispatch(finishAndClean());
+    return;
+  }
+
+  if (!isPro && remainingFiles <= 0) {
+    dispatch(displayUpgrade('remainingFiles'));
     dispatch(finishAndClean());
     return;
   }
@@ -130,7 +137,12 @@ const uploadFromQueue = () => (dispatch, getState) => {
 
           if (addToUser) dispatch(addFile(dbFile));
           dispatch(handleFinish());
-          dispatch(updateUserProperty('remainingBytes', file.size));
+          dispatch(
+            updateUserProperty('remainingBytes', remainingBytes - file.size)
+          );
+          dispatch(
+            updateUserProperty('remainingFiles', unwrappedRemainingFiles - 1)
+          );
 
           if (localConfig.notifyUpload) {
             notify({

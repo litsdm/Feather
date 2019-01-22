@@ -6,32 +6,53 @@ import styles from './UpgradeModal.scss';
 import { humanFileSize } from '../helpers/file';
 
 const UpgradeModal = ({ close, type, remainingBytes }) => {
-  const renderMessage = () =>
-    type === 'fileSize' ? (
-      <p className={styles.message}>
-        Your file size exceeds the maximum file size limit for your account (2
-        GB). We have a solution for you, with <b>Feather Plus</b> you can raise
-        the limit up to 10 GB per file.
-      </p>
-    ) : (
-      <p className={styles.message}>
-        You don
-        {"'"}t have enough storage left on your account (
-        {humanFileSize(remainingBytes)}
-        ). Get <b>Feather Plus</b> to upgrade your limit to 50 GB per week.
-      </p>
-    );
+  const getTitle = () => {
+    switch (type) {
+      case 'fileSize':
+        return 'File size exceeds limit';
+      case 'remainingBytes':
+        return 'File limit exceeded';
+      default:
+        return 'Not enough storage space';
+    }
+  };
+
+  const renderMessage = () => {
+    switch (type) {
+      case 'fileSize':
+        return (
+          <p className={styles.message}>
+            Your file size exceeds the maximum file size limit for your account
+            (2 GB). We have a solution for you, with <b>Feather Plus</b> you can
+            raise the limit up to 10 GB per file.
+          </p>
+        );
+      case 'remainingFiles':
+        return (
+          <p className={styles.message}>
+            You have exceeded the limit of 50 files per month for the free
+            account. Try <b>Feather Plus</b> now and upgrade your limit to{' '}
+            <b>10,000 files</b>.
+          </p>
+        );
+      default:
+        return (
+          <p className={styles.message}>
+            You don
+            {"'"}t have enough storage left on your account (
+            {humanFileSize(remainingBytes)}
+            ). Get <b>Feather Plus</b> to upgrade your limit to 50 GB per week.
+          </p>
+        );
+    }
+  };
 
   return (
     <div id="upgradeModal" className={styles.wrapper}>
       <button className={styles.overlay} type="button" onClick={close} />
       <div className={styles.modal}>
         <div className={styles.header}>
-          <p>
-            {type === 'fileSize'
-              ? 'File size exceeds limit'
-              : 'Not enough storage space'}
-          </p>
+          <p>{getTitle()}</p>
           <button type="button" className={styles.close} onClick={close}>
             <i className="fa fa-times" />
           </button>

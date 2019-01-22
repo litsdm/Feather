@@ -22,9 +22,9 @@ export const addUserFromToken = token => dispatch => {
 
 export const updateUserProperty = (name, value) => (dispatch, getState) => {
   const {
-    user: { id, remainingBytes }
+    user: { id }
   } = getState();
-  const payload = { name, value: remainingBytes - value };
+  const payload = { name, value };
 
   return callApi(`${id}/update`, payload, 'PUT')
     .then(res => res.json())
