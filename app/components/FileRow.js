@@ -6,6 +6,7 @@ import styles from './FileRow.scss';
 
 import callApi from '../helpers/apiCaller';
 import { getFileIcon, humanFileSize } from '../helpers/file';
+import analytics from '../helpers/analytics';
 import { emit } from '../socketClient';
 
 import Progressbar from './Progressbar';
@@ -32,6 +33,11 @@ const FileRow = ({
   };
 
   const handleDownload = () => {
+    analytics.send('event', {
+      ec: 'File-El',
+      ea: 'download',
+      el: `Download file ${id}`
+    });
     downloadFile(id, url, filename);
   };
 
@@ -54,6 +60,12 @@ const FileRow = ({
           removeFile(index);
           emit('removeFileFromRoom', { roomId: userId, index });
         }
+
+        analytics.send('event', {
+          ec: 'File-El',
+          ea: 'delete',
+          el: 'Delete file'
+        });
 
         return Promise.resolve();
       })

@@ -3,6 +3,7 @@ import { func, string, bool } from 'prop-types';
 import styles from './Auth.scss';
 
 import callApi from '../helpers/apiCaller';
+import analytics from '../helpers/analytics';
 
 import Loader from './Loader';
 
@@ -59,6 +60,11 @@ const Signup = ({
         addUser(token);
         fetchNeeded();
         goToHome();
+        analytics.send('event', {
+          ec: 'User-El',
+          ea: 'signup',
+          el: 'User signed up'
+        });
         return token;
       })
       .catch(err => {

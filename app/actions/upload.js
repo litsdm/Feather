@@ -2,6 +2,7 @@ import fs from 'fs';
 import mime from 'mime-types';
 import callApi, { uploadFile } from '../helpers/apiCaller';
 import notify from '../helpers/notifications';
+import analytics from '../helpers/analytics';
 import { emit } from '../socketClient';
 import { updateUserProperty } from './user';
 import { displayUpgrade } from './upgrade';
@@ -152,6 +153,13 @@ const uploadFromQueue = () => (dispatch, getState) => {
           }
         }
       );
+
+      analytics.send('event', {
+        ec: 'Upload-El',
+        ea: 'upload',
+        el: `Upload file ${dbFile._id}`
+      });
+
       return Promise.resolve();
     })
     .catch(() => {

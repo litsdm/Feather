@@ -4,13 +4,23 @@ import { func, string, number } from 'prop-types';
 import styles from './UpgradeModal.scss';
 
 import { humanFileSize } from '../helpers/file';
+import analytics from '../helpers/analytics';
 
 const UpgradeModal = ({ close, type, remainingBytes }) => {
+  const openLink = () => {
+    analytics.send('event', {
+      ec: 'Upgrade-El',
+      ea: 'gotoPage',
+      el: 'Open upgrade page'
+    });
+    shell.openExternal('https://feather-client.herokuapp.com/upgrade');
+  };
+
   const getTitle = () => {
     switch (type) {
       case 'fileSize':
         return 'File size exceeds limit';
-      case 'remainingBytes':
+      case 'remainingFiles':
         return 'File limit exceeded';
       default:
         return 'Not enough storage space';
@@ -59,13 +69,7 @@ const UpgradeModal = ({ close, type, remainingBytes }) => {
         </div>
         <div className={styles.content}>
           {renderMessage()}
-          <button
-            type="button"
-            className={styles.button}
-            onClick={() =>
-              shell.openExternal('https://feather-client.herokuapp.com/upgrade')
-            }
-          >
+          <button type="button" className={styles.button} onClick={openLink}>
             Get Feather Plus
           </button>
         </div>

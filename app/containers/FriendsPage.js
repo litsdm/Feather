@@ -4,6 +4,7 @@ import { arrayOf, bool, func } from 'prop-types';
 import { userShape, friendRequestShape } from '../shapes';
 
 import callApi from '../helpers/apiCaller';
+import analytics from '../helpers/analytics';
 import { emit } from '../socketClient';
 import { addFriend } from '../actions/friend';
 import { removeFriendRequest } from '../actions/friendRequest';
@@ -135,6 +136,12 @@ class FriendsPage extends Component {
             text: 'Your friend request is on the way!',
             type: 'success'
           }
+        });
+
+        analytics.send('event', {
+          ec: 'FriendRequest-El',
+          ea: 'send',
+          el: 'Sent friend request'
         });
         return Promise.resolve();
       })
