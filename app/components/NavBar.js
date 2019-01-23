@@ -90,10 +90,16 @@ const NavBar = ({ pathname, history, requestIndicator, updateAvailable }) => {
   ) : (
     <div className={styles.headerWrapper}>
       <div className={styles.dragZone}>
-        <p className={styles.windowsTitle}>
-          <i className="fa fa-feather-alt" />
-          Feather
-        </p>
+        {pathname === '/friends' ? (
+          <button type="button" className={styles.quit} onClick={handleGoBack}>
+            <i className="fa fa-arrow-left" />
+          </button>
+        ) : (
+          <p className={styles.windowsTitle}>
+            <i className="fa fa-feather-alt" />
+            Feather
+          </p>
+        )}
         <div className={styles.controls}>
           <div className={styles.otherControls}>{config.controlsRight}</div>
           <div className={styles.divider} />
