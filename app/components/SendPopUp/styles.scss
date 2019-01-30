@@ -50,8 +50,30 @@
 
 .selectedFriends {
   background-color: #fff;
-  border-top: 1px solid #eaedf3;
   display: flex;
   padding: 12px;
   padding-left: 15px;
+}
+
+.tabActive {
+  border-color: #2091f3 !important;
+  color: rgba(0, 0, 0, 0.8) !important;
+}
+
+.tabs {
+  display: flex;
+
+  button {
+    background-color: #fff;
+    border: none;
+    border-bottom: 1px solid #eaedf3;
+    color: rgba(0, 0, 0, 0.5);
+    cursor: pointer;
+    font-weight: 600;
+    outline: none;
+    padding: 6px 0;
+    text-transform: uppercase;
+    transition: 0.3s ease all;
+    width: 100%;
+  }
 }

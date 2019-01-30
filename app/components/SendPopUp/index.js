@@ -1,16 +1,21 @@
 import React, { Component } from 'react';
-import uuid from 'uuid/v4';
 import { arrayOf, bool, func } from 'prop-types';
 import { userShape } from '../../shapes';
 import styles from './styles.scss';
 
-import Row from './Row';
-import ProfilePic from '../ProfilePic';
+import { validateEmail } from '../../helpers/string';
+
+import FriendsTab from './FriendsTab';
+import EmailTab from './EmailTab';
 
 class SendPopUp extends Component {
   state = {
     receivers: [],
-    selectedIndeces: {}
+    selectedIndeces: {},
+    emails: [],
+    currentEmail: '',
+    emailError: '',
+    tab: 0
   };
 
   findFriendIndex = friendId => {
@@ -75,47 +80,67 @@ class SendPopUp extends Component {
     });
   };
 
-  renderSelectedFriends = () => {
-    const { receivers } = this.state;
-
-    const picStyle = {
-      border: '1px solid #fff',
-      height: '18px',
-      marginLeft: '-3px',
-      marginRight: 0,
-      width: '18px'
-    };
-
-    return receivers.map(friend => (
-      <ProfilePic
-        key={uuid()}
-        {...friend}
-        picStyle={picStyle}
-        phStyle={{ fontSize: '9px' }}
-      />
-    ));
+  handleKeyPress = ({ key }) => {
+    if (key === 'Enter' || key === ' ') {
+      const { emails, currentEmail } = this.state;
+      if (!validateEmail(currentEmail)) {
+        this.setState({ emailError: 'Invalid email' });
+        return;
+      }
+      this.setState({ emails: [...emails, currentEmail], currentEmail: '' });
+    }
   };
 
-  renderFriends = () => {
-    const { selectedIndeces } = this.state;
+  handleChange = ({ target: { name, value } }) =>
+    this.setState({ [name]: value.trim(), emailError: '' });
+
+  handleRemoveEmail = index => {
+    const { emails } = this.state;
+    this.setState({
+      emails: [...emails.slice(0, index), ...emails.slice(index + 1)]
+    });
+  };
+
+  renderTabs = () => {
+    const {
+      receivers,
+      selectedIndeces,
+      tab,
+      currentEmail,
+      emails,
+      emailError
+    } = this.state;
     const { friends } = this.props;
 
-    return friends.map((friend, index) => (
-      <Row
-        key={uuid()}
-        isSelected={selectedIndeces[index] || false}
-        addFriend={this.handleAdd}
-        removeFriend={this.handleRemove}
-        index={index}
-        {...friend}
-      />
-    ));
+    if (tab === 0)
+      return (
+        <FriendsTab
+          friends={friends}
+          receivers={receivers}
+          selectedIndeces={selectedIndeces}
+          handleAdd={this.handleAdd}
+          handleRemove={this.handleRemove}
+        />
+      );
+
+    if (tab === 1)
+      return (
+        <EmailTab
+          currentEmail={currentEmail}
+          emails={emails}
+          handleKeyPress={this.handleKeyPress}
+          handleChange={this.handleChange}
+          removeEmail={this.handleRemoveEmail}
+          error={emailError}
+        />
+      );
   };
 
   render() {
-    const { receivers } = this.state;
+    const { receivers, tab, emails } = this.state;
     const { display } = this.props;
-    const sendActive = receivers.length > 0;
+    const sendActive =
+      (tab === 0 && receivers.length > 0) || (tab === 1 && emails.length > 0);
 
     return (
       <div className={`${styles.popUp} ${display ? styles.active : ''}`}>
@@ -137,12 +162,23 @@ class SendPopUp extends Component {
             <i className="far fa-paper-plane" />
           </button>
         </div>
-        {receivers.length > 0 ? (
-          <div className={styles.selectedFriends}>
-            {this.renderSelectedFriends()}
-          </div>
-        ) : null}
-        <div className={styles.list}>{this.renderFriends()}</div>
+        <div className={styles.tabs}>
+          <button
+            type="button"
+            className={tab === 0 ? styles.tabActive : {}}
+            onClick={() => this.setState({ tab: 0 })}
+          >
+            Friends
+          </button>
+          <button
+            type="button"
+            className={tab === 1 ? styles.tabActive : {}}
+            onClick={() => this.setState({ tab: 1 })}
+          >
+            Email
+          </button>
+        </div>
+        {this.renderTabs()}
       </div>
     );
   }

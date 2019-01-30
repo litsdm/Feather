@@ -1,0 +1,44 @@
+.label {
+  border: 1px solid rgba(0, 0, 0, 0.5);
+  border-radius: 6px;
+  display: flex;
+  height: 50px;
+  margin-bottom: 12px;
+  position: relative;
+  width: 100%;
+
+  p {
+    color: #6a6d70;
+    cursor: text;
+    font-size: 0.875em;
+    left: 24px;
+    position: absolute;
+    top: 50%;
+    transition: 0.2s ease all;
+    transform: translate(0%, -50%);
+  }
+
+  &:focus-within {
+    border-color: #2091f3;
+
+    p {
+      font-size: 0.75em;
+      top: 30%;
+    }
+  }
+}
+
+.hasValue {
+  font-size: 0.75em !important;
+  top: 30% !important;
+}
+
+.input {
+  border-radius: 6px;
+  border: none;
+  font-size: 0.875em;
+  outline: none;
+  padding: 0 24px;
+  padding-top: 18px;
+  width: 100%;
+}

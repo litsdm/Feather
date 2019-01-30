@@ -1,0 +1,51 @@
+.emailTab {
+  padding: 24px;
+}
+
+.note {
+  font-size: 12px;
+  font-weight: 300;
+  margin-bottom: 24px;
+  text-align: center;
+}
+
+.tags {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  margin-bottom: 12px;
+}
+
+.tag {
+  align-items: center;
+  background-color: #2091f3;
+  border-radius: 6px;
+  color: #fff;
+  display: flex;
+  font-size: 12px;
+  font-weight: 600;
+  margin-bottom: 6px;
+  margin-right: 6px;
+  padding: 6px;
+
+  button {
+    align-items: center;
+    background-color: #fff;
+    border: none;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    height: 18px;
+    justify-content: center;
+    margin-left: 6px;
+    opacity: 0.8;
+    outline: none;
+    transition: 0.2s ease all;
+    width: 18px;
+
+    &:hover {
+      opacity: 1;
+    }
+  }
+}
