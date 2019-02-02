@@ -6,7 +6,10 @@ import {
   AWAIT_SEND_FOR_FILES,
   STOP_WAITING,
   SET_ADD_FLAG,
-  FINISH_AND_CLEAN
+  FINISH_AND_CLEAN,
+  START_SENDING,
+  UPDATE_STATUS,
+  FINISH_SENDING
 } from '../actions/upload';
 
 const initialState = {
@@ -16,12 +19,15 @@ const initialState = {
   queue: [],
   waitFiles: [],
   isWaiting: false,
-  addToUser: false
+  addToUser: false,
+  status: '',
+  statusProgress: 0,
+  isSending: false
 };
 
 const downloads = (
   state = initialState,
-  { type, file, progress, waitFiles, addToUser }
+  { type, file, progress, waitFiles, addToUser, status, statusProgress }
 ) => {
   switch (type) {
     case ADD_FILE_TO_QUEUE:
@@ -50,6 +56,27 @@ const downloads = (
         isUploading: false,
         progress: 0,
         file: null
+      };
+
+    case START_SENDING:
+      return {
+        ...state,
+        isSending: true
+      };
+
+    case UPDATE_STATUS:
+      return {
+        ...state,
+        status,
+        statusProgress
+      };
+
+    case FINISH_SENDING:
+      return {
+        ...state,
+        isSending: false,
+        status: '',
+        statusProgress: 0
       };
 
     case AWAIT_SEND_FOR_FILES:

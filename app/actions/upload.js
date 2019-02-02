@@ -20,6 +20,9 @@ export const AWAIT_SEND_FOR_FILES = 'AWAIT_SEND_FOR_FILES';
 export const STOP_WAITING = 'STOP_WAITING';
 export const SET_ADD_FLAG = 'SET_ADD_FLAG';
 export const FINISH_AND_CLEAN = 'FINISH_AND_CLEAN';
+export const START_SENDING = 'START_SENDING';
+export const UPDATE_STATUS = 'UPDATE_STATUS';
+export const FINISH_SENDING = 'FINISH_SENDING';
 
 export const awaitSendForFiles = waitFiles => ({
   waitFiles,
@@ -57,6 +60,20 @@ const startUpload = file => ({
 const addFileToQueue = file => ({
   file,
   type: ADD_FILE_TO_QUEUE
+});
+
+const startSending = () => ({
+  type: START_SENDING
+});
+
+const finishSending = () => ({
+  type: FINISH_SENDING
+});
+
+const updateStatus = (status, statusProgress = 0) => ({
+  status,
+  statusProgress,
+  type: UPDATE_STATUS
 });
 
 const handleFinish = () => (dispatch, getState) => {
@@ -204,17 +221,23 @@ export const uploadToLink = send => (dispatch, getState) => {
   const output = fs.createWriteStream(outputPath);
   const archive = archiver('zip');
 
+  dispatch(stopWaiting(false));
+  dispatch(startSending());
+  dispatch(updateStatus('Creating temporary directory...'));
+
   archive.pipe(output);
 
   // Create directory
   fs.mkdirSync(tempDirectoryPath);
 
   // Copy files to temporary directory
-  waitFiles.forEach(file => {
+  waitFiles.forEach((file, index) => {
+    dispatch(updateStatus('Copying files...', index / (waitFiles.length - 1)));
     fs.copyFileSync(file.path, `${tempDirectoryPath}${file.name}`);
   });
 
   // Compress temporary directory
+  dispatch(updateStatus('Compressing files...'));
   archive.directory(tempDirectoryPath, false);
 
   output.on('close', () => {
@@ -223,9 +246,11 @@ export const uploadToLink = send => (dispatch, getState) => {
     if (!shouldSend(dispatch, getState, zipFile)) {
       fs.unlinkSync(outputPath);
       rimraf.sync(tempDirectoryPath);
+      dispatch(finishSending());
       return;
     }
 
+    dispatch(updateStatus('Preparing upload...'));
     callApi(
       `sign-s3?file-name=FeatherFiles.zip&file-type=application/zip&folder-name=Files`
     )
@@ -236,6 +261,7 @@ export const uploadToLink = send => (dispatch, getState) => {
         return Promise.resolve();
       })
       .then(async () => {
+        dispatch(updateStatus('Linking files...'));
         const responses = await Promise.all(
           waitFiles.map(({ name, size, type }) => {
             const payload = { name, size, type, isGroup: true };
@@ -257,8 +283,9 @@ export const uploadToLink = send => (dispatch, getState) => {
         uploadFile(
           zipFile,
           signedReq,
-          progress => console.log(progress),
+          progress => dispatch(updateStatus('Uploading files...', progress)),
           () => {
+            dispatch(updateStatus('Finalizing...'));
             callApi(
               'email',
               { to: dbLink.to, endpoint: dbLink._id, from: username },
@@ -275,6 +302,7 @@ export const uploadToLink = send => (dispatch, getState) => {
               updateUserProperty('remainingFiles', unwrappedRemainingFiles - 1)
             );
 
+            dispatch(finishSending());
             fs.unlinkSync(outputPath);
             rimraf.sync(tempDirectoryPath);
           }
@@ -282,11 +310,15 @@ export const uploadToLink = send => (dispatch, getState) => {
 
         return Promise.resolve();
       })
-      .catch(err => console.error(err));
+      .catch(err => {
+        dispatch(finishSending());
+        fs.unlinkSync(outputPath);
+        rimraf.sync(tempDirectoryPath);
+        console.error(err);
+      });
   });
 
   archive.finalize();
-  dispatch(stopWaiting(false));
 };
 
 const shouldSend = (dispatch, getState, file) => {

@@ -39,9 +39,18 @@ import SendPopUp from '../components/SendPopUp';
 import UploadQueue from '../components/UploadQueue';
 import DisconnectedModal from '../components/DisconnectedModal';
 import UpgradeModal from '../components/UpgradeModal';
+import LinkProgress from '../components/LinkProgress';
 
 const mapStateToProps = ({
-  upload: { isWaiting, queue, file, progress },
+  upload: {
+    isWaiting,
+    queue,
+    file,
+    progress,
+    isSending,
+    status,
+    statusProgress
+  },
   user,
   friend: { friends },
   friendRequest: { friendRequests },
@@ -57,7 +66,10 @@ const mapStateToProps = ({
   uploadProgress: progress,
   failed,
   isFetchingFiles,
-  upgrade
+  upgrade,
+  isSending,
+  status,
+  statusProgress
 });
 
 const mapDispatchToProps = dispatch => ({
@@ -210,7 +222,10 @@ class App extends React.Component {
       failed,
       isFetchingFiles,
       upgrade,
-      closeUpgrade
+      closeUpgrade,
+      isSending,
+      status,
+      statusProgress
     } = this.props;
     const { updateAvailable } = this.state;
     return (
@@ -236,6 +251,11 @@ class App extends React.Component {
           queue={queue}
           file={uploadFile}
           progress={uploadProgress}
+        />
+        <LinkProgress
+          visible={isSending}
+          status={status}
+          progress={statusProgress}
         />
         {upgrade.visible ? (
           <UpgradeModal
@@ -275,6 +295,9 @@ App.propTypes = {
   waitForRecipients: func.isRequired,
   addNewFriend: func.isRequired,
   uploadLink: func.isRequired,
+  isSending: bool,
+  status: string,
+  statusProgress: number,
   friends: arrayOf(userShape),
   friendRequests: arrayOf(friendRequestShape),
   queue: arrayOf(fileShape),
@@ -290,6 +313,9 @@ App.defaultProps = {
   friends: [],
   friendRequests: [],
   queue: [],
+  isSending: false,
+  status: '',
+  statusProgress: 0,
   uploadFile: null,
   uploadProgress: 0,
   user: {}
