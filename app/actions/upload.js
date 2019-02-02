@@ -23,6 +23,7 @@ export const FINISH_AND_CLEAN = 'FINISH_AND_CLEAN';
 export const START_SENDING = 'START_SENDING';
 export const UPDATE_STATUS = 'UPDATE_STATUS';
 export const FINISH_SENDING = 'FINISH_SENDING';
+export const SET_LINK_URL = 'SET_LINK_URL';
 
 export const awaitSendForFiles = waitFiles => ({
   waitFiles,
@@ -74,6 +75,11 @@ const updateStatus = (status, statusProgress = 0) => ({
   status,
   statusProgress,
   type: UPDATE_STATUS
+});
+
+const setLinkUrl = url => ({
+  url,
+  type: SET_LINK_URL
 });
 
 const handleFinish = () => (dispatch, getState) => {
@@ -305,6 +311,9 @@ export const uploadToLink = send => (dispatch, getState) => {
             dispatch(finishSending());
             fs.unlinkSync(outputPath);
             rimraf.sync(tempDirectoryPath);
+
+            dispatch(setLinkUrl(`http://www.feathershare.com/${dbLink._id}`));
+            document.getElementById('linkModal').style.display = 'flex';
           }
         );
 

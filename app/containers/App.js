@@ -40,6 +40,7 @@ import UploadQueue from '../components/UploadQueue';
 import DisconnectedModal from '../components/DisconnectedModal';
 import UpgradeModal from '../components/UpgradeModal';
 import LinkProgress from '../components/LinkProgress';
+import LinkModal from '../components/LinkModal';
 
 const mapStateToProps = ({
   upload: {
@@ -49,7 +50,8 @@ const mapStateToProps = ({
     progress,
     isSending,
     status,
-    statusProgress
+    statusProgress,
+    linkUrl
   },
   user,
   friend: { friends },
@@ -69,7 +71,8 @@ const mapStateToProps = ({
   upgrade,
   isSending,
   status,
-  statusProgress
+  statusProgress,
+  linkUrl
 });
 
 const mapDispatchToProps = dispatch => ({
@@ -225,7 +228,8 @@ class App extends React.Component {
       closeUpgrade,
       isSending,
       status,
-      statusProgress
+      statusProgress,
+      linkUrl
     } = this.props;
     const { updateAvailable } = this.state;
     return (
@@ -257,6 +261,7 @@ class App extends React.Component {
           status={status}
           progress={statusProgress}
         />
+        <LinkModal url={linkUrl} />
         {upgrade.visible ? (
           <UpgradeModal
             type={upgrade.messageType}
@@ -306,6 +311,7 @@ App.propTypes = {
   user: userShape,
   failed: bool.isRequired,
   isFetchingFiles: bool.isRequired,
+  linkUrl: string.isRequired,
   upgrade: shape({ visible: bool, messageType: string }).isRequired
 };
 

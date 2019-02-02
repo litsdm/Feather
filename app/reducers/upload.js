@@ -9,7 +9,8 @@ import {
   FINISH_AND_CLEAN,
   START_SENDING,
   UPDATE_STATUS,
-  FINISH_SENDING
+  FINISH_SENDING,
+  SET_LINK_URL
 } from '../actions/upload';
 
 const initialState = {
@@ -22,12 +23,13 @@ const initialState = {
   addToUser: false,
   status: '',
   statusProgress: 0,
-  isSending: false
+  isSending: false,
+  linkUrl: ''
 };
 
 const downloads = (
   state = initialState,
-  { type, file, progress, waitFiles, addToUser, status, statusProgress }
+  { type, file, progress, waitFiles, addToUser, status, statusProgress, url }
 ) => {
   switch (type) {
     case ADD_FILE_TO_QUEUE:
@@ -92,6 +94,12 @@ const downloads = (
         isWaiting: false,
         waitFiles: [],
         addToUser
+      };
+
+    case SET_LINK_URL:
+      return {
+        ...state,
+        linkUrl: url
       };
 
     case SET_ADD_FLAG:
