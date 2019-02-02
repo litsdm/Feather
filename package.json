@@ -212,6 +212,7 @@
   },
   "dependencies": {
     "@fortawesome/fontawesome-free": "^5.2.0",
+    "archiver": "^3.0.0",
     "devtron": "^1.4.0",
     "electron-debug": "^2.0.0",
     "electron-dl": "^1.12.0",

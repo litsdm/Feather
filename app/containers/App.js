@@ -23,7 +23,8 @@ import { finishDownload, updateDownloadProgress } from '../actions/download';
 import {
   stopWaiting,
   uploadWithSend,
-  awaitSendForFiles
+  awaitSendForFiles,
+  uploadToLink
 } from '../actions/upload';
 import { fetchFriendsIfNeeded, addFriend } from '../actions/friend';
 import {
@@ -70,6 +71,7 @@ const mapDispatchToProps = dispatch => ({
   dRemoveFile: index => dispatch(removeFile(index)),
   dStopWaiting: () => dispatch(stopWaiting()),
   uploadFiles: (send, addToUser) => dispatch(uploadWithSend(send, addToUser)),
+  uploadLink: send => dispatch(uploadToLink(send)),
   addReceivedFriendRequest: friendRequest =>
     dispatch(addFriendRequest(friendRequest)),
   waitForRecipients: files => dispatch(awaitSendForFiles(files)),
@@ -203,6 +205,7 @@ class App extends React.Component {
       user,
       queue,
       uploadFile,
+      uploadLink,
       uploadProgress,
       failed,
       isFetchingFiles,
@@ -225,6 +228,7 @@ class App extends React.Component {
           display={isWaiting}
           stopWaiting={dStopWaiting}
           uploadFiles={uploadFiles}
+          uploadLink={uploadLink}
           user={user}
           friends={[{ ...user, _id: user.id }, ...friends]}
         />
@@ -270,6 +274,7 @@ App.propTypes = {
   addReceivedFriendRequest: func.isRequired,
   waitForRecipients: func.isRequired,
   addNewFriend: func.isRequired,
+  uploadLink: func.isRequired,
   friends: arrayOf(userShape),
   friendRequests: arrayOf(friendRequestShape),
   queue: arrayOf(fileShape),

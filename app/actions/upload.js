@@ -1,5 +1,8 @@
+import { remote } from 'electron';
 import fs from 'fs';
+import archiver from 'archiver';
 import mime from 'mime-types';
+import rimraf from 'rimraf';
 import callApi, { uploadFile } from '../helpers/apiCaller';
 import notify from '../helpers/notifications';
 import analytics from '../helpers/analytics';
@@ -76,7 +79,7 @@ const updateProgress = progress => ({
 const uploadFromQueue = () => (dispatch, getState) => {
   const {
     upload: { queue, addToUser },
-    user: { isPro, remainingBytes, remainingFiles }
+    user: { remainingBytes, remainingFiles }
   } = getState();
   const unwrappedRemainingFiles = remainingFiles || 50;
   const rawFile = queue[0];
@@ -90,28 +93,7 @@ const uploadFromQueue = () => (dispatch, getState) => {
   };
   let signedReq;
 
-  if (!isPro && file.size > 2147483648) {
-    dispatch(displayUpgrade('fileSize'));
-    dispatch(finishAndClean());
-    return;
-  }
-
-  if (!isPro && remainingFiles <= 0) {
-    dispatch(displayUpgrade('remainingFiles'));
-    dispatch(finishAndClean());
-    return;
-  }
-
-  if (file.size > remainingBytes) {
-    dispatch(displayUpgrade('remainingBytes'));
-    dispatch(finishAndClean());
-    return;
-  }
-
-  if (isPro && file.size > 10737418240) {
-    dispatch(finishAndClean());
-    return;
-  }
+  if (!shouldSend(dispatch, getState, file)) return;
 
   callApi(
     `sign-s3?file-name=${file.name}&file-type=${file.type}&folder-name=Files`
@@ -205,4 +187,134 @@ const getFileFromPath = path => {
   const file = new File([data], filename, { type: mime.lookup(filename) });
 
   return file;
+};
+
+export const uploadToLink = send => (dispatch, getState) => {
+  const {
+    upload: { waitFiles },
+    user: { username, remainingBytes, remainingFiles }
+  } = getState();
+  const unwrappedRemainingFiles = remainingFiles || 50;
+  const appTempDirectory = remote.app.getPath('temp');
+  const tempDirectoryPath = `${appTempDirectory}FeatherFiles/`;
+  const outputPath = `${appTempDirectory}FeatherFiles.zip`;
+  const link = { ...send, files: [] };
+  let signedReq;
+
+  const output = fs.createWriteStream(outputPath);
+  const archive = archiver('zip');
+
+  archive.pipe(output);
+
+  // Create directory
+  fs.mkdirSync(tempDirectoryPath);
+
+  // Copy files to temporary directory
+  waitFiles.forEach(file => {
+    fs.copyFileSync(file.path, `${tempDirectoryPath}${file.name}`);
+  });
+
+  // Compress temporary directory
+  archive.directory(tempDirectoryPath, false);
+
+  output.on('close', () => {
+    const zipFile = getFileFromPath(outputPath);
+
+    if (!shouldSend(dispatch, getState, zipFile)) {
+      fs.unlinkSync(outputPath);
+      rimraf.sync(tempDirectoryPath);
+      return;
+    }
+
+    callApi(
+      `sign-s3?file-name=FeatherFiles.zip&file-type=application/zip&folder-name=Files`
+    )
+      .then(res => res.json())
+      .then(({ signedRequest, url }) => {
+        link.s3Url = url;
+        signedReq = signedRequest;
+        return Promise.resolve();
+      })
+      .then(async () => {
+        const responses = await Promise.all(
+          waitFiles.map(({ name, size, type }) => {
+            const payload = { name, size, type, isGroup: true };
+            return callApi('files', payload, 'POST');
+          })
+        );
+        const dbFiles = await Promise.all(responses.map(res => res.json()));
+        const fileIds = dbFiles.map(({ file: { _id } }) => _id);
+
+        link.files = fileIds;
+        link.size = zipFile.size;
+
+        return callApi('links', link, 'POST');
+      })
+      .then(res => res.json())
+      .then(({ message, link: dbLink }) => {
+        if (message) return Promise.reject(new Error(message));
+
+        uploadFile(
+          zipFile,
+          signedReq,
+          progress => console.log(progress),
+          () => {
+            callApi(
+              'email',
+              { to: dbLink.to, endpoint: dbLink._id, from: username },
+              'POST'
+            );
+
+            dispatch(
+              updateUserProperty(
+                'remainingBytes',
+                remainingBytes - zipFile.size
+              )
+            );
+            dispatch(
+              updateUserProperty('remainingFiles', unwrappedRemainingFiles - 1)
+            );
+
+            fs.unlinkSync(outputPath);
+            rimraf.sync(tempDirectoryPath);
+          }
+        );
+
+        return Promise.resolve();
+      })
+      .catch(err => console.error(err));
+  });
+
+  archive.finalize();
+  dispatch(stopWaiting(false));
+};
+
+const shouldSend = (dispatch, getState, file) => {
+  const {
+    user: { isPro, remainingBytes, remainingFiles }
+  } = getState();
+  if (!isPro && file.size > 2147483648) {
+    dispatch(displayUpgrade('fileSize'));
+    dispatch(finishAndClean());
+    return false;
+  }
+
+  if (!isPro && remainingFiles <= 0) {
+    dispatch(displayUpgrade('remainingFiles'));
+    dispatch(finishAndClean());
+    return false;
+  }
+
+  if (file.size > remainingBytes) {
+    dispatch(displayUpgrade('remainingBytes'));
+    dispatch(finishAndClean());
+    return false;
+  }
+
+  if (isPro && file.size > 10737418240) {
+    dispatch(finishAndClean());
+    return false;
+  }
+
+  return true;
 };

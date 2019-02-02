@@ -31,22 +31,29 @@ class SendPopUp extends Component {
   };
 
   handleSend = () => {
-    const { receivers, selectedIndeces } = this.state;
+    const { receivers, selectedIndeces, tab, emails } = this.state;
     const {
       user: { id },
-      uploadFiles
+      uploadFiles,
+      uploadLink
     } = this.props;
 
-    const to = receivers.map(({ _id }) => _id);
+    const to = tab === 0 ? receivers.map(({ _id }) => _id) : emails;
 
     const send = {
       to,
       from: id
     };
 
-    uploadFiles(send, selectedIndeces[0]);
+    if (tab === 0) uploadFiles(send, selectedIndeces[0]);
+    else if (tab === 1) uploadLink(send);
 
-    this.setState({ receivers: [], selectedIndeces: {} });
+    this.setState({
+      receivers: [],
+      selectedIndeces: {},
+      emails: [],
+      currentEmail: ''
+    });
   };
 
   handleBack = () => {
@@ -189,6 +196,7 @@ SendPopUp.propTypes = {
   stopWaiting: func.isRequired,
   friends: arrayOf(userShape).isRequired,
   uploadFiles: func.isRequired,
+  uploadLink: func.isRequired,
   user: userShape
 };
 
