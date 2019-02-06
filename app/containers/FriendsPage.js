@@ -109,10 +109,18 @@ class FriendsPage extends Component {
   sendRequest = () => {
     const { friendTag } = this.state;
     const { user } = this.props;
+    const queryProperty =
+      friendTag.split('#').length < 2 && friendTag.includes('@')
+        ? 'email'
+        : 'tag';
 
     this.setState({ requestMessage: null });
 
-    callApi('friendRequest', { tag: friendTag, from: user.id }, 'POST')
+    callApi(
+      'friendRequest',
+      { tag: friendTag, from: user.id, queryProperty },
+      'POST'
+    )
       .then(res => res.json())
       .then(({ friendRequest, message }) => {
         if (message) return Promise.reject(message);

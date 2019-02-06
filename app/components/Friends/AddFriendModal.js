@@ -17,6 +17,10 @@ const AddFriendModal = ({
     const parts = friendTag.split('#');
     let sliceIndex = 0;
 
+    if (friendTag.includes('@')) {
+      return friendTag;
+    }
+
     if (parts.length === 2) {
       sliceIndex = parts[1].length + 1;
     }
@@ -57,7 +61,7 @@ const AddFriendModal = ({
               type="text"
               name="friendTag"
               value={friendTag}
-              placeholder="Enter your friend's username#0000"
+              placeholder="username#0000 or email"
               onChange={handleChange}
             />
             <div className={styles.hint}>{friendTag ? formatHint() : null}</div>
