@@ -1,8 +1,12 @@
-import { ADD_DOWNLOAD, FINISH_DOWNLOAD, UPDATE_DOWNLOAD_PROGRESS } from '../actions/download';
+import {
+  ADD_DOWNLOAD,
+  FINISH_DOWNLOAD,
+  UPDATE_DOWNLOAD_PROGRESS
+} from '../actions/download';
 
 const initialState = {};
 
-const downloads = (state = initialState, { type, fileId, progress, }) => {
+const downloads = (state = initialState, { type, fileId, progress }) => {
   switch (type) {
     case ADD_DOWNLOAD:
       return { ...state, [fileId]: { progress: 0 } };
@@ -16,7 +20,7 @@ const downloads = (state = initialState, { type, fileId, progress, }) => {
       return {
         ...state,
         [fileId]: { progress }
-      }
+      };
 
     default:
       return state;

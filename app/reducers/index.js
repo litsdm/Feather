@@ -1,6 +1,6 @@
 // @flow
 import { combineReducers } from 'redux';
-import { routerReducer as router } from 'react-router-redux';
+import { connectRouter } from 'connected-react-router';
 import file from './file';
 import user from './user';
 import downloads from './download';
@@ -11,20 +11,21 @@ import upgrade from './upgrade';
 
 import { USER_LOGOUT } from '../actions/user';
 
-const appReducer = combineReducers({
-  downloads,
-  file,
-  router,
-  upload,
-  friend,
-  friendRequest,
-  user,
-  upgrade
-});
+const appReducer = history =>
+  combineReducers({
+    file,
+    downloads,
+    router: connectRouter(history),
+    upload,
+    friend,
+    friendRequest,
+    user,
+    upgrade
+  });
 
-const rootReducer = (state, action) => {
+const rootReducer = history => (state, action) => {
   const appState = action.type === USER_LOGOUT ? undefined : state;
-  return appReducer(appState, action);
+  return appReducer(history)(appState, action);
 };
 
 export default rootReducer;

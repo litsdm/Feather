@@ -5,7 +5,7 @@ const notify = ({ title, ...options }) => {
 
   notification.onClick = () => {
     ipcRenderer.send('show-window');
-  }
-}
+  };
+};
 
 export default notify;

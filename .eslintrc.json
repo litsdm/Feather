@@ -1,0 +1,13 @@
+{
+  "extends": "erb",
+  "rules": {
+    "no-underscore-dangle": "off"
+  },
+  "settings": {
+    "import/resolver": {
+      "webpack": {
+        "config": "configs/webpack.config.eslint.js"
+      }
+    }
+  }
+}

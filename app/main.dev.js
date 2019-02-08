@@ -1,4 +1,4 @@
-/* eslint global-require: 0, flowtype-errors/show-errors: 0 */
+/* eslint global-require: off */
 
 /**
  * This module executes inside of electron's main process. You can start
@@ -13,13 +13,21 @@
 import { app, BrowserWindow, Tray, ipcMain, nativeImage } from 'electron';
 import { download } from 'electron-dl';
 import { autoUpdater } from 'electron-updater';
+import log from 'electron-log';
 import path from 'path';
 import MenuBuilder from './menu';
 
+export default class AppUpdater {
+  constructor() {
+    log.transports.file.level = 'info';
+    autoUpdater.logger = log;
+    if (process.env.NODE_ENV === 'production')
+      autoUpdater.checkForUpdatesAndNotify();
+  }
+}
+
 let mainWindow = null;
 let tray = null;
-
-if (process.platform === 'darwin') app.dock.hide();
 
 if (process.env.NODE_ENV === 'production') {
   const sourceMapSupport = require('source-map-support');
@@ -31,8 +39,6 @@ if (
   process.env.DEBUG_PROD === 'true'
 ) {
   require('electron-debug')();
-  const p = path.join(__dirname, '..', 'app', 'node_modules');
-  require('module').globalPaths.push(p);
 }
 
 const installExtensions = async () => {
@@ -147,6 +153,7 @@ ipcMain.on('quitApp', () => {
 });
 
 autoUpdater.on('update-downloaded', () => {
+  console.log('update ready');
   mainWindow.webContents.send('updateReady');
 });
 
@@ -155,7 +162,11 @@ ipcMain.on('quitAndInstall', () => {
 });
 
 app.on('window-all-closed', () => {
-  app.quit();
+  // Respect the OSX convention of having the application in memory even
+  // after all windows have been closed
+  if (process.platform !== 'darwin') {
+    app.quit();
+  }
 });
 
 app.on('ready', async () => {
@@ -177,10 +188,6 @@ app.on('ready', async () => {
     process.env.DEBUG_PROD === 'true'
   ) {
     await installExtensions();
-  }
-
-  if (process.env.NODE_ENV === 'production') {
-    autoUpdater.checkForUpdates();
   }
 
   mainWindow = new BrowserWindow({
@@ -211,16 +218,14 @@ app.on('ready', async () => {
     }
   });
 
-  /* mainWindow.on('blur', () => {
-    if (!mainWindow.webContents.isDevToolsOpened()) {
-      mainWindow.hide();
-    }
-  }) */
-
   mainWindow.on('closed', () => {
     mainWindow = null;
   });
 
   const menuBuilder = new MenuBuilder(mainWindow);
   menuBuilder.buildMenu();
+
+  // Remove this if your app does not use auto updates
+  // eslint-disable-next-line
+  new AppUpdater();
 });

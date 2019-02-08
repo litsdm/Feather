@@ -28,25 +28,24 @@ const FileList = ({
   };
 
   const renderFiles = () =>
-    files.map(
-      ({ name, size, s3Url, _id, expiresAt }, index) =>
-        moment().diff(expiresAt) < 0 ? (
-          <FileRow
-            key={uuid()}
-            filename={name}
-            size={size}
-            expiresAt={moment(expiresAt)}
-            url={s3Url}
-            downloads={downloads}
-            id={_id}
-            downloadFile={downloadFile}
-            uploadId={uploadId}
-            uploadProgress={uploadProgress}
-            index={index}
-            userId={userId}
-            removeFile={removeFile}
-          />
-        ) : null
+    files.map(({ name, size, s3Url, _id, expiresAt }, index) =>
+      moment().diff(expiresAt) < 0 ? (
+        <FileRow
+          key={uuid()}
+          filename={name}
+          size={size}
+          expiresAt={moment(expiresAt)}
+          url={s3Url}
+          downloads={downloads}
+          id={_id}
+          downloadFile={downloadFile}
+          uploadId={uploadId}
+          uploadProgress={uploadProgress}
+          index={index}
+          userId={userId}
+          removeFile={removeFile}
+        />
+      ) : null
     );
 
   return (
