@@ -1,7 +1,7 @@
 {
   "name": "feather",
   "productName": "Feather",
-  "version": "0.1.0",
+  "version": "0.2.1",
   "description": "Easy file transfer tray application.",
   "scripts": {
     "build": "concurrently \"yarn build-main\" \"yarn build-renderer\"",
@@ -26,6 +26,9 @@
     "postlint-styles-fix": "prettier --ignore-path .eslintignore --single-quote --write '**/*.{css,scss}'",
     "preinstall": "node ./internals/scripts/CheckYarn.js",
     "prestart": "yarn build",
+    "ship": "yarn build && build -p always",
+    "ship-win": "yarn build && build --win --x64 -p always",
+    "ship-all": "yarn build && build --mac --win --x64 -p always",
     "start": "cross-env NODE_ENV=production electron ./app/main.prod.js",
     "start-main-dev": "cross-env HOT=1 NODE_ENV=development electron -r @babel/register ./app/main.dev.js",
     "start-renderer-dev": "cross-env NODE_ENV=development webpack-dev-server --config configs/webpack.config.renderer.dev.babel.js",
@@ -63,7 +66,8 @@
       "app/app.html",
       "app/main.prod.js",
       "app/main.prod.js.map",
-      "package.json"
+      "package.json",
+      "assets/"
     ],
     "dmg": {
       "contents": [
@@ -101,8 +105,7 @@
     "publish": {
       "provider": "github",
       "owner": "cdiezmoran",
-      "repo": "Feather",
-      "private": false
+      "repo": "Feather"
     }
   },
   "repository": {
