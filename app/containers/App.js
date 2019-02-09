@@ -3,76 +3,28 @@ import { ipcRenderer } from 'electron';
 import { connect } from 'react-redux';
 import { withRouter } from 'react-router';
 import jwtDecode from 'jwt-decode';
-import {
-  arrayOf,
-  bool,
-  func,
-  object,
-  node,
-  number,
-  shape,
-  string
-} from 'prop-types';
-import { userShape, friendRequestShape, fileShape } from '../shapes';
+import { arrayOf, func, object, node } from 'prop-types';
+import { friendRequestShape, userShape } from '../shapes';
 import socket, { emit } from '../socketClient';
 
 import notify from '../helpers/notifications';
 
 import { fetchFilesIfNeeded, addFile, removeFile } from '../actions/file';
 import { finishDownload, updateDownloadProgress } from '../actions/download';
-import {
-  stopWaiting,
-  uploadWithSend,
-  awaitSendForFiles,
-  uploadToLink
-} from '../actions/upload';
+import { awaitSendForFiles } from '../actions/upload';
 import { fetchFriendsIfNeeded, addFriend } from '../actions/friend';
 import {
   fetchFriendRequestsIfNeeded,
   addFriendRequest
 } from '../actions/friendRequest';
 import { addUserFromToken } from '../actions/user';
-import { hideUpgrade } from '../actions/upgrade';
 
 import NavBar from '../components/NavBar';
-import SendPopUp from '../components/SendPopUp';
-import UploadQueue from '../components/UploadQueue';
-import DisconnectedModal from '../components/DisconnectedModal';
-import UpgradeModal from '../components/UpgradeModal';
-import LinkProgress from '../components/LinkProgress';
-import LinkModal from '../components/LinkModal';
+import PopUpContainer from './PopUpContainer';
 
-const mapStateToProps = ({
-  upload: {
-    isWaiting,
-    queue,
-    file,
-    progress,
-    isSending,
-    status,
-    statusProgress,
-    linkUrl
-  },
+const mapStateToProps = ({ user, friendRequest: { friendRequests } }) => ({
   user,
-  friend: { friends },
-  friendRequest: { friendRequests },
-  file: { failed, isFetching: isFetchingFiles },
-  upgrade
-}) => ({
-  isWaiting,
-  user,
-  friends,
-  friendRequests,
-  queue,
-  uploadFile: file,
-  uploadProgress: progress,
-  failed,
-  isFetchingFiles,
-  upgrade,
-  isSending,
-  status,
-  statusProgress,
-  linkUrl
+  friendRequests
 });
 
 const mapDispatchToProps = dispatch => ({
@@ -84,20 +36,15 @@ const mapDispatchToProps = dispatch => ({
     dispatch(updateDownloadProgress(fileId, progress)),
   dAddFile: file => dispatch(addFile(file)),
   dRemoveFile: index => dispatch(removeFile(index)),
-  dStopWaiting: () => dispatch(stopWaiting()),
-  uploadFiles: (send, addToUser) => dispatch(uploadWithSend(send, addToUser)),
-  uploadLink: send => dispatch(uploadToLink(send)),
   addReceivedFriendRequest: friendRequest =>
     dispatch(addFriendRequest(friendRequest)),
   waitForRecipients: files => dispatch(awaitSendForFiles(files)),
   addNewFriend: friend => dispatch(addFriend(friend)),
-  updateUser: token => dispatch(addUserFromToken(token)),
-  closeUpgrade: () => dispatch(hideUpgrade())
+  updateUser: token => dispatch(addUserFromToken(token))
 });
 
 class App extends React.Component {
   state = {
-    user: null,
     updateAvailable: false
   };
 
@@ -106,7 +53,7 @@ class App extends React.Component {
       history,
       location: { pathname }
     } = this.props;
-    const { user } = this.state;
+    const { user } = this.props;
     const token = localStorage.getItem('tempoToken');
     const localConfig = localStorage.getItem('localConfig');
 
@@ -212,24 +159,7 @@ class App extends React.Component {
       children,
       location: { pathname },
       history,
-      isWaiting,
-      dStopWaiting,
-      uploadFiles,
-      friends,
-      friendRequests,
-      user,
-      queue,
-      uploadFile,
-      uploadLink,
-      uploadProgress,
-      failed,
-      isFetchingFiles,
-      upgrade,
-      closeUpgrade,
-      isSending,
-      status,
-      statusProgress,
-      linkUrl
+      friendRequests
     } = this.props;
     const { updateAvailable } = this.state;
     return (
@@ -243,38 +173,7 @@ class App extends React.Component {
           />
         ) : null}
         {children}
-        <SendPopUp
-          display={isWaiting}
-          stopWaiting={dStopWaiting}
-          uploadFiles={uploadFiles}
-          uploadLink={uploadLink}
-          user={user}
-          friends={[{ ...user, _id: user.id }, ...friends]}
-        />
-        <UploadQueue
-          queue={queue}
-          file={uploadFile}
-          progress={uploadProgress}
-        />
-        <LinkProgress
-          visible={isSending}
-          status={status}
-          progress={statusProgress}
-        />
-        <LinkModal url={linkUrl} />
-        {upgrade.visible ? (
-          <UpgradeModal
-            type={upgrade.messageType}
-            close={closeUpgrade}
-            remainingBytes={user.remainingBytes || 0}
-          />
-        ) : null}
-        {failed ? (
-          <DisconnectedModal
-            retry={this.fetchData}
-            isFetching={isFetchingFiles}
-          />
-        ) : null}
+        <PopUpContainer fetchData={this.fetchData} />
       </React.Fragment>
     );
   }
@@ -289,41 +188,18 @@ App.propTypes = {
   dUpdateDownloadProgress: func.isRequired,
   dAddFile: func.isRequired,
   dRemoveFile: func.isRequired,
-  isWaiting: bool.isRequired,
-  dStopWaiting: func.isRequired,
-  uploadFiles: func.isRequired,
   fetchFriends: func.isRequired,
   updateUser: func.isRequired,
-  closeUpgrade: func.isRequired,
   fetchFriendRequests: func.isRequired,
   addReceivedFriendRequest: func.isRequired,
   waitForRecipients: func.isRequired,
   addNewFriend: func.isRequired,
-  uploadLink: func.isRequired,
-  isSending: bool,
-  status: string,
-  statusProgress: number,
-  friends: arrayOf(userShape),
   friendRequests: arrayOf(friendRequestShape),
-  queue: arrayOf(fileShape),
-  uploadFile: fileShape,
-  uploadProgress: number,
-  user: userShape,
-  failed: bool.isRequired,
-  isFetchingFiles: bool.isRequired,
-  linkUrl: string.isRequired,
-  upgrade: shape({ visible: bool, messageType: string }).isRequired
+  user: userShape
 };
 
 App.defaultProps = {
-  friends: [],
   friendRequests: [],
-  queue: [],
-  isSending: false,
-  status: '',
-  statusProgress: 0,
-  uploadFile: null,
-  uploadProgress: 0,
   user: {}
 };
 

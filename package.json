@@ -67,7 +67,7 @@
       "app/main.prod.js",
       "app/main.prod.js.map",
       "package.json",
-      "assets/"
+      "app/assets/"
     ],
     "dmg": {
       "contents": [
