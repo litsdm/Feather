@@ -224,6 +224,13 @@ export const uploadToLink = send => (dispatch, getState) => {
   const link = { ...send, files: [] };
   let signedReq;
 
+  console.log(appTempDirectory);
+
+  if (fs.existsSync(tempDirectoryPath)) {
+    fs.unlinkSync(outputPath);
+    rimraf.sync(tempDirectoryPath);
+  }
+
   const output = fs.createWriteStream(outputPath);
   const archive = archiver('zip');
 
@@ -237,7 +244,19 @@ export const uploadToLink = send => (dispatch, getState) => {
   fs.mkdirSync(tempDirectoryPath);
 
   // Copy files to temporary directory
-  waitFiles.forEach((file, index) => {
+  waitFiles.forEach((waitFile, index) => {
+    const file =
+      typeof waitFile === 'string'
+        ? {
+            path: waitFile,
+            name: waitFile
+              .split('\\')
+              .pop()
+              .split('/')
+              .pop()
+          }
+        : waitFile;
+
     dispatch(updateStatus('Copying files...', index / (waitFiles.length - 1)));
     fs.copyFileSync(file.path, `${tempDirectoryPath}${file.name}`);
   });
@@ -269,7 +288,9 @@ export const uploadToLink = send => (dispatch, getState) => {
       .then(async () => {
         dispatch(updateStatus('Linking files...'));
         const responses = await Promise.all(
-          waitFiles.map(({ name, size, type }) => {
+          waitFiles.map(file => {
+            const { name, size, type } =
+              typeof file === 'string' ? getFileFromPath(file) : file;
             const payload = { name, size, type, isGroup: true };
             return callApi('files', payload, 'POST');
           })
