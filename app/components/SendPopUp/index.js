@@ -31,14 +31,26 @@ class SendPopUp extends Component {
   };
 
   handleSend = () => {
-    const { receivers, selectedIndeces, tab, emails } = this.state;
+    const {
+      receivers,
+      selectedIndeces,
+      tab,
+      emails,
+      currentEmail
+    } = this.state;
     const {
       user: { id },
       uploadFiles,
       uploadLink
     } = this.props;
 
-    const to = tab === 0 ? receivers.map(({ _id }) => _id) : emails;
+    const finalEmails =
+      (tab === 0 && receivers.length > 0) ||
+      (tab === 1 && emails.length > 0 && validateEmail(currentEmail))
+        ? [...emails, currentEmail]
+        : emails;
+
+    const to = tab === 0 ? receivers.map(({ _id }) => _id) : finalEmails;
 
     const send = {
       to,
@@ -144,10 +156,11 @@ class SendPopUp extends Component {
   };
 
   render() {
-    const { receivers, tab, emails } = this.state;
+    const { receivers, tab, emails, currentEmail } = this.state;
     const { display } = this.props;
     const sendActive =
-      (tab === 0 && receivers.length > 0) || (tab === 1 && emails.length > 0);
+      (tab === 0 && receivers.length > 0) ||
+      (tab === 1 && (emails.length > 0 || validateEmail(currentEmail)));
 
     return (
       <div className={`${styles.popUp} ${display ? styles.active : ''}`}>
