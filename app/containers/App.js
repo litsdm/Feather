@@ -67,9 +67,15 @@ class App extends React.Component {
         })
       );
 
-    if (!user && !token && pathname !== '/auth') history.push('/auth');
+    if (
+      !Object.prototype.hasOwnProperty.call(user, 'id') &&
+      !token &&
+      pathname !== '/auth'
+    ) {
+      history.push('/auth');
+    }
 
-    if (user || token) {
+    if (Object.prototype.hasOwnProperty.call(user, 'id') || token) {
       const userId = user ? user.id : jwtDecode(token).id;
       emit('userConnection', userId);
       this.fetchData();
