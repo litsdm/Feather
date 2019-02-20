@@ -12,14 +12,24 @@ const initialState = {
 
 export default function counter(
   state = initialState,
-  { type, friend, friends, index }
+  { type, friend, friends, index, insertIndex }
 ) {
   switch (type) {
-    case ADD_FRIEND:
+    case ADD_FRIEND: {
+      const newFriends =
+        insertIndex !== null
+          ? [
+              ...state.friends.slice(0, insertIndex),
+              friend,
+              ...state.friends.slice(insertIndex)
+            ]
+          : [...state.friends, friend];
+
       return {
         ...state,
-        friends: [...state.friends, friend]
+        friends: newFriends
       };
+    }
 
     case REQUEST_FRIENDS:
       return {

@@ -6,12 +6,20 @@ export const REQUEST_FRIENDS = 'REQUEST_FRIENDS';
 export const RECEIVE_FRIENDS = 'RECEIVE_FRIENDS';
 export const REMOVE_FRIEND = 'REMOVE_FRIEND';
 
-export function addFriend(friend) {
-  return {
-    friend,
-    type: ADD_FRIEND
-  };
-}
+export const addFriend = friend => (dispatch, getState) => {
+  const {
+    friend: { friends }
+  } = getState();
+  const insertIndex = getInsertIndex(friend, friends);
+
+  dispatch(insertFriend(friend, insertIndex));
+};
+
+const insertFriend = (friend, insertIndex) => ({
+  friend,
+  insertIndex,
+  type: ADD_FRIEND
+});
 
 export function removeFriend(index) {
   return {
@@ -58,3 +66,14 @@ export function fetchFriendsIfNeeded() {
     }
   };
 }
+
+const getInsertIndex = ({ username }, friends) => {
+  for (let i = 0; i < friends.length; i += 1) {
+    const { username: checkUsername } = friends[i];
+    if (username.toLowerCase() < checkUsername.toLowerCase()) {
+      return i;
+    }
+  }
+
+  return null;
+};
