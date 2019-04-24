@@ -45,8 +45,7 @@ class SendPopUp extends Component {
     } = this.props;
 
     const finalEmails =
-      (tab === 0 && receivers.length > 0) ||
-      (tab === 1 && emails.length > 0 && validateEmail(currentEmail))
+      tab === 1 && validateEmail(currentEmail)
         ? [...emails, currentEmail]
         : emails;
 
