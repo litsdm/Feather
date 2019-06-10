@@ -15,7 +15,7 @@ export const getFileIcon = filename => {
     case 'wav':
     case 'wma':
     case 'wpl':
-      return { icon: 'far fa-file-audio', color: '#03A9F4' };
+      return { icon: 'fas fa-volume-up', color: '#03A9F4' };
     // Compressed files
     case '7z':
     case 'arj':
@@ -26,7 +26,7 @@ export const getFileIcon = filename => {
     case 'z':
     case 'zip':
     case 'gz':
-      return { icon: 'far fa-file-archive', color: '#FFC107' };
+      return { icon: 'fas fa-archive', color: '#FFC107' };
     // Image files
     case 'ai':
     case 'bmp':
@@ -41,7 +41,7 @@ export const getFileIcon = filename => {
     case 'tif':
     case 'tiff':
     case 'icns':
-      return { icon: 'far fa-file-image', color: '#536DFE' };
+      return { icon: 'far fa-image', color: '#536DFE' };
     // Code files
     case 'asp':
     case 'aspx':
@@ -74,7 +74,7 @@ export const getFileIcon = filename => {
     case 'json':
     case 'babelrc':
     case 'yml':
-      return { icon: 'far fa-file-code', color: '#673AB7' };
+      return { icon: 'fas fa-code', color: '#673AB7' };
     // Video files
     case '3g2':
     case '3gp':
@@ -91,21 +91,21 @@ export const getFileIcon = filename => {
     case 'swf':
     case 'vob':
     case 'wmv':
-      return { icon: 'far fa-file-video', color: '#F44336' };
+      return { icon: 'fas fa-video', color: '#F44336' };
     // PowerPoint files
     case 'pps':
     case 'ppt':
     case 'pptx':
-      return { icon: 'far fa-file-powerpoint', color: '#d24726' };
+      return { icon: 'fas fa-file-powerpoint', color: '#d24726' };
     // Excel files
     case 'xlr':
     case 'xls':
     case 'xlsx':
-      return { icon: 'far fa-file-excel', color: '#217346' };
+      return { icon: 'fas fa-file-excel', color: '#217346' };
     // Word Files
     case 'doc':
     case 'docx':
-      return { icon: 'far fa-file-word', color: '#2b579a' };
+      return { icon: 'fas fa-file-word', color: '#2b579a' };
     // Text files
     case 'odt':
     case 'rtf':
@@ -115,12 +115,12 @@ export const getFileIcon = filename => {
     case 'wps':
     case 'wpd':
     case 'pages':
-      return { icon: 'far fa-file-alt', color: '#607D8B' };
+      return { icon: 'fas fa-file-alt', color: '#607D8B' };
     // pdf files
     case 'pdf':
-      return { icon: 'far fa-file-pdf', color: '#ff0000' };
+      return { icon: 'fas fa-file-pdf', color: '#ff0000' };
     default:
-      return { icon: 'far fa-file', color: '#000' };
+      return { icon: 'fas fa-file', color: '#000' };
   }
 };
 

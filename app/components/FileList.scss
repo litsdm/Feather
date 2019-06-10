@@ -1,8 +1,16 @@
+.container {
+  height: 100%;
+}
+
 .list {
-  background-color: #f9f9fb;
-  height: 360px;
+  background-color: #fff;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  // height: 462px;
   overflow-y: scroll;
   outline: none;
+  padding: 0 18px;
   position: relative;
 }
 
@@ -12,14 +20,20 @@
 }
 
 .empty {
-  background-color: #f9f9fb;
+  background-color: #fff;
   font-size: 14px;
-  height: 312px;
+  height: 414px;
   padding: 24px;
+  position: relative;
   text-align: center;
 
   p {
+    left: 50%;
     opacity: 0.6;
+    position: absolute;
+    top: calc(50% - 98px);
+    transform: translate(-50%);
+    width: 85%;
   }
 }
 

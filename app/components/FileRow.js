@@ -1,37 +1,24 @@
-import React, { Fragment } from 'react';
+import React from 'react';
 import moment from 'moment';
 import { momentObj } from 'react-moment-proptypes';
-import { object, func, number, string } from 'prop-types';
+import { func, number, string } from 'prop-types';
 import styles from './FileRow.scss';
 
 import callApi from '../helpers/apiCaller';
-import { getFileIcon, humanFileSize } from '../helpers/file';
+import { getFileIcon } from '../helpers/file';
 import analytics from '../helpers/analytics';
 import { emit } from '../socketClient';
 
-import Progressbar from './Progressbar';
-
 const FileRow = ({
-  downloads,
   downloadFile,
   filename,
   expiresAt,
   id,
-  size,
   url,
-  uploadId,
-  uploadProgress,
   userId,
   removeFile,
   index
 }) => {
-  const getState = () => {
-    if (typeof downloads[id] !== 'undefined') return 'downloading';
-    if (id === uploadId) return 'uploading';
-
-    return 'default';
-  };
-
   const handleDownload = () => {
     analytics.send('event', {
       ec: 'File-El',
@@ -72,65 +59,57 @@ const FileRow = ({
       .catch(err => console.error(err.message));
   };
 
-  const state = getState();
   const fileIcon = getFileIcon(filename);
 
-  const renderInfoSection = () => {
-    if (state === 'downloading')
-      return <Progressbar progress={downloads[id].progress} action={state} />;
-    if (state === 'uploading')
-      return <Progressbar progress={uploadProgress} action={state} />;
-
-    return (
-      <Fragment>
-        <p className={styles.expiry}>Expires {moment().to(expiresAt)}</p>
-        <p className={styles.size}>{humanFileSize(size, true)}</p>
-      </Fragment>
-    );
-  };
-
   return (
-    <div className={styles.row}>
-      <div className={styles.top}>
-        <div className={styles.info}>
-          <i className={fileIcon.icon} style={{ color: fileIcon.color }} />
-          <p className={styles.name}>{filename}</p>
-        </div>
-        {state === 'default' ? (
-          <div className={styles.actions}>
+    <div className={styles.item}>
+      <div className={styles.square}>
+        <div className={styles.overlay}>
+          <div className={styles.overlayCol}>
             <button
               type="button"
-              className={styles.download}
+              className={styles.downloadButton}
               onClick={handleDownload}
             >
-              <i className="fa fa-download" />
+              <i className="fas fa-long-arrow-alt-down" />
             </button>
+            Download
+          </div>
+          <div className={styles.overlayCol}>
             <button
               type="button"
-              className={styles.delete}
+              className={styles.deleteButton}
               onClick={handleDelete}
             >
-              <i className="fa fa-trash-alt" />
+              <i className="far fa-trash-alt" />
             </button>
+            Delete
           </div>
-        ) : null}
+        </div>
+        <div
+          className={styles.innerSquare}
+          style={{ backgroundColor: fileIcon.color }}
+        />
+        <i
+          className={`${styles.centerIcon} ${fileIcon.icon}`}
+          style={{ color: fileIcon.color }}
+        />
       </div>
-      <div className={styles.bottom}>{renderInfoSection()}</div>
+      <div>
+        <p className={styles.name}>{filename}</p>
+        <p className={styles.expiry}>Expires {moment().to(expiresAt)}</p>
+      </div>
     </div>
   );
 };
 
 FileRow.propTypes = {
-  downloads: object.isRequired, // eslint-disable-line
   downloadFile: func.isRequired,
   expiresAt: momentObj.isRequired,
   filename: string.isRequired,
   id: string.isRequired,
   index: number.isRequired,
   removeFile: func.isRequired,
-  size: number.isRequired,
-  uploadId: string.isRequired,
-  uploadProgress: number.isRequired,
   userId: string.isRequired,
   url: string.isRequired
 };
