@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React, { useState, useEffect } from 'react';
 import { ipcRenderer } from 'electron';
 import { connect } from 'react-redux';
 import { withRouter } from 'react-router';
@@ -43,17 +43,28 @@ const mapDispatchToProps = dispatch => ({
   updateUser: token => dispatch(addUserFromToken(token))
 });
 
-class App extends React.Component {
-  state = {
-    updateAvailable: false
-  };
+const App = ({
+  addNewFriend,
+  addReceivedFriendRequest,
+  children,
+  dAddFile,
+  dFinishDownload,
+  dRemoveFile,
+  dUpdateDownloadProgress,
+  fetchFiles,
+  fetchFriends,
+  fetchFriendRequests,
+  friendRequests,
+  history,
+  location: { pathname },
+  updateUser,
+  user,
+  waitForRecipients
+}) => {
+  const [updateAvailable, setUpdateAvailable] = useState(false);
 
-  componentDidMount() {
-    const {
-      history,
-      location: { pathname }
-    } = this.props;
-    const { user } = this.props;
+  // component did mount equivalent (runs once)
+  useEffect(() => {
     const token = localStorage.getItem('tempoToken');
     const localConfig = localStorage.getItem('localConfig');
 
@@ -78,35 +89,25 @@ class App extends React.Component {
     if (Object.prototype.hasOwnProperty.call(user, 'id') || token) {
       const userId = user ? user.id : jwtDecode(token).id;
       emit('userConnection', userId);
-      this.fetchData();
+      fetchData();
     }
 
-    this.setupListeners();
-  }
+    setupListeners();
+  }, []);
 
-  fetchData = () => {
-    const { fetchFiles, fetchFriends, fetchFriendRequests } = this.props;
+  const fetchData = () => {
     fetchFiles();
     fetchFriends();
     fetchFriendRequests();
   };
 
-  setupListeners = () => {
-    const {
-      dAddFile,
-      dRemoveFile,
-      addReceivedFriendRequest,
-      addNewFriend,
-      updateUser
-    } = this.props;
+  const setupListeners = () => {
     const localConfig = JSON.parse(localStorage.getItem('localConfig'));
 
-    ipcRenderer.on('download-progress', this.handleDownloadProgress);
-    ipcRenderer.on('download-finish', this.handleDownloadFinish);
-    ipcRenderer.on('upload-from-tray', this.handleTrayUpload);
-    ipcRenderer.on('updateReady', () =>
-      this.setState({ updateAvailable: true })
-    );
+    ipcRenderer.on('download-progress', handleDownloadProgress);
+    ipcRenderer.on('download-finish', handleDownloadFinish);
+    ipcRenderer.on('upload-from-tray', handleTrayUpload);
+    ipcRenderer.on('updateReady', () => setUpdateAvailable(true));
     socket.on('recieveFile', file => {
       dAddFile(file);
 
@@ -136,18 +137,11 @@ class App extends React.Component {
     });
   };
 
-  handleTrayUpload = (e, files) => {
-    const { waitForRecipients } = this.props;
-    waitForRecipients(files);
-  };
-
-  handleDownloadProgress = (e, { progress, fileId }) => {
-    const { dUpdateDownloadProgress } = this.props;
+  const handleTrayUpload = (e, files) => waitForRecipients(files);
+  const handleDownloadProgress = (e, { progress, fileId }) =>
     dUpdateDownloadProgress(fileId, progress);
-  };
 
-  handleDownloadFinish = (e, { fileId, filename }) => {
-    const { dFinishDownload } = this.props;
+  const handleDownloadFinish = (e, { fileId, filename }) => {
     const localConfig = JSON.parse(localStorage.getItem('localConfig'));
 
     dFinishDownload(fileId);
@@ -160,30 +154,21 @@ class App extends React.Component {
     }
   };
 
-  render() {
-    const {
-      children,
-      location: { pathname },
-      history,
-      friendRequests
-    } = this.props;
-    const { updateAvailable } = this.state;
-    return (
-      <React.Fragment>
-        {pathname !== '/settings' && pathname !== '/auth' ? (
-          <NavBar
-            pathname={pathname}
-            history={history}
-            requestIndicator={friendRequests.length > 0}
-            updateAvailable={updateAvailable}
-          />
-        ) : null}
-        {children}
-        <PopUpContainer fetchData={this.fetchData} />
-      </React.Fragment>
-    );
-  }
-}
+  return (
+    <>
+      {pathname !== '/settings' && pathname !== '/auth' ? (
+        <NavBar
+          pathname={pathname}
+          history={history}
+          requestIndicator={friendRequests.length > 0}
+          updateAvailable={updateAvailable}
+        />
+      ) : null}
+      {children}
+      <PopUpContainer fetchData={fetchData} />
+    </>
+  );
+};
 
 App.propTypes = {
   children: node.isRequired,
