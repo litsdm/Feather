@@ -23,6 +23,10 @@ body {
   height: 100%;
 }
 
+#app {
+  height: 100%;
+}
+
 h2 {
   margin: 0;
   font-size: 2.25rem;

@@ -1,0 +1,19 @@
+.overlay {
+  align-items: center;
+  background-color: #fff;
+  bottom: 0;
+  justify-content: center;
+  left: 0;
+  opacity: 0.9;
+  padding: 24px;
+  position: absolute;
+  right: 0;
+  top: 0;
+  z-index: 1;
+
+  p {
+    font-weight: bold;
+    font-size: 30px;
+    text-align: center;
+  }
+}

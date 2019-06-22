@@ -8,6 +8,7 @@ import { friendRequestShape, userShape } from '../shapes';
 import socket, { emit } from '../socketClient';
 
 import notify from '../helpers/notifications';
+import useDropzone from '../helpers/useDropzone';
 
 import { fetchFilesIfNeeded, addFile, removeFile } from '../actions/file';
 import { finishDownload, updateDownloadProgress } from '../actions/download';
@@ -21,6 +22,7 @@ import { addUserFromToken } from '../actions/user';
 
 import NavBar from '../components/NavBar';
 import PopUpContainer from './PopUpContainer';
+import DropOverlay from '../components/DropOverlay';
 
 const mapStateToProps = ({ user, friendRequest: { friendRequests } }) => ({
   user,
@@ -62,6 +64,7 @@ const App = ({
   waitForRecipients
 }) => {
   const [updateAvailable, setUpdateAvailable] = useState(false);
+  const isDragging = useDropzone();
 
   // component did mount equivalent (runs once)
   useEffect(() => {
@@ -154,6 +157,8 @@ const App = ({
     }
   };
 
+  console.log(isDragging);
+
   return (
     <>
       {pathname !== '/settings' && pathname !== '/auth' ? (
@@ -166,6 +171,7 @@ const App = ({
       ) : null}
       {children}
       <PopUpContainer fetchData={fetchData} />
+      <DropOverlay visible={isDragging} />
     </>
   );
 };
