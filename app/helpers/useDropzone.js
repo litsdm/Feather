@@ -9,6 +9,8 @@ import React, {
 
 const DropzoneContext = createContext(undefined);
 
+let awaitFiles = null
+
 export function DropzoneProvider({ children }) {
   const [isDragging, setDragging] = useState(false);
 
@@ -29,10 +31,9 @@ export function DropzoneProvider({ children }) {
       if (target === cachedTarget.current && isDragging) setDragging(false);
     };
 
-    const handleDrop = () => {
-      console.log('drop');
-
+    const handleDrop = ({ dataTransfer: { files } }) => {
       if (isDragging) setDragging(false);
+      if (files.length > 0 && awaitFiles) awaitFiles(files);
     };
 
     window.addEventListener('dragenter', handleDragEnter);
@@ -54,12 +55,14 @@ export function DropzoneProvider({ children }) {
   );
 }
 
-export default function useDropzone() {
+export default function useDropzone(awaitSendForFiles = null) {
   const context = useContext(DropzoneContext);
 
   if (!context) {
     throw new Error(`useDropzone must be used within a DropzoneProvider`);
   }
+
+  awaitFiles = awaitSendForFiles;
 
   return context.isDragging;
 }

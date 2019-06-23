@@ -64,7 +64,7 @@ const App = ({
   waitForRecipients
 }) => {
   const [updateAvailable, setUpdateAvailable] = useState(false);
-  const isDragging = useDropzone();
+  const isDragging = useDropzone(waitForRecipients);
 
   // component did mount equivalent (runs once)
   useEffect(() => {
@@ -156,8 +156,6 @@ const App = ({
       });
     }
   };
-
-  console.log(isDragging);
 
   return (
     <>
