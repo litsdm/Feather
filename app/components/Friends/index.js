@@ -17,7 +17,6 @@ const Friends = ({
   friends,
   resolveRequest,
   friendRequests,
-  sendFiles,
   searchTerm,
   filteredFriends
 }) => {
@@ -37,18 +36,14 @@ const Friends = ({
     const friendsToRender =
       filteredFriends.length > 0 ? filteredFriends : friends;
 
-    return friendsToRender.map(
-      ({ _id, username, profilePic, placeholderColor }) => (
-        <FriendRow
-          key={uuid()}
-          _id={_id}
-          profilePic={profilePic}
-          username={username}
-          placeholderColor={placeholderColor}
-          sendFiles={sendFiles}
-        />
-      )
-    );
+    return friendsToRender.map(({ username, profilePic, placeholderColor }) => (
+      <FriendRow
+        key={uuid()}
+        profilePic={profilePic}
+        username={username}
+        placeholderColor={placeholderColor}
+      />
+    ));
   };
 
   return (
@@ -106,7 +101,6 @@ Friends.propTypes = {
   }),
   friends: arrayOf(userShape),
   friendRequests: arrayOf(friendRequestShape),
-  sendFiles: func.isRequired,
   searchTerm: string,
   filteredFriends: arrayOf(userShape)
 };
