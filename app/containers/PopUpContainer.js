@@ -8,6 +8,7 @@ import { hideUpgrade } from '../actions/upgrade';
 
 import SendPopUp from '../components/SendPopUp';
 import UploadQueue from '../components/UploadQueue';
+import Queue from '../components/Queue';
 import DisconnectedModal from '../components/DisconnectedModal';
 import UpgradeModal from '../components/UpgradeModal';
 import LinkProgress from '../components/LinkProgress';
@@ -80,7 +81,10 @@ const PopUpContainer = ({
       user={user}
       friends={[{ ...user, _id: user.id }, ...friends]}
     />
-    <UploadQueue queue={queue} file={uploadFile} progress={uploadProgress} />
+    <Queue />
+    {/*
+      <UploadQueue queue={queue} file={uploadFile} progress={uploadProgress} />
+    */}
     <LinkProgress
       visible={isSending}
       status={status}
