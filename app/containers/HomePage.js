@@ -7,7 +7,7 @@ import Home from '../components/Home';
 
 import { removeFile } from '../actions/file';
 import { downloadFile } from '../actions/download';
-import { awaitSendForFiles } from '../actions/upload';
+import { awaitRecipients } from '../actions/queue';
 
 const mapStateToProps = ({ file: { files, isFetching }, user }) => ({
   files,
@@ -19,7 +19,7 @@ const mapDispatchToProps = dispatch => ({
   dDownloadFile: (fileId, url, filename) =>
     dispatch(downloadFile(fileId, url, filename)),
   dRemoveFile: index => dispatch(removeFile(index)),
-  dAwaitSendForFiles: files => dispatch(awaitSendForFiles(files))
+  waitForRecipients: files => dispatch(awaitRecipients(files))
 });
 
 const HomePage = ({
@@ -28,7 +28,7 @@ const HomePage = ({
   isFetching,
   dDownloadFile,
   dRemoveFile,
-  dAwaitSendForFiles
+  waitForRecipients
 }) => (
   <Home
     files={files}
@@ -36,7 +36,7 @@ const HomePage = ({
     isFetching={isFetching}
     downloadFile={dDownloadFile}
     removeFile={dRemoveFile}
-    awaitSendForFiles={dAwaitSendForFiles}
+    awaitSendForFiles={waitForRecipients}
   />
 );
 
@@ -46,7 +46,7 @@ HomePage.propTypes = {
   isFetching: bool.isRequired,
   dDownloadFile: func.isRequired,
   dRemoveFile: func.isRequired,
-  dAwaitSendForFiles: func.isRequired
+  waitForRecipients: func.isRequired
 };
 
 export default connect(

@@ -1,10 +1,11 @@
 import React from 'react';
 import { arrayOf, bool, func, string } from 'prop-types';
-import { fileShape } from '../shapes';
-import styles from './Home.scss';
+import { fileShape } from '../../shapes';
+import styles from './styles.scss';
 
 import FileList from './FileList';
-import Loader from './Loader';
+import Queue from '../Queue';
+import Loader from '../Loader';
 
 const Home = ({
   files,
@@ -41,6 +42,7 @@ const Home = ({
           userId={userId}
         />
       )}
+      <Queue />
     </div>
   );
 };

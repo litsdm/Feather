@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React, { Fragment, useState } from 'react';
+import uuid from 'uuid/v4';
 import styles from './styles.scss';
 
 import expandIcon from '../../assets/expand-icon.svg';
@@ -55,12 +56,12 @@ const Queue = () => {
 
   const renderRows = () =>
     tempData.map(({ name, progress }, index) => (
-      <>
+      <Fragment key={uuid()}>
         <Row name={name} progress={Math.round(progress * 100)} />
         {index + 1 < tempData.length ? (
           <div className={styles.divider} />
         ) : null}
-      </>
+      </Fragment>
     ));
 
   const totalProgress = calculateTotalProgress();

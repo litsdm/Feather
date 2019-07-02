@@ -2,7 +2,7 @@ import React from 'react';
 import uuid from 'uuid/v4';
 import moment from 'moment';
 import { arrayOf, func, string } from 'prop-types';
-import { fileShape } from '../shapes';
+import { fileShape } from '../../shapes';
 import styles from './FileList.scss';
 
 import FileRow from './FileRow';

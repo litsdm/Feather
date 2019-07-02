@@ -4,10 +4,10 @@ import { momentObj } from 'react-moment-proptypes';
 import { func, number, string } from 'prop-types';
 import styles from './FileRow.scss';
 
-import callApi from '../helpers/apiCaller';
-import { getFileIcon } from '../helpers/file';
-import analytics from '../helpers/analytics';
-import { emit } from '../socketClient';
+import callApi from '../../helpers/apiCaller';
+import { getFileIcon } from '../../helpers/file';
+import analytics from '../../helpers/analytics';
+import { emit } from '../../socketClient';
 
 const FileRow = ({
   downloadFile,
