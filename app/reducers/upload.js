@@ -32,11 +32,11 @@ const downloads = (
   { type, file, progress, waitFiles, addToUser, status, statusProgress, url }
 ) => {
   switch (type) {
-    case ADD_FILE_TO_QUEUE:
+    /* case ADD_FILE_TO_QUEUE:
       return {
         ...state,
         queue: [...state.queue, file]
-      };
+      }; */
 
     case START_UPLOAD:
       return {
@@ -81,7 +81,7 @@ const downloads = (
         statusProgress: 0
       };
 
-    case AWAIT_SEND_FOR_FILES:
+    /* case AWAIT_SEND_FOR_FILES:
       return {
         ...state,
         isWaiting: true,
@@ -94,7 +94,7 @@ const downloads = (
         isWaiting: false,
         waitFiles: [],
         addToUser
-      };
+      }; */
 
     case SET_LINK_URL:
       return {

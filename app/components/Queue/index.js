@@ -1,5 +1,6 @@
 import React, { Fragment, useState } from 'react';
 import uuid from 'uuid/v4';
+import { object, number } from 'prop-types';
 import styles from './styles.scss';
 
 import expandIcon from '../../assets/expand-icon.svg';
@@ -7,45 +8,22 @@ import shrinkIcon from '../../assets/shrink-icon.svg';
 
 import Row from './row';
 
-const tempData = [
-  {
-    name: 'Movie trailer.mp4',
-    progress: 0.344
-  },
-  {
-    name: 'final_project.pdf',
-    progress: 0.644
-  },
-  {
-    name: 'eng-essay.docx',
-    progress: 0.287
-  },
-  {
-    name: 'final-animation6.aep',
-    progress: 0.287
-  },
-  {
-    name: 'final_project.pdf',
-    progress: 0.644
-  },
-  {
-    name: 'eng-essay.docx',
-    progress: 0.287
-  },
-  {
-    name: 'final-animation6.aep',
-    progress: 0.287
-  }
-];
-
-const Queue = () => {
+const Queue = ({ files, completedCount }) => {
   const [isExpanded, setExpanded] = useState(false);
+  const fileKeys = Object.keys(files);
 
   const calculateTotalProgress = () => {
     // iterate through queued files and sum the progress
-    const progress = 0.54;
+    let totalProgress = 0;
+    const fileValues = Object.values(files);
 
-    return Math.round(progress * 100);
+    if (!fileValues || fileValues.length <= 0) return 0;
+
+    fileValues.forEach(({ progress }) => {
+      totalProgress += progress;
+    });
+
+    return Math.round((totalProgress / fileValues.length) * 100);
   };
 
   const hideOnExpand = () => (isExpanded ? { display: 'none' } : {});
@@ -55,10 +33,10 @@ const Queue = () => {
     `${className} ${isExpanded ? styles.expand : {}}`;
 
   const renderRows = () =>
-    tempData.map(({ name, progress }, index) => (
+    Object.values(files).map(({ name, progress }, index) => (
       <Fragment key={uuid()}>
         <Row name={name} progress={Math.round(progress * 100)} />
-        {index + 1 < tempData.length ? (
+        {index + 1 < fileKeys.length ? (
           <div className={styles.divider} />
         ) : null}
       </Fragment>
@@ -67,19 +45,25 @@ const Queue = () => {
   const totalProgress = calculateTotalProgress();
 
   return (
-    <div className={styles.container}>
+    <div style={{ display: fileKeys <= 0 ? 'none' : 'block' }}>
       <button
         type="button"
         className={styles.overlay}
         style={showOnExpand()}
         onClick={() => setExpanded(false)}
       />
-      <div className={withExpand(styles.queue)}>
+      <div
+        className={withExpand(styles.queue)}
+        style={{ bottom: fileKeys.length <= 0 ? -80 : 0 }}
+      >
         <div className={withExpand(styles.header)}>
           <div className={styles.info}>
-            <p className={withExpand(styles.title)}>Uploading 3 files</p>
+            <p className={withExpand(styles.title)}>
+              Uploading {fileKeys.length} files
+            </p>
             <p className={styles.subtitle} style={hideOnExpand()}>
-              {totalProgress}% • 0 out of 3 completed
+              {totalProgress}% • {completedCount} out of {fileKeys.length}{' '}
+              completed
             </p>
           </div>
           <button
@@ -104,6 +88,16 @@ const Queue = () => {
       </div>
     </div>
   );
+};
+
+Queue.propTypes = {
+  completedCount: number,
+  files: object // eslint-disable-line react/forbid-prop-types
+};
+
+Queue.defaultProps = {
+  completedCount: 0,
+  files: {}
 };
 
 export default Queue;

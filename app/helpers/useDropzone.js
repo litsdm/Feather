@@ -6,12 +6,17 @@ import React, {
   useEffect,
   useRef
 } from 'react';
+import { connect } from 'react-redux';
+
+import { awaitRecipients } from '../actions/queue';
+
+const mapDispatchToProps = dispatch => ({
+  waitForRecipients: files => dispatch(awaitRecipients(files))
+});
 
 const DropzoneContext = createContext(undefined);
 
-let awaitFiles = null
-
-export function DropzoneProvider({ children }) {
+function _DropzoneProvider({ children, waitForRecipients }) {
   const [isDragging, setDragging] = useState(false);
 
   const value = useMemo(() => ({ isDragging }), [isDragging]);
@@ -33,7 +38,7 @@ export function DropzoneProvider({ children }) {
 
     const handleDrop = ({ dataTransfer: { files } }) => {
       if (isDragging) setDragging(false);
-      if (files.length > 0 && awaitFiles) awaitFiles(files);
+      waitForRecipients(files);
     };
 
     window.addEventListener('dragenter', handleDragEnter);
@@ -55,14 +60,17 @@ export function DropzoneProvider({ children }) {
   );
 }
 
-export default function useDropzone(awaitSendForFiles = null) {
+export const DropzoneProvider = connect(
+  null,
+  mapDispatchToProps
+)(_DropzoneProvider);
+
+export default function useDropzone() {
   const context = useContext(DropzoneContext);
 
   if (!context) {
     throw new Error(`useDropzone must be used within a DropzoneProvider`);
   }
-
-  awaitFiles = awaitSendForFiles;
 
   return context.isDragging;
 }

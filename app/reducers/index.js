@@ -8,6 +8,7 @@ import upload from './upload';
 import friend from './friend';
 import friendRequest from './friendRequest';
 import upgrade from './upgrade';
+import queue from './queue';
 
 import { USER_LOGOUT } from '../actions/user';
 
@@ -20,7 +21,8 @@ const appReducer = history =>
     friend,
     friendRequest,
     user,
-    upgrade
+    upgrade,
+    queue
   });
 
 const rootReducer = history => (state, action) => {

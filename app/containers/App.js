@@ -12,7 +12,7 @@ import useDropzone from '../helpers/useDropzone';
 
 import { fetchFilesIfNeeded, addFile, removeFile } from '../actions/file';
 import { finishDownload, updateDownloadProgress } from '../actions/download';
-import { awaitSendForFiles } from '../actions/upload';
+import { awaitRecipients } from '../actions/queue';
 import { fetchFriendsIfNeeded, addFriend } from '../actions/friend';
 import {
   fetchFriendRequestsIfNeeded,
@@ -40,7 +40,7 @@ const mapDispatchToProps = dispatch => ({
   dRemoveFile: index => dispatch(removeFile(index)),
   addReceivedFriendRequest: friendRequest =>
     dispatch(addFriendRequest(friendRequest)),
-  waitForRecipients: files => dispatch(awaitSendForFiles(files)),
+  waitForRecipients: files => dispatch(awaitRecipients(files)),
   addNewFriend: friend => dispatch(addFriend(friend)),
   updateUser: token => dispatch(addUserFromToken(token))
 });
