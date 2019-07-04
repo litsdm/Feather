@@ -1,0 +1,57 @@
+.friends {
+  height: calc(100% - 72px);
+  overflow-y: scroll;
+}
+
+.row {
+  align-items: center;
+  display: flex;
+  justify-content: space-between;
+  padding: 12px;
+}
+
+.info {
+  align-items: center;
+  display: flex;
+}
+
+.name {
+  margin-left: 12px;
+}
+
+.folderIcon {
+  align-items: center;
+  background-color: rgba(32, 145, 243, 0.2);;
+  border-radius: 12px;
+  display: flex;
+  font-size: 26px;
+  height: 36px;
+  justify-content: center;
+  width: 36px;
+
+  i {
+    color: #2091f3;
+  }
+}
+
+.add,
+.remove {
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: bold;
+  padding: 6px 18px;
+  outline: none;
+  transition: 0.2s ease all;
+}
+
+.add {
+  background-color: rgba(32, 145, 243, 0.2);
+  color: #2091f3;
+}
+
+.remove {
+  background-color: rgba(244, 67, 54, 0.2);
+  color: #F44336;
+}

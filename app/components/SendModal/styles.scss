@@ -1,0 +1,116 @@
+.sendModal {
+  background-color: #fff;
+  border-top-left-radius: 12px;
+  border-top-right-radius: 12px;
+  bottom: 0;
+  box-shadow: 0px 0px 12px rgba(0,0,0,0.16), 0 6px 12px rgba(0,0,0,0.23);
+  left: 0;
+  height: calc(100% - 24px);
+  position: absolute;
+  right: 0;
+  transition: 0.2s ease all;
+  z-index: 15;
+}
+
+.overlay {
+  background-color: rgba(0, 0, 0, 0.4);
+  border: none;
+  bottom: 0;
+  left: 0;
+  outline: none;
+  position: absolute;
+  right: 0;
+  top: 0;
+  transition: 0.2s ease all;
+  width: 100%;
+  z-index: 1;
+}
+
+.top {
+  align-items: center;
+  display: flex;
+  justify-content: space-between;
+  padding: 12px;
+  padding-bottom: 3px;
+
+  p {
+    font-weight: bold;
+  }
+}
+
+.close,
+.send {
+  background-color: transparent;
+  border: none;
+  border-radius: 50%;
+  cursor: pointer;
+  font-size: 16px;
+  outline: none;
+}
+
+.close {
+  padding: 3px 7px;
+  opacity: 0.5;
+  transition: 0.2s ease background-color;
+
+  &:hover {
+    background-color: rgba(0, 0, 0, 0.1);
+    color: #000;
+    opacity: 1;
+  }
+}
+
+.send {
+  font-size: 15px;
+  opacity: 0.5;
+  padding: 5px 0px;
+  transition: 0.2s ease all;
+
+  &.active {
+    color: #2091f3;
+    opacity: 1;
+
+    &:hover {
+      background-color: rgba(32, 145, 243, 0.2);
+    }
+  }
+}
+
+.tabActive {
+  border-color: #2091f3 !important;
+  color: rgba(0, 0, 0, 0.8) !important;
+}
+
+.tabSelect {
+  display: flex;
+
+  button {
+    align-items: center;
+    background-color: #fff;
+    border: none;
+    border-bottom: 1px solid #eaedf3;
+    color: rgba(0, 0, 0, 0.5);
+    cursor: pointer;
+    display: flex;
+    font-size: 14px;
+    font-weight: 600;
+    justify-content: center;
+    outline: none;
+    padding: 6px 0;
+    transition: 0.3s ease all;
+    width: 100%;
+  }
+}
+
+.badge {
+  align-items: center;
+  background-color: rgba(32, 145, 243, 0.2);
+  border-radius: 50%;
+  color: #2091f3;
+  display: flex;
+  font-size: 12px;
+  height: 17px;
+  justify-content: center;
+  margin-left: 6px;
+  width: 17px;
+}

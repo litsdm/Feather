@@ -7,7 +7,7 @@ import { finishSelectingRecipients, stopWaiting } from '../actions/queue';
 import { uploadToLink } from '../actions/upload';
 import { hideUpgrade } from '../actions/upgrade';
 
-import SendPopUp from '../components/SendPopUp';
+import SendModal from '../components/SendModal';
 import DisconnectedModal from '../components/DisconnectedModal';
 import UpgradeModal from '../components/UpgradeModal';
 import LinkProgress from '../components/LinkProgress';
@@ -59,13 +59,12 @@ const PopUpContainer = ({
   fetchData
 }) => (
   <Fragment>
-    <SendPopUp
+    <SendModal
       display={isWaiting}
       stopWaiting={dStopWaiting}
+      friends={friends}
+      userID={user.id}
       uploadFiles={uploadFiles}
-      uploadLink={uploadLink}
-      user={user}
-      friends={[{ ...user, _id: user.id }, ...friends]}
     />
     <LinkProgress
       visible={isSending}
