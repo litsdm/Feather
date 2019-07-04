@@ -65,6 +65,7 @@ const PopUpContainer = ({
       friends={friends}
       userID={user.id}
       uploadFiles={uploadFiles}
+      uploadLink={uploadLink}
     />
     <LinkProgress
       visible={isSending}

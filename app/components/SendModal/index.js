@@ -3,14 +3,32 @@ import { arrayOf, bool, func, string } from 'prop-types';
 import { userShape } from '../../shapes';
 import styles from './styles.scss';
 
-import Friends from './FriendsTab';
+import { validateEmail } from '../../helpers/string';
 
-const SendModal = ({ stopWaiting, friends, userID, display, uploadFiles }) => {
+import Friends from './FriendsTab';
+import Emails from './EmailTab';
+
+const SendModal = ({
+  stopWaiting,
+  friends,
+  userID,
+  display,
+  uploadFiles,
+  uploadLink
+}) => {
+  const [error, setError] = useState('');
+  const [emails, setEmails] = useState([]);
+  const [currentEmail, setCurrentEmail] = useState('');
   const [selectedFriends, setSelectedFriends] = useState({});
   const [tab, setActiveTab] = useState(0);
+  const sendActive =
+    (tab === 0 && Object.keys(selectedFriends).length > 0) ||
+    (tab === 1 && (emails.length > 0 || validateEmail(currentEmail)));
 
   const resetState = () => {
     setSelectedFriends({});
+    setCurrentEmail('');
+    setEmails([]);
   };
 
   const handleBack = () => {
@@ -19,7 +37,10 @@ const SendModal = ({ stopWaiting, friends, userID, display, uploadFiles }) => {
   };
 
   const handleSend = () => {
-    const finalEmails = [];
+    const finalEmails =
+      tab === 1 && validateEmail(currentEmail)
+        ? [...emails, currentEmail]
+        : emails;
     const to = tab === 0 ? Object.keys(selectedFriends) : finalEmails;
     const addToUser = selectedFriends[userID] === 1;
 
@@ -29,8 +50,34 @@ const SendModal = ({ stopWaiting, friends, userID, display, uploadFiles }) => {
     };
 
     if (tab === 0) uploadFiles(send, addToUser);
+    else if (tab === 1) uploadLink(send);
 
     resetState();
+  };
+
+  const handleKeyDown = ({ key }) => {
+    if (key === 'Enter' || key === ' ') {
+      if (!validateEmail(currentEmail)) {
+        setError('Invalid email');
+      } else {
+        const newEmails = [...emails, currentEmail];
+        setEmails(newEmails);
+        setCurrentEmail('');
+      }
+    }
+  };
+
+  const removeEmail = email => () => {
+    const newEmails = [...emails];
+    const index = emails.indexOf(email);
+
+    newEmails.splice(index, 1);
+    setEmails(newEmails);
+  };
+
+  const handleEmailChange = ({ target: { value } }) => {
+    setError('');
+    setCurrentEmail(value.trim());
   };
 
   const handleSelect = id => () => {
@@ -62,6 +109,17 @@ const SendModal = ({ stopWaiting, friends, userID, display, uploadFiles }) => {
             userID={userID}
           />
         );
+      case 1:
+        return (
+          <Emails
+            currentEmail={currentEmail}
+            emails={emails}
+            handleEmailChange={handleEmailChange}
+            handleKeyDown={handleKeyDown}
+            removeEmail={removeEmail}
+            error={error}
+          />
+        );
       default:
         return null;
     }
@@ -69,14 +127,22 @@ const SendModal = ({ stopWaiting, friends, userID, display, uploadFiles }) => {
 
   return (
     <div style={{ zIndex: display ? 15 : -1 }}>
-      <div className={styles.overlay} style={{ opacity: display ? 1 : 0 }} />
+      <div
+        className={styles.overlay}
+        style={{ display: display ? 'block' : 'none' }}
+      />
       <div className={styles.sendModal} style={{ bottom: display ? 0 : -560 }}>
         <div className={styles.top}>
           <button type="button" className={styles.close} onClick={handleBack}>
             <i className="fa fa-times" />
           </button>
           <p>Send To</p>
-          <button type="button" className={styles.send} onClick={handleSend}>
+          <button
+            type="button"
+            className={`${styles.send} ${sendActive ? styles.active : ''}`}
+            onClick={handleSend}
+            disabled={!sendActive}
+          >
             <i className="far fa-paper-plane" />
           </button>
         </div>
@@ -112,7 +178,8 @@ SendModal.propTypes = {
   stopWaiting: func.isRequired,
   userID: string.isRequired,
   display: bool.isRequired,
-  uploadFiles: func.isRequired
+  uploadFiles: func.isRequired,
+  uploadLink: func.isRequired
 };
 
 SendModal.defaultProps = {
