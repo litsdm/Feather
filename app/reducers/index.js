@@ -4,7 +4,6 @@ import { connectRouter } from 'connected-react-router';
 import file from './file';
 import user from './user';
 import downloads from './download';
-import upload from './upload';
 import friend from './friend';
 import friendRequest from './friendRequest';
 import upgrade from './upgrade';
@@ -17,7 +16,6 @@ const appReducer = history =>
     file,
     downloads,
     router: connectRouter(history),
-    upload,
     friend,
     friendRequest,
     user,

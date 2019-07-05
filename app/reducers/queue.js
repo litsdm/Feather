@@ -4,19 +4,21 @@ import {
   AWAIT_RECIPIENTS,
   STOP_WAITING,
   COMPLETE_FILE,
-  FINISH_UPLOADING
+  FINISH_UPLOADING,
+  SET_LINK_URL
 } from '../actions/queue';
 
 const initialState = {
   isWaiting: false,
   files: {},
   waitFiles: [],
-  completedCount: 0
+  completedCount: 0,
+  linkUrl: ''
 };
 
 const queue = (
   state = initialState,
-  { type, waitFiles, file, id, progress, count }
+  { type, waitFiles, file, id, progress, count, url }
 ) => {
   switch (type) {
     case AWAIT_RECIPIENTS:
@@ -53,6 +55,9 @@ const queue = (
       return state.isWaiting
         ? { ...state, files: {}, completedCount: 0 }
         : initialState;
+
+    case SET_LINK_URL:
+      return { ...state, linkUrl: url };
 
     default:
       return state;

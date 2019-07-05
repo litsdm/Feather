@@ -1,30 +1,28 @@
 import React, { Fragment } from 'react';
 import { connect } from 'react-redux';
-import { arrayOf, bool, func, number, shape, string } from 'prop-types';
+import { arrayOf, bool, func, shape, string } from 'prop-types';
 import { userShape } from '../shapes';
 
-import { finishSelectingRecipients, stopWaiting } from '../actions/queue';
-import { uploadToLink } from '../actions/upload';
+import {
+  finishSelectingRecipients,
+  stopWaiting,
+  uploadToLink
+} from '../actions/queue';
 import { hideUpgrade } from '../actions/upgrade';
 
 import SendModal from '../components/SendModal';
 import DisconnectedModal from '../components/DisconnectedModal';
 import UpgradeModal from '../components/UpgradeModal';
-import LinkProgress from '../components/LinkProgress';
 import LinkModal from '../components/LinkModal';
 
 const mapStateToProps = ({
-  queue: { isWaiting },
-  upload: { isSending, status, statusProgress, linkUrl },
+  queue: { isWaiting, linkUrl },
   file: { failed, isFetching: isFetchingFiles },
   friend: { friends },
   upgrade,
   user
 }) => ({
   isWaiting,
-  isSending,
-  status,
-  statusProgress,
   linkUrl,
   upgrade,
   user,
@@ -52,9 +50,6 @@ const PopUpContainer = ({
   isFetchingFiles,
   upgrade,
   closeUpgrade,
-  isSending,
-  status,
-  statusProgress,
   linkUrl,
   fetchData
 }) => (
@@ -66,11 +61,6 @@ const PopUpContainer = ({
       userID={user.id}
       uploadFiles={uploadFiles}
       uploadLink={uploadLink}
-    />
-    <LinkProgress
-      visible={isSending}
-      status={status}
-      progress={statusProgress}
     />
     <LinkModal url={linkUrl} />
     {upgrade.visible ? (
@@ -93,9 +83,6 @@ PopUpContainer.propTypes = {
   fetchData: func.isRequired,
   closeUpgrade: func.isRequired,
   uploadLink: func.isRequired,
-  isSending: bool,
-  status: string,
-  statusProgress: number,
   friends: arrayOf(userShape),
   user: userShape,
   failed: bool.isRequired,
@@ -106,9 +93,6 @@ PopUpContainer.propTypes = {
 
 PopUpContainer.defaultProps = {
   friends: [],
-  isSending: false,
-  status: '',
-  statusProgress: 0,
   user: {}
 };
 

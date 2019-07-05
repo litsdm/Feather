@@ -1,5 +1,8 @@
+import { remote } from 'electron';
+import archiver from 'archiver';
 import fs from 'fs';
 import mime from 'mime-types';
+import rimraf from 'rimraf';
 
 import { emit } from '../socketClient';
 import { updateUserProperty } from './user';
@@ -13,6 +16,8 @@ export const UPDATE_PROGRESS = 'UPDATE_PROGRESS';
 export const ADD_FILE_TO_QUEUE = 'ADD_FILE_TO_QUEUE';
 export const COMPLETE_FILE = 'COMPLETE_FILE';
 export const FINISH_UPLOADING = 'FINISH_UPLOADING';
+export const SET_LINK_URL = 'SET_LINK_URL';
+export const FINISH_ON_ERROR = 'FINISH_ON_ERROR';
 
 export const awaitRecipients = waitFiles => ({
   waitFiles,
@@ -43,6 +48,16 @@ const finishUploading = () => ({
   type: FINISH_UPLOADING
 });
 
+const setLinkUrl = url => ({
+  url,
+  type: SET_LINK_URL
+});
+
+const finishOnError = error => ({
+  error,
+  type: FINISH_ON_ERROR
+});
+
 const notifyOnUpload = filename => {
   const { notifyUpload } = JSON.parse(localStorage.getItem('localConfig'));
 
@@ -54,9 +69,9 @@ const notifyOnUpload = filename => {
   }
 };
 
-const uploadComplete = file => (dispatch, getState) => {
+const uploadComplete = (file, isLink = false) => (dispatch, getState) => {
   const {
-    user: { remainingBytes, remainingFiles },
+    user: { remainingBytes, remainingFiles, username },
     queue: { files, completedCount }
   } = getState();
   const dbFile = files[file.id];
@@ -65,9 +80,19 @@ const uploadComplete = file => (dispatch, getState) => {
     remainingFiles && remainingFiles <= 10 ? remainingFiles - 1 : 9;
   const newRemainingBytes = remainingBytes - file.size;
 
-  file.to.forEach(receiver =>
-    emit('sendFile', { roomId: receiver, file: dbFile })
-  );
+  if (isLink) {
+    dispatch(setLinkUrl(`http://www.feathershare.com/${file.id}`));
+    deleteDirectories();
+    callApi(
+      'email',
+      { to: file.to, endpoint: file.id, from: username },
+      'POST'
+    );
+  } else {
+    file.to.forEach(receiver =>
+      emit('sendFile', { roomId: receiver, file: dbFile })
+    );
+  }
 
   if (dbFile.addToUser) dispatch(addFile(dbFile));
 
@@ -82,20 +107,23 @@ const uploadComplete = file => (dispatch, getState) => {
 };
 
 const postFiles = async (files, signedReqs) => {
-  // TODO: Add a try catch block to catch errors from promises
-  const postPromises = [];
-  const filePromises = [];
-  files.forEach(({ name, size, type }, index) => {
-    const postFile = { name, size, type, s3Url: signedReqs[index].url };
-    postPromises.push(callApi('files', postFile, 'POST'));
-  });
-  const responses = await Promise.all(postPromises);
+  try {
+    const postPromises = [];
+    const filePromises = [];
+    files.forEach(({ name, size, type }, index) => {
+      const postFile = { name, size, type, s3Url: signedReqs[index].url };
+      postPromises.push(callApi('files', postFile, 'POST'));
+    });
+    const responses = await Promise.all(postPromises);
 
-  responses.forEach(response => {
-    filePromises.push(response.json());
-  });
+    responses.forEach(response => {
+      filePromises.push(response.json());
+    });
 
-  return Promise.all(filePromises);
+    return Promise.all(filePromises);
+  } catch (exception) {
+    throw new Error(`[queue.postFiles] ${exception.message}`);
+  }
 };
 
 const signedRequests = async files => {
@@ -143,16 +171,24 @@ const readFile = (file, send) =>
   });
 
 const readFiles = (files, send) => {
-  // TODO: Add a try catch block to catch errors from promises
-  const readPromises = [];
-  for (let i = 0; i < files.length; i += 1) {
-    const file = files[i];
-    readPromises.push(readFile(file, send));
-  }
+  try {
+    const readPromises = [];
+    for (let i = 0; i < files.length; i += 1) {
+      const file = files[i];
+      readPromises.push(readFile(file, send));
+    }
 
-  return Promise.all(readPromises);
+    return Promise.all(readPromises);
+  } catch (exception) {
+    throw new Error(`[queue.readFiles] ${exception.message}`);
+  }
 };
 
+/**
+ * Handle upload of files in wait queue and send them to the recipients(send.to)
+ * @param  {Object}  send              send.to and send.from for files
+ * @param  {Boolean} [addToUser=false] determine if file should be added to current state
+ */
 export const finishSelectingRecipients = (send, addToUser = false) => async (
   dispatch,
   getState
@@ -161,26 +197,199 @@ export const finishSelectingRecipients = (send, addToUser = false) => async (
     queue: { waitFiles }
   } = getState();
   // TODO: Add the should send function
-  const files = await readFiles(waitFiles, send);
-  const signedReqs = await signedRequests(files);
-  const dbFiles = await postFiles(files, signedReqs);
+  try {
+    const files = await readFiles(waitFiles, send);
+    const signedReqs = await signedRequests(files);
+    const dbFiles = await postFiles(files, signedReqs);
 
-  const handleProgress = (id, progress) => {
-    dispatch(updateProgress(id, progress));
-  };
+    const handleProgress = (id, progress) => {
+      dispatch(updateProgress(id, progress));
+    };
 
-  const handleFinish = file => {
-    dispatch(uploadComplete(file));
-  };
+    const handleFinish = file => {
+      dispatch(uploadComplete(file));
+    };
 
+    for (let i = 0; i < files.length; i += 1) {
+      const { signedRequest } = signedReqs[i];
+      const dbFile = dbFiles[i].file;
+      const file = { ...files[i], id: dbFile._id, to: dbFile.to };
+
+      dispatch(addFileToQueue({ ...dbFile, addToUser, progress: 0 }));
+      uploadFile(file, signedRequest, handleProgress, handleFinish);
+    }
+
+    dispatch(stopWaiting());
+  } catch (exception) {
+    console.error(`[queue.finishSelectingRecipients] ${exception.message}`);
+    dispatch(finishOnError(exception.message));
+  }
+};
+
+const postLink = async link => {
+  try {
+    const response = await callApi('links', link, 'POST');
+    return response.json();
+  } catch (exception) {
+    throw new Error(`[queue.postLink] ${exception.message}`);
+  }
+};
+
+const getLinkSignedRequest = async () => {
+  try {
+    const response = await callApi(
+      'sign-s3?file-name=FeatherFiles.zip&file-type=application/zip&folder-name=Files'
+    );
+
+    return response.json();
+  } catch (exception) {
+    throw new Error(`[queue.getLinkSignedRequest] ${exception.message}`);
+  }
+};
+
+const compressFiles = (directoryPath, outputPath) =>
+  new Promise((resolve, reject) => {
+    const output = fs.createWriteStream(outputPath);
+    const archive = archiver('zip');
+
+    archive.pipe(output);
+    archive.directory(directoryPath, false);
+
+    output.on('close', () => resolve());
+    output.on('error', err => reject(err));
+
+    archive.finalize();
+  });
+
+const copyFileAsync = (source, destination) =>
+  new Promise((resolve, reject) =>
+    fs.copyFile(source, destination, error => {
+      if (error) reject(error);
+      resolve();
+    })
+  );
+
+const copyFiles = (files, directoryPath) => {
+  const promises = [];
   for (let i = 0; i < files.length; i += 1) {
-    const { signedRequest } = signedReqs[i];
-    const dbFile = dbFiles[i].file;
-    const file = { ...files[i], id: dbFile._id, to: dbFile.to };
+    const file =
+      typeof files[i] === 'string'
+        ? {
+            path: files[i],
+            name: files[i]
+              .split('\\')
+              .pop()
+              .split('/')
+              .pop()
+          }
+        : files[i];
 
-    dispatch(addFileToQueue({ ...dbFile, addToUser }));
-    uploadFile(file, signedRequest, handleProgress, handleFinish);
+    promises.push(copyFileAsync(file.path, `${directoryPath}${file.name}`));
   }
 
-  dispatch(stopWaiting());
+  return Promise.all(promises);
 };
+
+const mkdirAsync = path =>
+  new Promise((resolve, reject) =>
+    fs.mkdir(path, {}, error => {
+      if (error) reject(error);
+      resolve();
+    })
+  );
+
+const deleteDirectories = () => {
+  const tempDirectoryPath = remote.app.getPath('temp');
+  const directoryPath = `${tempDirectoryPath}FeatherFiles/`;
+  const outputPath = `${tempDirectoryPath}FeatherFiles.zip`;
+
+  if (fs.existsSync(directoryPath)) rimraf.sync(directoryPath);
+  if (fs.existsSync(outputPath)) fs.unlinkSync(outputPath);
+};
+
+/**
+ * Create a link to send via email, compress waitFiles into a zip and upload that zip.
+ * @param  {Object} send Recipients and sender data - send.to and send.from
+ */
+export const uploadToLink = send => async (dispatch, getState) => {
+  const tempDirectoryPath = remote.app.getPath('temp');
+  const directoryPath = `${tempDirectoryPath}FeatherFiles/`;
+  const outputPath = `${tempDirectoryPath}FeatherFiles.zip`;
+  try {
+    const {
+      queue: { waitFiles }
+    } = getState();
+    deleteDirectories();
+
+    await mkdirAsync(directoryPath);
+    await copyFiles(waitFiles, directoryPath);
+    await compressFiles(directoryPath, outputPath);
+
+    const { signedRequest, url } = await getLinkSignedRequest();
+    const rdFiles = await readFiles(waitFiles);
+    const dbFiles = await postFiles(rdFiles, [{ url }]);
+
+    dispatch(stopWaiting());
+
+    let zipFile = getFileFromPath(outputPath);
+    const fileIDs = dbFiles.map(({ file: { _id } }) => _id);
+    const link = {
+      ...send,
+      files: fileIDs,
+      size: zipFile.size,
+      s3Url: url,
+      type: zipFile.type
+    };
+
+    const dbLink = await postLink(link);
+
+    const handleProgress = (id, progress) => {
+      dispatch(updateProgress(id, progress));
+    };
+
+    const handleFinish = file => {
+      dispatch(uploadComplete(file, true));
+    };
+
+    dispatch(
+      addFileToQueue({ _id: dbLink._id, name: 'FeatherFiles.zip', progress: 0 })
+    );
+
+    zipFile = { ...zipFile, id: dbLink._id, progress: 0 };
+    uploadFile(zipFile, signedRequest, handleProgress, handleFinish);
+  } catch (exception) {
+    console.error(exception.message);
+    deleteDirectories();
+    dispatch(finishOnError(exception.message));
+  }
+};
+
+/* const shouldSend = (dispatch, getState, file) => {
+  const {
+    user: { isPro, remainingBytes, remainingFiles }
+  } = getState();
+  if (!isPro && file.size > 2147483648) {
+    dispatch(displayUpgrade('fileSize'));
+    dispatch(finishAndClean());
+    return false;
+  }
+
+  if (!isPro && remainingFiles <= 0) {
+    dispatch(displayUpgrade('remainingFiles'));
+    dispatch(finishAndClean());
+    return false;
+  }
+
+  if (file.size > remainingBytes) {
+    dispatch(displayUpgrade('remainingBytes'));
+    dispatch(finishAndClean());
+    return false;
+  }
+
+  if (isPro && file.size > 10737418240) {
+    dispatch(finishAndClean());
+    return false;
+  }
+
+  return true;
+}; */
