@@ -8,6 +8,7 @@ import { emit } from '../socketClient';
 import { updateUserProperty } from './user';
 import { addFile } from './file';
 import { displayUpgrade } from './upgrade';
+import { setIsLoading } from './loading';
 import callApi, { uploadFile } from '../helpers/apiCaller';
 import notify from '../helpers/notifications';
 
@@ -339,6 +340,7 @@ export const uploadToLink = send => async (dispatch, getState) => {
     const {
       queue: { waitFiles }
     } = getState();
+    dispatch(setIsLoading(true));
     deleteDirectories();
 
     await mkdirAsync(directoryPath);
@@ -352,6 +354,7 @@ export const uploadToLink = send => async (dispatch, getState) => {
     const rdFiles = await readFiles(waitFiles);
     const dbFiles = await postFiles(rdFiles, [{ url }]);
 
+    dispatch(setIsLoading(false));
     dispatch(stopWaiting());
 
     const fileIDs = dbFiles.map(({ file: { _id } }) => _id);

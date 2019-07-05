@@ -14,13 +14,15 @@ import SendModal from '../components/SendModal';
 import DisconnectedModal from '../components/DisconnectedModal';
 import UpgradeModal from '../components/UpgradeModal';
 import LinkModal from '../components/LinkModal';
+import ModalLoader from '../components/ModalLoader';
 
 const mapStateToProps = ({
   queue: { isWaiting, linkUrl },
   file: { failed, isFetching: isFetchingFiles },
   friend: { friends },
   upgrade,
-  user
+  user,
+  loading
 }) => ({
   isWaiting,
   linkUrl,
@@ -28,7 +30,8 @@ const mapStateToProps = ({
   user,
   failed,
   isFetchingFiles,
-  friends
+  friends,
+  isLoading: loading
 });
 
 const mapDispatchToProps = dispatch => ({
@@ -51,9 +54,11 @@ const PopUpContainer = ({
   upgrade,
   closeUpgrade,
   linkUrl,
-  fetchData
+  fetchData,
+  isLoading
 }) => (
   <Fragment>
+    <ModalLoader display={isLoading} />
     <SendModal
       display={isWaiting}
       stopWaiting={dStopWaiting}
@@ -88,6 +93,7 @@ PopUpContainer.propTypes = {
   failed: bool.isRequired,
   isFetchingFiles: bool.isRequired,
   linkUrl: string.isRequired,
+  isLoading: bool.isRequired,
   upgrade: shape({ visible: bool, messageType: string }).isRequired
 };
 
