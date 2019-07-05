@@ -85,8 +85,7 @@ const uploadComplete = (file, isLink = false) => (dispatch, getState) => {
 
   const newRemainingFiles =
     remainingFiles && remainingFiles <= 10 ? remainingFiles - 1 : 9;
-  console.log(newRemainingFiles);
-  const newRemainingBytes = remainingBytes - file.size;
+  const newRemainingBytes = remainingBytes - dbFile.size;
 
   if (isLink) {
     dispatch(setLinkUrl(`http://www.feathershare.com/${file.id}`));
