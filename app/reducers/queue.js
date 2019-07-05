@@ -5,7 +5,9 @@ import {
   STOP_WAITING,
   COMPLETE_FILE,
   FINISH_UPLOADING,
-  SET_LINK_URL
+  SET_LINK_URL,
+  FINISH_ON_ERROR,
+  FINISH_AND_CLEAN
 } from '../actions/queue';
 
 const initialState = {
@@ -18,7 +20,7 @@ const initialState = {
 
 const queue = (
   state = initialState,
-  { type, waitFiles, file, id, progress, count, url }
+  { type, waitFiles, file, id, progress, count, url, error }
 ) => {
   switch (type) {
     case AWAIT_RECIPIENTS:
@@ -58,6 +60,12 @@ const queue = (
 
     case SET_LINK_URL:
       return { ...state, linkUrl: url };
+
+    case FINISH_AND_CLEAN:
+      return initialState;
+
+    case FINISH_ON_ERROR:
+      return { ...initialState, error };
 
     default:
       return state;

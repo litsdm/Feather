@@ -7,6 +7,7 @@ import rimraf from 'rimraf';
 import { emit } from '../socketClient';
 import { updateUserProperty } from './user';
 import { addFile } from './file';
+import { displayUpgrade } from './upgrade';
 import callApi, { uploadFile } from '../helpers/apiCaller';
 import notify from '../helpers/notifications';
 
@@ -18,6 +19,7 @@ export const COMPLETE_FILE = 'COMPLETE_FILE';
 export const FINISH_UPLOADING = 'FINISH_UPLOADING';
 export const SET_LINK_URL = 'SET_LINK_URL';
 export const FINISH_ON_ERROR = 'FINISH_ON_ERROR';
+export const FINISH_AND_CLEAN = 'FINISH_AND_CLEAN';
 
 export const awaitRecipients = waitFiles => ({
   waitFiles,
@@ -58,6 +60,10 @@ const finishOnError = error => ({
   type: FINISH_ON_ERROR
 });
 
+const finishAndClean = () => ({
+  type: FINISH_AND_CLEAN
+});
+
 const notifyOnUpload = filename => {
   const { notifyUpload } = JSON.parse(localStorage.getItem('localConfig'));
 
@@ -78,6 +84,7 @@ const uploadComplete = (file, isLink = false) => (dispatch, getState) => {
 
   const newRemainingFiles =
     remainingFiles && remainingFiles <= 10 ? remainingFiles - 1 : 9;
+  console.log(newRemainingFiles);
   const newRemainingBytes = remainingBytes - file.size;
 
   if (isLink) {
@@ -156,6 +163,17 @@ const getFileFromPath = path => {
   return file;
 };
 
+const shouldSendMultiple = (files, dispatch, getState) => {
+  let totalSize = 0;
+  let count = 0;
+  for (count; count < files.length; count += 1) {
+    const { size } = files[count];
+    totalSize += size;
+  }
+
+  return shouldSend(totalSize, count, dispatch, getState);
+};
+
 const readFile = (file, send) =>
   new Promise((resolve, reject) => {
     const rawFile = typeof file === 'string' ? getFileFromPath(file) : file;
@@ -196,9 +214,11 @@ export const finishSelectingRecipients = (send, addToUser = false) => async (
   const {
     queue: { waitFiles }
   } = getState();
-  // TODO: Add the should send function
   try {
     const files = await readFiles(waitFiles, send);
+
+    if (!shouldSendMultiple(files, dispatch, getState)) return;
+
     const signedReqs = await signedRequests(files);
     const dbFiles = await postFiles(files, signedReqs);
 
@@ -325,13 +345,15 @@ export const uploadToLink = send => async (dispatch, getState) => {
     await copyFiles(waitFiles, directoryPath);
     await compressFiles(directoryPath, outputPath);
 
+    let zipFile = getFileFromPath(outputPath);
+    if (!shouldSend(zipFile.size, 1, dispatch, getState)) deleteDirectories();
+
     const { signedRequest, url } = await getLinkSignedRequest();
     const rdFiles = await readFiles(waitFiles);
     const dbFiles = await postFiles(rdFiles, [{ url }]);
 
     dispatch(stopWaiting());
 
-    let zipFile = getFileFromPath(outputPath);
     const fileIDs = dbFiles.map(({ file: { _id } }) => _id);
     const link = {
       ...send,
@@ -364,32 +386,26 @@ export const uploadToLink = send => async (dispatch, getState) => {
   }
 };
 
-/* const shouldSend = (dispatch, getState, file) => {
+const shouldSend = (size, count, dispatch, getState) => {
   const {
     user: { isPro, remainingBytes, remainingFiles }
   } = getState();
-  if (!isPro && file.size > 2147483648) {
-    dispatch(displayUpgrade('fileSize'));
-    dispatch(finishAndClean());
+  let type = '';
+
+  if (!isPro && size > 2147483648) type = 'fileSize';
+  else if (!isPro && remainingFiles - count < 0) type = 'remainingFiles';
+  else if (!isPro && size > remainingBytes) type = 'remainingBytes';
+
+  if (isPro && size > 10737418240) {
+    dispatch(finishOnError('File exceeds pro limit.'));
     return false;
   }
 
-  if (!isPro && remainingFiles <= 0) {
-    dispatch(displayUpgrade('remainingFiles'));
-    dispatch(finishAndClean());
-    return false;
-  }
-
-  if (file.size > remainingBytes) {
-    dispatch(displayUpgrade('remainingBytes'));
-    dispatch(finishAndClean());
-    return false;
-  }
-
-  if (isPro && file.size > 10737418240) {
+  if (type) {
+    dispatch(displayUpgrade(type));
     dispatch(finishAndClean());
     return false;
   }
 
   return true;
-}; */
+};
