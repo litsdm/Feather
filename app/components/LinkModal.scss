@@ -1,87 +1,108 @@
-.wrapper {
+.linkModal {
   align-items: center;
-  bottom: 0;
   display: none;
   justify-content: center;
-  left: 0;
   padding: 12px;
+}
+
+.linkModal,
+.overlay {
+  bottom: 0;
+  left: 0;
   position: absolute;
   right: 0;
   top: 0;
-  z-index: 10;
+  z-index: 14;
 }
 
 .overlay {
-  background-color: rgba(0, 0, 0, 0.4);
-  border: none;
-  bottom: 0;
-  left: 0;
+  background-color: rgba(255, 255, 255, 0.8);
   outline: none;
-  position: absolute;
-  right: 0;
-  top: 0;
   width: 100%;
+  z-index: -1;
 }
 
 .modal {
-  background-color: #fff;
-  border-radius: 6px;
-  width: 100%;
-  z-index: 1;
-}
-
-.header {
   align-items: center;
-  display: flex;
-  justify-content: space-between;
-  padding: 24px;
-
-  p {
-    font-weight: 600;
-  }
-}
-
-.content {
-  align-items: center;
-  background-color: #f9f9fb;
-  border-bottom-left-radius: 6px;
-  border-bottom-right-radius: 6px;
+  background-color: #303537;
+  border-radius: 12px;
+  box-shadow: 0 3px 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23);
+  color: white;
   display: flex;
   flex-direction: column;
   padding: 24px;
+  position: relative;
+  z-index: 1;
 }
 
 .close {
+  align-items: center;
   background-color: transparent;
   border: none;
   border-radius: 50%;
+  color: rgba(255, 255, 255, 0.7);
   cursor: pointer;
-  font-size: 18px;
-  height: 30px;
-  opacity: 0.7;
+  display: flex;
+  font-size: 15px;
+  justify-content: center;
+  height: 24px;
   outline: none;
+  position: absolute;
+  right: 6px;
+  top: 6px;
   transition: 0.2s ease all;
-  width: 30px;
-  z-index: 2;
+  width: 24px;
 
   &:hover {
-    background-color: #efefef;
-    opacity: 1;
+    background-color: #272A2B;
+    color: #fff;
   }
 }
 
-.input {
-  background-color: rgba(96, 125, 139, 0.1);
-  border: none;
-  border-radius: 4px;
-  cursor: text;
+.title {
+  font-size: 18px;
+  font-weight: 600;
+  margin-bottom: 6px;
+  margin-top: 12px;
+  text-align: center;
+}
+
+.subtitle {
   font-size: 14px;
+  font-weight: 100;
+  margin-bottom: 24px;
+  text-align: center;
+  width: 80%;
+}
+
+.input {
+  border: none;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 600;
   outline: none;
   padding: 12px 6px;
-  transition: 0.2s ease all;
   width: 100%;
+}
 
-  &:focus {
-    background-color: rgba(96, 125, 139, 0.2);
+.badgeNotification {
+  background-color: #303537;
+  border-radius: 24px;
+  bottom: 24px;
+  box-shadow: 0 3px 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23);
+  color: #fff;
+  opacity: 0;
+  padding: 6px 12px;
+  position: absolute;
+  transition: all 0.3s cubic-bezier(.25, .8, .25, 1);
+
+  &.display {
+    bottom: 36px;
+    opacity: 1;
+  }
+
+  p {
+    font-size: 12px;
+    font-weight: bold;
   }
 }

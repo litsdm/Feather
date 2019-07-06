@@ -76,6 +76,16 @@ const notifyOnUpload = filename => {
   }
 };
 
+const sendEmail = async (file, username, dispatch) => {
+  await callApi(
+    'email',
+    { to: file.to, endpoint: file._id, from: username },
+    'POST'
+  );
+  dispatch(setLinkUrl(`https://www.feathershare.com/${file._id}`));
+  document.getElementById('linkModal').style.display = 'flex';
+};
+
 const uploadComplete = (file, isLink = false) => (dispatch, getState) => {
   const {
     user: { remainingBytes, remainingFiles, username },
@@ -88,13 +98,8 @@ const uploadComplete = (file, isLink = false) => (dispatch, getState) => {
   const newRemainingBytes = remainingBytes - dbFile.size;
 
   if (isLink) {
-    dispatch(setLinkUrl(`http://www.feathershare.com/${file.id}`));
+    sendEmail(dbFile, username, dispatch);
     deleteDirectories();
-    callApi(
-      'email',
-      { to: file.to, endpoint: file.id, from: username },
-      'POST'
-    );
   } else {
     file.to.forEach(receiver =>
       emit('sendFile', { roomId: receiver, file: dbFile })
@@ -347,7 +352,10 @@ export const uploadToLink = send => async (dispatch, getState) => {
     await compressFiles(directoryPath, outputPath);
 
     let zipFile = getFileFromPath(outputPath);
-    if (!shouldSend(zipFile.size, 1, dispatch, getState)) deleteDirectories();
+    if (!shouldSend(zipFile.size, 1, dispatch, getState)) {
+      deleteDirectories();
+      return;
+    }
 
     const { signedRequest, url } = await getLinkSignedRequest();
     const rdFiles = await readFiles(waitFiles);
@@ -365,7 +373,7 @@ export const uploadToLink = send => async (dispatch, getState) => {
       type: zipFile.type
     };
 
-    const dbLink = await postLink(link);
+    const { link: dbLink } = await postLink(link);
 
     const handleProgress = (id, progress) => {
       dispatch(updateProgress(id, progress));
@@ -376,10 +384,16 @@ export const uploadToLink = send => async (dispatch, getState) => {
     };
 
     dispatch(
-      addFileToQueue({ _id: dbLink._id, name: 'FeatherFiles.zip', progress: 0 })
+      addFileToQueue({
+        _id: dbLink._id,
+        name: 'FeatherFiles.zip',
+        progress: 0,
+        size: zipFile.size,
+        to: link.to
+      })
     );
 
-    zipFile = { ...zipFile, id: dbLink._id, progress: 0 };
+    zipFile = { ...zipFile, id: dbLink._id };
     uploadFile(zipFile, signedRequest, handleProgress, handleFinish);
   } catch (exception) {
     console.error(exception.message);
