@@ -1,10 +1,13 @@
 import React from 'react';
+import Lottie from 'react-lottie';
 import { func, string, shape } from 'prop-types';
 import styles from './AddFriendModal.scss';
 
+import celebrationAnimation from '../../assets/celebrationAnimation.json';
+
 const AddFriendModal = ({
   friendTag,
-  handleChange,
+  setFriendTag,
   requestMessage,
   sendRequest
 }) => {
@@ -28,52 +31,53 @@ const AddFriendModal = ({
     return `${friendTag}${additional.slice(sliceIndex)}`;
   };
 
+  const badgeClass = () => {
+    if (!requestMessage) return styles.errBadge;
+
+    return `${
+      requestMessage.type === 'success' ? styles.successBadge : styles.errBadge
+    } ${styles.display}`;
+  };
+
   return (
-    <div className={styles.wrapper} id="addFriendModal">
-      <div
-        className={styles.overlay}
-        onClick={closeModal}
-        onKeyPress={() => {}}
-        role="button"
-        tabIndex="0"
-      />
+    <div id="addFriendModal" className={styles.friendModal}>
+      <button type="button" className={styles.overlay} onClick={closeModal} />
       <div className={styles.modal}>
-        <div className={styles.header}>
-          <p>Add a Friend</p>
-          <button type="button" className={styles.close} onClick={closeModal}>
-            <i className="fa fa-times" />
-          </button>
-        </div>
-        <div className={styles.content}>
-          {requestMessage ? (
-            <p
-              className={styles.message}
-              style={{
-                color: requestMessage.type === 'success' ? '#4CAF50' : '#F44336'
-              }}
-            >
-              {requestMessage.text}
-            </p>
-          ) : null}
-          <label htmlFor="addFriendInput" className={styles.label}>
-            <input
-              id="addFriendInput"
-              type="text"
-              name="friendTag"
-              value={friendTag}
-              placeholder="username#0000 or email"
-              onChange={handleChange}
-            />
-            <div className={styles.hint}>{friendTag ? formatHint() : null}</div>
-          </label>
-          <button
-            type="button"
-            className={styles.addButton}
-            onClick={sendRequest}
-          >
-            Send Friend Request
-          </button>
-        </div>
+        <button type="button" className={styles.close} onClick={closeModal}>
+          <i className="fa fa-times" />
+        </button>
+        <p className={styles.title}>Add a Friend</p>
+        <label htmlFor="addFriendInput" className={styles.label}>
+          <input
+            id="addFriendInput"
+            type="text"
+            name="friendTag"
+            value={friendTag}
+            placeholder="username#0000 or email"
+            onChange={({ target: { value } }) => setFriendTag(value)}
+          />
+          <div className={styles.hint}>{friendTag ? formatHint() : null}</div>
+        </label>
+        <button type="button" className={styles.send} onClick={sendRequest}>
+          Send Friend Request
+        </button>
+      </div>
+      <div className={badgeClass()}>
+        <p>{requestMessage ? requestMessage.text : ''}</p>
+      </div>
+      <div className={styles.animation}>
+        <Lottie
+          options={{
+            loop: false,
+            autoplay: false,
+            animationData: celebrationAnimation,
+            rendererSettings: {
+              preserveAspectRatio: 'xMidYMid meet'
+            }
+          }}
+          height={285}
+          isStopped={!(requestMessage && requestMessage.type === 'success')}
+        />
       </div>
     </div>
   );
@@ -81,7 +85,7 @@ const AddFriendModal = ({
 
 AddFriendModal.propTypes = {
   friendTag: string.isRequired,
-  handleChange: func.isRequired,
+  setFriendTag: func.isRequired,
   sendRequest: func.isRequired,
   requestMessage: shape({
     text: string,

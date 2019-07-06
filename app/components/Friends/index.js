@@ -10,7 +10,8 @@ import AddFriendModal from './AddFriendModal';
 
 const Friends = ({
   friendTag,
-  handleChange,
+  setFriendTag,
+  handleSearchChange,
   openModal,
   requestMessage,
   sendRequest,
@@ -57,7 +58,7 @@ const Friends = ({
             value={searchTerm}
             type="text"
             placeholder="Search for friends"
-            onChange={handleChange}
+            onChange={handleSearchChange}
           />
         </label>
       </div>
@@ -69,7 +70,12 @@ const Friends = ({
           </Fragment>
         ) : null}
         <p className={styles.title}>Your Friends</p>
-        <button type="button" className={rowStyles.row} onClick={openModal}>
+        <button
+          type="button"
+          className={rowStyles.row}
+          onClick={openModal}
+          style={{ cursor: 'pointer' }}
+        >
           <span style={{ display: 'flex', alignItems: 'center' }}>
             <div className={styles.addIcon}>
               <i className="fa fa-user-plus" />
@@ -81,7 +87,7 @@ const Friends = ({
       </div>
       <AddFriendModal
         friendTag={friendTag}
-        handleChange={handleChange}
+        setFriendTag={setFriendTag}
         sendRequest={sendRequest}
         requestMessage={requestMessage}
       />
@@ -91,7 +97,8 @@ const Friends = ({
 
 Friends.propTypes = {
   friendTag: string.isRequired,
-  handleChange: func.isRequired,
+  setFriendTag: func.isRequired,
+  handleSearchChange: func.isRequired,
   openModal: func.isRequired,
   sendRequest: func.isRequired,
   resolveRequest: func.isRequired,

@@ -1,77 +1,81 @@
-.wrapper {
+.friendModal {
   align-items: center;
-  bottom: 0;
   display: none;
   justify-content: center;
-  left: 0;
   padding: 12px;
+}
+
+.friendModal,
+.overlay {
+  bottom: 0;
+  left: 0;
   position: absolute;
   right: 0;
   top: 0;
-  z-index: 4;
+  z-index: 14;
 }
 
 .overlay {
-  background-color: rgba(0, 0, 0, 0.4);
-  bottom: 0;
-  left: 0;
-  position: absolute;
-  right: 0;
-  top: 0;
+  background-color: rgba(255, 255, 255, 0.8);
+  outline: none;
+  width: 100%;
+  z-index: -1;
 }
 
 .modal {
-  background-color: #fff;
-  border-radius: 6px;
+  align-items: center;
+  background-color: #303537;
+  border-radius: 12px;
+  box-shadow: 0 3px 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23);
+  color: white;
+  display: flex;
+  flex-direction: column;
+  padding: 24px;
+  position: relative;
   width: 100%;
   z-index: 1;
 }
 
-.header {
-  align-items: center;
-  display: flex;
-  justify-content: space-between;
-  padding: 24px;
-
-  p {
-    font-weight: 600;
-  }
-}
-
 .close {
+  align-items: center;
+  background-color: transparent;
   border: none;
   border-radius: 50%;
-  background-color: transparent;
+  color: rgba(255, 255, 255, 0.7);
   cursor: pointer;
-  font-size: 14px;
-  opacity: 0.5;
+  display: flex;
+  font-size: 15px;
+  justify-content: center;
+  height: 24px;
   outline: none;
-  padding: 4px 8px;
+  position: absolute;
+  right: 6px;
+  top: 6px;
+  transition: 0.2s ease all;
+  width: 24px;
 
   &:hover {
-    background-color: #eeeff1;
-    opacity: 1;
+    background-color: #272A2B;
+    color: #fff;
   }
 }
 
-.content {
-  align-items: center;
-  background-color: #f9f9fb;
-  border-bottom-left-radius: 6px;
-  border-bottom-right-radius: 6px;
-  display: flex;
-  flex-direction: column;
-  padding: 24px;
+.title {
+  font-size: 24px;
+  font-weight: bold;
+  margin-bottom: 24px;
 }
 
 .label {
-  background-color: #eeeff1;
+  background-color: #fff;
+  border: 1px solid transparent;
   border-radius: 6px;
   cursor: text;
   display: flex;
   padding: 12px;
   position: relative;
-  width: 100%;
+  transition: 0.2s ease all;
+  width: calc(100% - 24px);
 
   input {
     background-color: transparent;
@@ -88,19 +92,6 @@
   }
 }
 
-.addButton {
-  background-color: #2091f3;
-  border: none;
-  border-radius: 6px;
-  color: #fff;
-  cursor: pointer;
-  font-size: 14px;
-  margin-top: 12px;
-  outline: none;
-  padding: 12px 0;
-  width: 90%;
-}
-
 .hint {
   color: rgba(0, 0, 0, 0.2);
   font: 400 11px system-ui;
@@ -113,9 +104,60 @@
   white-space: pre;
 }
 
-.message {
-  font-size: 12px;
-  margin-bottom: 12px;
-  text-align: center;
-  width: 100%;
+.send {
+  background-color: rgba(32, 145, 243, 0.05);
+  border: 1px solid #2091f3;
+  border-radius: 6px;
+  color: #2091f3;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 600;
+  margin-top: 24px;
+  opacity: 0.8;
+  padding: 10px 18px;
+  outline: none;
+  transition: 0.2s ease all;
+
+  &:hover {
+    background-color: rgba(32, 145, 243, 0.1);
+    opacity: 1;
+  }
+}
+
+.successBadge,
+.errBadge {
+  // background-color: #303537;
+  border-radius: 24px;
+  bottom: 102px;
+  box-shadow: 0 3px 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23);
+  color: #fff;
+  opacity: 0;
+  padding: 6px 12px;
+  position: absolute;
+  transition: all 0.3s cubic-bezier(.25, .8, .25, 1);
+
+  &.display {
+    bottom: 114px;
+    opacity: 1;
+  }
+
+  p {
+    font-size: 12px;
+    font-weight: bold;
+  }
+}
+
+.errBadge {
+  background-color: #F44336;
+}
+
+.successBadge {
+  background-color: #4CAF50;
+}
+
+.animation {
+  bottom: 0;
+  left: 0;
+  position: absolute;
+  right: 0;
 }
