@@ -1,65 +1,56 @@
-.wrapper {
+.disconnectModal {
   align-items: center;
-  bottom: 0;
   display: flex;
   justify-content: center;
-  left: 0;
   padding: 12px;
-  position: absolute;
-  right: 0;
-  top: 0;
-  z-index: 10;
 }
 
+.disconnectModal,
 .overlay {
-  background-color: rgba(0, 0, 0, 0.4);
   bottom: 0;
   left: 0;
   position: absolute;
   right: 0;
   top: 0;
+  z-index: 30;
+}
+.overlay {
+  background-color: rgba(255, 255, 255, 0.9);
+  width: 100%;
+  z-index: -1;
 }
 
 .modal {
-  background-color: #fff;
-  border-radius: 6px;
-  width: 100%;
-  z-index: 1;
-}
-
-.header {
   align-items: center;
-  display: flex;
-  justify-content: space-between;
-  padding: 24px;
-
-  p {
-    font-weight: 600;
-  }
-}
-
-.content {
-  align-items: center;
-  background-color: #f9f9fb;
-  border-bottom-left-radius: 6px;
-  border-bottom-right-radius: 6px;
+  background-color: #303537;
+  border-radius: 12px;
+  box-shadow: 0 3px 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23);
+  color: white;
   display: flex;
   flex-direction: column;
   padding: 24px;
+  position: relative;
+  z-index: 1;
 }
 
-.message {
+.title {
+  font-size: 24px;
+  font-weight: bold;
+  margin-bottom: 24px;
+}
+
+.subtitle {
   font-size: 14px;
-  font-weight: 300;
-  margin-bottom: 12px;
-  opacity: 0.7;
+  font-weight: 100;
+  margin-bottom: 24px;
   text-align: center;
 }
 
-.retrying {
+.status {
   font-size: 14px;
-  margin-bottom: 12px;
-  opacity: 0.6;
+  font-weight: 600;
+  margin-bottom: 24px;
+  text-align: center;
 }
 
 .retry {
@@ -69,6 +60,13 @@
   color: #fff;
   cursor: pointer;
   font-size: 14px;
+  font-weight: 600;
+  opacity: 0.9;
   outline: none;
-  padding: 8px 24px;
+  padding: 10px 18px;
+  transition: 0.2s ease all;
+
+  &:hover {
+    opacity: 1;
+  }
 }

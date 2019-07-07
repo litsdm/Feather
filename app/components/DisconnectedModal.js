@@ -1,93 +1,55 @@
-import React, { Component } from 'react';
+import React, { useEffect, useState } from 'react';
 import { bool, func } from 'prop-types';
 import styles from './DisconnectedModal.scss';
 
-class DisconnectedModal extends Component {
-  state = {
-    timeLeft: 10,
-    prevTime: 0
-  };
+function useCountdown(retry) {
+  const [timeLeft, setTimeLeft] = useState(10);
+  const [prevTime, setPrevTime] = useState(10);
+  let interval;
 
-  componentDidMount = () => {
-    this.startTimer();
-  };
+  useEffect(() => {
+    interval = setInterval(() => {
+      setTimeLeft(current => {
+        if (current <= 0) {
+          const newTime = prevTime === 60 ? 60 : prevTime + 10;
+          clearInterval(interval);
+          retry();
+          setPrevTime(newTime);
+          return newTime;
+        }
 
-  componentDidUpdate = prevProps => {
-    const { isFetching } = this.props;
-    const { isFetching: prevFetching } = prevProps;
+        return current - 1;
+      });
+    }, 1000);
 
-    if (prevFetching && !isFetching) {
-      this.startTimer();
-    }
-  };
+    return () => clearInterval(interval);
+  });
 
-  componentWilUnmount = () => {
-    if (this.timer !== 0) clearInterval(this.timer);
-  };
-
-  timer = 0;
-
-  startTimer = () => {
-    const { prevTime } = this.state;
-    const newTime = prevTime + 10;
-    this.setState({ timeLeft: newTime, prevTime: newTime }, () => {
-      this.timer = setInterval(this.countDown, 1000);
-    });
-  };
-
-  countDown = () => {
-    const { timeLeft } = this.state;
-    const { retry } = this.props;
-    const newTime = timeLeft - 1;
-
-    this.setState({ timeLeft: newTime });
-
-    if (newTime === 0) {
-      retry();
-      clearInterval(this.timer);
-    }
-  };
-
-  handleRetryNow = () => {
-    const { retry } = this.props;
-    clearInterval(this.timer);
-    retry();
-  };
-
-  render() {
-    const { timeLeft } = this.state;
-    const { isFetching } = this.props;
-
-    return (
-      <div className={styles.wrapper}>
-        <div className={styles.overlay} />
-        <div className={styles.modal}>
-          <div className={styles.header}>
-            <p>Unable to Connect</p>
-          </div>
-          <div className={styles.content}>
-            <p className={styles.message}>
-              Please double check your internet connection. If this issue
-              persists please contact support.
-            </p>
-            <p className={styles.retrying}>
-              {isFetching
-                ? 'Retrying...'
-                : `Retrying again in ${timeLeft} seconds`}
-            </p>
-            <button
-              type="button"
-              className={styles.retry}
-              onClick={this.handleRetryNow}
-            >
-              Retry Now
-            </button>
-          </div>
-        </div>
-      </div>
-    );
-  }
+  return timeLeft;
 }
+
+const DisconnectedModal = ({ isFetching, retry }) => {
+  const timeLeft = useCountdown(retry);
+
+  return (
+    <div className={styles.disconnectModal}>
+      <div className={styles.overlay} />
+      <div className={styles.modal}>
+        <p className={styles.title}>Unable to Connect</p>
+        <p className={styles.subtitle}>
+          Please double check your internet connection. If this issue persists
+          please contact support.
+        </p>
+        <p className={styles.status}>
+          {isFetching ? 'Retrying...' : `Retrying again in ${timeLeft} seconds`}
+        </p>
+        <button type="button" className={styles.retry} onClick={retry}>
+          Retry Now
+        </button>
+      </div>
+    </div>
+  );
+};
 
 DisconnectedModal.propTypes = {
   retry: func.isRequired,

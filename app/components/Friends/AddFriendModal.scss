@@ -105,21 +105,20 @@
 }
 
 .send {
-  background-color: rgba(32, 145, 243, 0.05);
+  background-color: #2091f3;
   border: 1px solid #2091f3;
   border-radius: 6px;
-  color: #2091f3;
+  color: #fff;
   cursor: pointer;
   font-size: 14px;
   font-weight: 600;
   margin-top: 24px;
-  opacity: 0.8;
+  opacity: 0.9;
   padding: 10px 18px;
   outline: none;
   transition: 0.2s ease all;
 
   &:hover {
-    background-color: rgba(32, 145, 243, 0.1);
     opacity: 1;
   }
 }
