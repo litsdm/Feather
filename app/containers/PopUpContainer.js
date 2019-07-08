@@ -69,11 +69,7 @@ const PopUpContainer = ({
     />
     <LinkModal url={linkUrl} />
     {upgrade.visible ? (
-      <UpgradeModal
-        type={upgrade.messageType}
-        close={closeUpgrade}
-        remainingBytes={user.remainingBytes || 0}
-      />
+      <UpgradeModal type={upgrade.messageType} close={closeUpgrade} />
     ) : null}
     {failed ? (
       <DisconnectedModal retry={fetchData} isFetching={isFetchingFiles} />

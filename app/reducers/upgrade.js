@@ -2,7 +2,7 @@ import { DISPLAY_UPGRADE, HIDE_UPGRADE } from '../actions/upgrade';
 
 const initialState = {
   visible: false,
-  messageType: 'fileSize'
+  messageType: ''
 };
 
 const upgrade = (state = initialState, { type, messageType }) => {
