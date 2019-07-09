@@ -6,59 +6,58 @@ export const REQUEST_FRIEND_REQUESTS = 'REQUEST_FRIEND_REQUESTS';
 export const RECEIVE_FRIEND_REQUESTS = 'RECEIVE_FRIEND_REQUESTS';
 export const REMOVE_FRIEND_REQUEST = 'REMOVE_FRIEND_REQUEST';
 
-export function addFriendRequest(friendRequest) {
-  return {
-    friendRequest,
-    type: ADD_FRIEND_REQUEST
-  };
-}
+export const addFriendRequest = friendRequest => ({
+  friendRequest,
+  type: ADD_FRIEND_REQUEST
+});
 
-export function removeFriendRequest(index) {
-  return {
-    index,
-    type: REMOVE_FRIEND_REQUEST
-  };
-}
+export const removeFriendRequest = index => ({
+  index,
+  type: REMOVE_FRIEND_REQUEST
+});
 
-function requestFriendRequests() {
-  return {
-    type: REQUEST_FRIEND_REQUESTS
-  };
-}
+const requestFriendRequests = () => ({
+  type: REQUEST_FRIEND_REQUESTS
+});
 
-function receiveFriendRequests(friendRequests) {
-  return {
-    type: RECEIVE_FRIEND_REQUESTS,
-    friendRequests,
-    receivedAt: Date.now()
-  };
-}
+const receiveFriendRequests = friendRequests => ({
+  friendRequests,
+  receivedAt: Date.now(),
+  type: RECEIVE_FRIEND_REQUESTS
+});
 
-function fetchFriendRequests(userId) {
-  return dispatch => {
+const getFriendRequests = async userID => {
+  try {
+    const response = await callApi(`friendRequest/${userID}`);
+    const { friendRequests } = await response.json();
+    return friendRequests;
+  } catch (exception) {
+    throw new Error(`[friendRequests.getFriendRequests] ${exception.message}`);
+  }
+};
+
+const fetchFriendRequests = userID => async dispatch => {
+  try {
     dispatch(requestFriendRequests());
-    return callApi(`friendRequest/${userId}`)
-      .then(res => res.json())
-      .then(({ friendRequests }) =>
-        dispatch(receiveFriendRequests(friendRequests))
-      );
-  };
-}
+    const friendRequests = await getFriendRequests(userID);
+    return dispatch(receiveFriendRequests(friendRequests));
+  } catch (exception) {
+    console.error(exception.message);
+  }
+};
 
-function shouldFetchFriendRequests({
+const shouldFetchFriendRequests = ({
   friendRequest: { friendRequests, isFetching }
-}) {
+}) => {
   if (!friendRequests || friendRequests.length <= 0) return true;
   if (isFetching) return false;
 
   return false;
-}
+};
 
-export function fetchFriendRequestsIfNeeded() {
-  return (dispatch, getState) => {
-    const state = getState();
-    if (shouldFetchFriendRequests(state)) {
-      return dispatch(fetchFriendRequests(state.user.id));
-    }
-  };
-}
+export const fetchFriendRequestsIfNeeded = () => (dispatch, getState) => {
+  const state = getState();
+  if (shouldFetchFriendRequests(state)) {
+    return dispatch(fetchFriendRequests(state.user.id));
+  }
+};

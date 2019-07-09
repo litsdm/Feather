@@ -9,7 +9,11 @@ const Badge = ({ error }) => (
 );
 
 Badge.propTypes = {
-  error: string.isRequired
+  error: string
+};
+
+Badge.defaultProps = {
+  error: null
 };
 
 export default Badge;
