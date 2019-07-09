@@ -176,14 +176,15 @@ const SendModal = ({
 SendModal.propTypes = {
   friends: arrayOf(userShape),
   stopWaiting: func.isRequired,
-  userID: string.isRequired,
+  userID: string,
   display: bool.isRequired,
   uploadFiles: func.isRequired,
   uploadLink: func.isRequired
 };
 
 SendModal.defaultProps = {
-  friends: []
+  friends: [],
+  userID: ''
 };
 
 export default SendModal;

@@ -69,13 +69,14 @@ const FriendsTab = ({ friends, selectedFriends, select, userID }) => {
 FriendsTab.propTypes = {
   friends: arrayOf(userShape),
   select: func.isRequired,
-  userID: string.isRequired,
+  userID: string,
   selectedFriends: object // eslint-disable-line react/forbid-prop-types
 };
 
 FriendsTab.defaultProps = {
   friends: [],
-  selectedFriends: {}
+  selectedFriends: {},
+  userID: ''
 };
 
 export default FriendsTab;
