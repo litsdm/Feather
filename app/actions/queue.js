@@ -5,7 +5,7 @@ import mime from 'mime-types';
 import rimraf from 'rimraf';
 
 import { emit } from '../socketClient';
-import { updateUserProperty } from './user';
+import { updateUser } from './user';
 import { addFile } from './file';
 import { displayUpgrade } from './upgrade';
 import { setIsLoading } from './loading';
@@ -112,8 +112,12 @@ const uploadComplete = (file, isLink = false) => (dispatch, getState) => {
     dispatch(finishUploading());
   else dispatch(completeFile(completedCount + 1));
 
-  dispatch(updateUserProperty('remainingBytes', newRemainingBytes));
-  dispatch(updateUserProperty('remainingFiles', newRemainingFiles));
+  dispatch(
+    updateUser({
+      remainingBytes: newRemainingBytes,
+      remainingFiles: newRemainingFiles
+    })
+  );
 
   notifyOnUpload(dbFile.name);
 };

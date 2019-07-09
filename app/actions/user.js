@@ -20,16 +20,26 @@ export const addUserFromToken = token => dispatch => {
   dispatch(addUser(user));
 };
 
-export const updateUserProperty = (name, value) => (dispatch, getState) => {
-  const {
-    user: { id }
-  } = getState();
-  const payload = { name, value };
+const putUser = async (id, properties) => {
+  try {
+    const response = await callApi(`${id}/update`, { ...properties }, 'PUT');
+    const { token } = await response.json();
+    return token;
+  } catch (exception) {
+    throw new Error(`[user.putUser] ${exception.error}`);
+  }
+};
 
-  return callApi(`${id}/update`, payload, 'PUT')
-    .then(res => res.json())
-    .then(({ token }) => {
-      emit('updatedUser', { roomId: id, token });
-      return dispatch(addUserFromToken(token));
-    });
+export const updateUser = properties => async (dispatch, getState) => {
+  try {
+    const {
+      user: { id }
+    } = getState();
+
+    const token = await putUser(id, properties);
+    emit('updatedUser', { roomId: id, token });
+    return dispatch(addUserFromToken(token));
+  } catch (exception) {
+    console.error(exception.message);
+  }
 };
