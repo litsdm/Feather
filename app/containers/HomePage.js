@@ -6,8 +6,7 @@ import { fileShape } from '../shapes';
 import Home from '../components/Home';
 
 import { removeFile } from '../actions/file';
-import { downloadFile } from '../actions/download';
-import { awaitRecipients } from '../actions/queue';
+import { awaitRecipients, downloadFile } from '../actions/queue';
 
 const mapStateToProps = ({
   file: { files, isFetching },

@@ -14,7 +14,7 @@ const FileRow = ({
   filename,
   expiresAt,
   id,
-  url,
+  s3Filename,
   userId,
   removeFile,
   index
@@ -25,7 +25,7 @@ const FileRow = ({
       ea: 'download',
       el: `Download file ${id}`
     });
-    downloadFile(id, url, filename);
+    downloadFile(id, s3Filename, filename);
   };
 
   const handleDelete = () => {
@@ -111,7 +111,7 @@ FileRow.propTypes = {
   index: number.isRequired,
   removeFile: func.isRequired,
   userId: string.isRequired,
-  url: string.isRequired
+  s3Filename: string.isRequired
 };
 
 export default FileRow;

@@ -1,4 +1,4 @@
-import { remote } from 'electron';
+import { remote, ipcRenderer } from 'electron';
 import archiver from 'archiver';
 import fs from 'fs';
 import mime from 'mime-types';
@@ -36,7 +36,7 @@ const addFileToQueue = file => ({
   type: ADD_FILE_TO_QUEUE
 });
 
-const updateProgress = (id, progress) => ({
+export const updateProgress = (id, progress) => ({
   id,
   progress,
   type: UPDATE_PROGRESS
@@ -64,6 +64,59 @@ const finishOnError = error => ({
 const finishAndClean = () => ({
   type: FINISH_AND_CLEAN
 });
+
+export const completeDownload = (fileID, filename) => (dispatch, getState) => {
+  const {
+    queue: { files, completedCount }
+  } = getState();
+
+  if (completedCount + 1 === Object.keys(files).length)
+    dispatch(finishUploading());
+  else dispatch(completeFile(completedCount + 1));
+
+  const localConfig = JSON.parse(localStorage.getItem('localConfig'));
+  if (localConfig.notifyDownload) {
+    notify({
+      title: 'Download Complete',
+      body: `${filename} has finished downloading.`
+    });
+  }
+};
+
+const getSignedUrl = async s3Filename => {
+  try {
+    const response = await callApi(`get-s3?file-name=${s3Filename}`);
+    const { signedRequest } = await response.json();
+    return signedRequest;
+  } catch (exception) {
+    throw new Error(`[queue.getSignedUrl] ${exception.message}`);
+  }
+};
+
+export const downloadFile = (
+  fileId,
+  s3Filename,
+  filename
+) => async dispatch => {
+  try {
+    const file = {
+      _id: fileId,
+      name: filename,
+      queueType: 'download',
+      progress: 0
+    };
+
+    const localPath =
+      JSON.parse(localStorage.getItem('localConfig')).downloadPath || null;
+
+    const url = await getSignedUrl(s3Filename);
+
+    ipcRenderer.send('download-file', { fileId, url, filename, localPath });
+    dispatch(addFileToQueue(file));
+  } catch (exception) {
+    console.error(`[queue.downloadFile] ${exception.message}`);
+  }
+};
 
 const notifyOnUpload = filename => {
   const { notifyUpload } = JSON.parse(localStorage.getItem('localConfig'));
@@ -126,8 +179,9 @@ const postFiles = async (files, signedReqs) => {
   try {
     const postPromises = [];
     const filePromises = [];
-    files.forEach(({ name, size, type }, index) => {
-      const postFile = { name, size, type, s3Url: signedReqs[index].url };
+    files.forEach(({ name, size, type, send: { to, from } }, index) => {
+      const { url, s3Filename } = signedReqs[index];
+      const postFile = { name, size, type, s3Url: url, s3Filename, to, from };
       postPromises.push(callApi('files', postFile, 'POST'));
     });
     const responses = await Promise.all(postPromises);
@@ -242,7 +296,9 @@ export const finishSelectingRecipients = (send, addToUser = false) => async (
     for (let i = 0; i < files.length; i += 1) {
       const { signedRequest } = signedReqs[i];
       const dbFile = dbFiles[i].file;
-      const file = { ...files[i], id: dbFile._id, to: dbFile.to };
+      const file = files[i];
+      file.id = dbFile._id;
+      file.to = dbFile.to;
 
       dispatch(addFileToQueue({ ...dbFile, addToUser, progress: 0 }));
       uploadFile(file, signedRequest, handleProgress, handleFinish);
@@ -252,6 +308,26 @@ export const finishSelectingRecipients = (send, addToUser = false) => async (
   } catch (exception) {
     console.error(`[queue.finishSelectingRecipients] ${exception.message}`);
     dispatch(finishOnError(exception.message));
+  }
+};
+
+const postLinkFiles = async files => {
+  try {
+    const postPromises = [];
+    const filePromises = [];
+    files.forEach(({ name, size, type }) => {
+      const postFile = { name, size, type };
+      postPromises.push(callApi('files', postFile, 'POST'));
+    });
+    const responses = await Promise.all(postPromises);
+
+    responses.forEach(response => {
+      filePromises.push(response.json());
+    });
+
+    return Promise.all(filePromises);
+  } catch (exception) {
+    throw new Error(`[queue.postFiles] ${exception.message}`);
   }
 };
 
@@ -361,9 +437,9 @@ export const uploadToLink = send => async (dispatch, getState) => {
       return;
     }
 
-    const { signedRequest, url } = await getLinkSignedRequest();
+    const { signedRequest, url, s3Filename } = await getLinkSignedRequest();
     const rdFiles = await readFiles(waitFiles);
-    const dbFiles = await postFiles(rdFiles, [{ url }]);
+    const dbFiles = await postLinkFiles(rdFiles);
 
     dispatch(setIsLoading(false));
     dispatch(stopWaiting());
@@ -371,6 +447,7 @@ export const uploadToLink = send => async (dispatch, getState) => {
     const fileIDs = dbFiles.map(({ file: { _id } }) => _id);
     const link = {
       ...send,
+      s3Filename,
       files: fileIDs,
       size: zipFile.size,
       s3Url: url,

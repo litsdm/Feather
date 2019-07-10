@@ -1,4 +1,4 @@
-import React, { Fragment, useState } from 'react';
+import React, { Fragment, useState, useEffect } from 'react';
 import uuid from 'uuid/v4';
 import { object, number } from 'prop-types';
 import styles from './styles.scss';
@@ -10,7 +10,21 @@ import Row from './row';
 
 const Queue = ({ files, completedCount }) => {
   const [isExpanded, setExpanded] = useState(false);
+  const [downloadCount, setDownloadCount] = useState(0);
+  const [uploadCount, setUploadCount] = useState(0);
   const fileKeys = Object.keys(files);
+
+  useEffect(() => {
+    let downCount = 0;
+    let upCount = 0;
+    fileKeys.forEach(key => {
+      if (files[key].queueType === 'download') downCount += 1;
+      else upCount += 1;
+    });
+
+    setDownloadCount(downCount);
+    setUploadCount(upCount);
+  }, [files]);
 
   const calculateTotalProgress = () => {
     // iterate through queued files and sum the progress
@@ -26,6 +40,13 @@ const Queue = ({ files, completedCount }) => {
     return Math.round((totalProgress / fileValues.length) * 100);
   };
 
+  const getTitle = () => {
+    if (!downloadCount) return `Uploading ${uploadCount} files`;
+    if (!uploadCount) return `Downloading ${downloadCount} files`;
+
+    return `Downloading ${downloadCount}, Uploading ${uploadCount}`;
+  };
+
   const hideOnExpand = () => (isExpanded ? { display: 'none' } : {});
   const showOnExpand = () => (!isExpanded ? { display: 'none' } : {});
 
@@ -33,9 +54,13 @@ const Queue = ({ files, completedCount }) => {
     `${className} ${isExpanded ? styles.expand : {}}`;
 
   const renderRows = () =>
-    Object.values(files).map(({ name, progress }, index) => (
+    Object.values(files).map(({ name, progress, queueType }, index) => (
       <Fragment key={uuid()}>
-        <Row name={name} progress={Math.round(progress * 100)} />
+        <Row
+          name={name}
+          progress={Math.round(progress * 100)}
+          type={queueType}
+        />
         {index + 1 < fileKeys.length ? (
           <div className={styles.divider} />
         ) : null}
@@ -58,9 +83,7 @@ const Queue = ({ files, completedCount }) => {
       >
         <div className={withExpand(styles.header)}>
           <div className={styles.info}>
-            <p className={withExpand(styles.title)}>
-              Uploading {fileKeys.length} files
-            </p>
+            <p className={withExpand(styles.title)}>{getTitle()}</p>
             <p className={styles.subtitle} style={hideOnExpand()}>
               {totalProgress}% • {completedCount} out of {fileKeys.length}{' '}
               completed

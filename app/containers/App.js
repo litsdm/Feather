@@ -11,8 +11,11 @@ import notify from '../helpers/notifications';
 import useDropzone from '../helpers/useDropzone';
 
 import { fetchFilesIfNeeded, addFile, removeFile } from '../actions/file';
-import { finishDownload, updateDownloadProgress } from '../actions/download';
-import { awaitRecipients } from '../actions/queue';
+import {
+  awaitRecipients,
+  completeDownload,
+  updateProgress
+} from '../actions/queue';
 import { fetchFriendsIfNeeded, addFriend } from '../actions/friend';
 import {
   fetchFriendRequestsIfNeeded,
@@ -33,9 +36,10 @@ const mapDispatchToProps = dispatch => ({
   fetchFiles: () => dispatch(fetchFilesIfNeeded()),
   fetchFriends: () => dispatch(fetchFriendsIfNeeded()),
   fetchFriendRequests: () => dispatch(fetchFriendRequestsIfNeeded()),
-  dFinishDownload: fileId => dispatch(finishDownload(fileId)),
-  dUpdateDownloadProgress: (fileId, progress) =>
-    dispatch(updateDownloadProgress(fileId, progress)),
+  finishDownload: (fileID, filename) =>
+    dispatch(completeDownload(fileID, filename)),
+  updateDownloadProgress: (fileID, progress) =>
+    dispatch(updateProgress(fileID, progress)),
   dAddFile: file => dispatch(addFile(file)),
   dRemoveFile: index => dispatch(removeFile(index)),
   addReceivedFriendRequest: friendRequest =>
@@ -50,9 +54,9 @@ const App = ({
   addReceivedFriendRequest,
   children,
   dAddFile,
-  dFinishDownload,
+  finishDownload,
   dRemoveFile,
-  dUpdateDownloadProgress,
+  updateDownloadProgress,
   fetchFiles,
   fetchFriends,
   fetchFriendRequests,
@@ -142,20 +146,10 @@ const App = ({
 
   const handleTrayUpload = (e, files) => waitForRecipients(files);
   const handleDownloadProgress = (e, { progress, fileId }) =>
-    dUpdateDownloadProgress(fileId, progress);
+    updateDownloadProgress(fileId, progress);
 
-  const handleDownloadFinish = (e, { fileId, filename }) => {
-    const localConfig = JSON.parse(localStorage.getItem('localConfig'));
-
-    dFinishDownload(fileId);
-
-    if (localConfig.notifyDownload) {
-      notify({
-        title: 'Download Complete',
-        body: `${filename} has finished downloading.`
-      });
-    }
-  };
+  const handleDownloadFinish = (e, { fileId, filename }) =>
+    finishDownload(fileId, filename);
 
   return (
     <>
@@ -179,8 +173,8 @@ App.propTypes = {
   location: object.isRequired, // eslint-disable-line react/forbid-prop-types
   history: object.isRequired, // eslint-disable-line react/forbid-prop-types
   fetchFiles: func.isRequired,
-  dFinishDownload: func.isRequired,
-  dUpdateDownloadProgress: func.isRequired,
+  finishDownload: func.isRequired,
+  updateDownloadProgress: func.isRequired,
   dAddFile: func.isRequired,
   dRemoveFile: func.isRequired,
   fetchFriends: func.isRequired,
