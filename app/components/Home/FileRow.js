@@ -65,7 +65,10 @@ const FileRow = ({
   const fileIcon = getFileIcon(filename);
 
   return (
-    <div className={styles.item}>
+    <div
+      className={styles.item}
+      style={{ marginRight: (index + 1) % 3 === 0 ? '0' : '18px' }}
+    >
       <div className={styles.square}>
         <div className={styles.overlay}>
           <div className={styles.overlayCol}>
