@@ -84,10 +84,10 @@ const removeFilesIfExpired = (userId, files) => async dispatch => {
     const deletePromises = [];
     const s3Promises = [];
 
-    files.forEach(({ expiresAt, name, _id }, index) => {
+    files.forEach(({ expiresAt, s3Filename, _id }, index) => {
       if (moment().diff(expiresAt) > 0) {
         deletePromises.push(callApi(`${userId}/files/${_id}`, {}, 'DELETE'));
-        s3Promises.push(callApi('delete-s3', { filename: name }, 'POST'));
+        s3Promises.push(callApi('delete-s3', { filename: s3Filename }, 'POST'));
         dispatch(removeFile(index));
       }
     });

@@ -28,35 +28,38 @@ const FileRow = ({
     downloadFile(id, s3Filename, filename);
   };
 
-  const handleDelete = () => {
-    callApi(`${userId}/files/${id}`, {}, 'DELETE')
-      .then(res => res.json())
-      .then(({ message, shouldDeleteS3 }) => {
-        if (message) return Promise.reject(new Error(message));
+  const deleteFile = async () => {
+    try {
+      const response = await callApi(`${userId}/files/${id}`, {}, 'DELETE');
+      const { message, shouldDeleteS3 } = await response.json();
 
-        if (shouldDeleteS3) {
-          callApi('delete-s3', { filename }, 'POST')
-            .then(({ status }) => {
-              if (status !== 200) return Promise.reject();
-              removeFile(index);
-              emit('removeFileFromRoom', { roomId: userId, index });
-              return Promise.resolve();
-            })
-            .catch(err => console.error(err.message));
-        } else {
-          removeFile(index);
-          emit('removeFileFromRoom', { roomId: userId, index });
-        }
+      if (message) throw new Error(message);
 
-        analytics.send('event', {
-          ec: 'File-El',
-          ea: 'delete',
-          el: 'Delete file'
-        });
+      return shouldDeleteS3;
+    } catch (exception) {
+      throw new Error(`[FileRow.deleteFile] ${exception.message}`);
+    }
+  };
 
-        return Promise.resolve();
-      })
-      .catch(err => console.error(err.message));
+  const handleDelete = async () => {
+    try {
+      const shouldDeleteS3 = await deleteFile();
+
+      if (shouldDeleteS3) {
+        await callApi('delete-s3', { filename: s3Filename }, 'POST');
+      }
+
+      removeFile(index);
+      emit('removeFileFromRoom', { roomId: userId, index });
+
+      analytics.send('event', {
+        ec: 'File-El',
+        ea: 'delete',
+        el: 'Delete file'
+      });
+    } catch (exception) {
+      console.error(`[FileRow.handleDelete] ${exception.message}`);
+    }
   };
 
   const fileIcon = getFileIcon(filename);
