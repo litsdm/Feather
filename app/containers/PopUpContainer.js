@@ -17,7 +17,7 @@ import LinkModal from '../components/LinkModal';
 import ModalLoader from '../components/ModalLoader';
 
 const mapStateToProps = ({
-  queue: { isWaiting, linkUrl },
+  queue: { isWaiting, linkUrl, onlyLink },
   file: { failed, isFetching: isFetchingFiles },
   friend: { friends },
   upgrade,
@@ -28,6 +28,7 @@ const mapStateToProps = ({
   linkUrl,
   upgrade,
   user,
+  onlyLink,
   failed,
   isFetchingFiles,
   friends,
@@ -38,7 +39,8 @@ const mapDispatchToProps = dispatch => ({
   dStopWaiting: () => dispatch(stopWaiting()),
   uploadFiles: (send, addToUser) =>
     dispatch(finishSelectingRecipients(send, addToUser)),
-  uploadLink: send => dispatch(uploadToLink(send)),
+  uploadLink: (send, onlyLink = false) =>
+    dispatch(uploadToLink(send, onlyLink)),
   closeUpgrade: () => dispatch(hideUpgrade())
 });
 
@@ -55,7 +57,8 @@ const PopUpContainer = ({
   closeUpgrade,
   linkUrl,
   fetchData,
-  isLoading
+  isLoading,
+  onlyLink
 }) => (
   <Fragment>
     <ModalLoader display={isLoading} />
@@ -67,7 +70,7 @@ const PopUpContainer = ({
       uploadFiles={uploadFiles}
       uploadLink={uploadLink}
     />
-    <LinkModal url={linkUrl} />
+    <LinkModal url={linkUrl} onlyLink={onlyLink} />
     {upgrade.visible ? (
       <UpgradeModal type={upgrade.messageType} close={closeUpgrade} />
     ) : null}
@@ -90,6 +93,7 @@ PopUpContainer.propTypes = {
   isFetchingFiles: bool.isRequired,
   linkUrl: string.isRequired,
   isLoading: bool.isRequired,
+  onlyLink: bool.isRequired,
   upgrade: shape({ visible: bool, messageType: string }).isRequired
 };
 

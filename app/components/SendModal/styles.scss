@@ -34,12 +34,15 @@
   padding-bottom: 3px;
 
   p {
+    flex-basis: 50%;
     font-weight: bold;
+    text-align: center;
   }
 }
 
 .close,
-.send {
+.send,
+.clip {
   background-color: transparent;
   border: none;
   border-radius: 50%;
@@ -73,6 +76,19 @@
     &:hover {
       background-color: rgba(32, 145, 243, 0.2);
     }
+  }
+}
+
+.clip {
+  margin-right: 6px;
+  opacity: 0.6;
+  padding: 5px 7px;
+  transition: 0.2s ease all;
+
+  &:hover {
+    background-color: rgba(76, 175, 80, 0.2);
+    color: #4CAF50;
+    opacity: 1;
   }
 }
 
@@ -113,4 +129,17 @@
   justify-content: center;
   margin-left: 6px;
   width: 17px;
+}
+
+.left {
+  display: flex;
+  flex-basis: 25%;
+  justify-content: flex-start;
+}
+
+.right {
+  align-items: center;
+  display: flex;
+  flex-basis: 25%;
+  justify-content: flex-end;
 }

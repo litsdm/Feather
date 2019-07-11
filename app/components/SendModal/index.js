@@ -36,6 +36,11 @@ const SendModal = ({
     resetState();
   };
 
+  const handleLink = () => {
+    uploadLink({}, true);
+    resetState();
+  };
+
   const handleSend = () => {
     const finalEmails =
       tab === 1 && validateEmail(currentEmail)
@@ -133,18 +138,25 @@ const SendModal = ({
       />
       <div className={styles.sendModal} style={{ bottom: display ? 0 : -560 }}>
         <div className={styles.top}>
-          <button type="button" className={styles.close} onClick={handleBack}>
-            <i className="fa fa-times" />
-          </button>
+          <div className={styles.left}>
+            <button type="button" className={styles.close} onClick={handleBack}>
+              <i className="fa fa-times" />
+            </button>
+          </div>
           <p>Send To</p>
-          <button
-            type="button"
-            className={`${styles.send} ${sendActive ? styles.active : ''}`}
-            onClick={handleSend}
-            disabled={!sendActive}
-          >
-            <i className="far fa-paper-plane" />
-          </button>
+          <div className={styles.right}>
+            <button type="button" className={styles.clip} onClick={handleLink}>
+              <i className="fas fa-paperclip" />
+            </button>
+            <button
+              type="button"
+              className={`${styles.send} ${sendActive ? styles.active : ''}`}
+              onClick={handleSend}
+              disabled={!sendActive}
+            >
+              <i className="far fa-paper-plane" />
+            </button>
+          </div>
         </div>
         <div className={styles.tabSelect}>
           <button

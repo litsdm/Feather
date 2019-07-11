@@ -51,8 +51,9 @@ const finishUploading = () => ({
   type: FINISH_UPLOADING
 });
 
-const setLinkUrl = url => ({
+const setLinkUrl = (url, onlyLink = false) => ({
   url,
+  onlyLink,
   type: SET_LINK_URL
 });
 
@@ -139,7 +140,10 @@ const sendEmail = async (file, username, dispatch) => {
   document.getElementById('linkModal').style.display = 'flex';
 };
 
-const uploadComplete = (file, isLink = false) => (dispatch, getState) => {
+const uploadComplete = (file, isLink = false, onlyLink = false) => (
+  dispatch,
+  getState
+) => {
   const {
     user: { remainingBytes, remainingFiles, username },
     queue: { files, completedCount }
@@ -151,7 +155,10 @@ const uploadComplete = (file, isLink = false) => (dispatch, getState) => {
   const newRemainingBytes = remainingBytes - dbFile.size;
 
   if (isLink) {
-    sendEmail(dbFile, username, dispatch);
+    if (onlyLink) {
+      dispatch(setLinkUrl(`https://www.feathershare.com/${dbFile._id}`, true));
+      document.getElementById('linkModal').style.display = 'flex';
+    } else sendEmail(dbFile, username, dispatch);
     deleteDirectories();
   } else {
     file.to.forEach(receiver =>
@@ -416,7 +423,10 @@ const deleteDirectories = () => {
  * Create a link to send via email, compress waitFiles into a zip and upload that zip.
  * @param  {Object} send Recipients and sender data - send.to and send.from
  */
-export const uploadToLink = send => async (dispatch, getState) => {
+export const uploadToLink = (send, onlyLink = false) => async (
+  dispatch,
+  getState
+) => {
   const tempDirectoryPath = remote.app.getPath('temp');
   const directoryPath = `${tempDirectoryPath}FeatherFiles/`;
   const outputPath = `${tempDirectoryPath}FeatherFiles.zip`;
@@ -461,7 +471,7 @@ export const uploadToLink = send => async (dispatch, getState) => {
     };
 
     const handleFinish = file => {
-      dispatch(uploadComplete(file, true));
+      dispatch(uploadComplete(file, true, onlyLink));
     };
 
     dispatch(

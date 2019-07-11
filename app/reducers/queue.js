@@ -15,12 +15,13 @@ const initialState = {
   files: {},
   waitFiles: [],
   completedCount: 0,
-  linkUrl: ''
+  linkUrl: '',
+  onlyLink: false
 };
 
 const queue = (
   state = initialState,
-  { type, waitFiles, file, id, progress, count, url, error }
+  { type, waitFiles, file, id, progress, count, url, error, onlyLink }
 ) => {
   switch (type) {
     case AWAIT_RECIPIENTS:
@@ -56,10 +57,10 @@ const queue = (
     case FINISH_UPLOADING:
       return state.isWaiting
         ? { ...state, files: {}, completedCount: 0 }
-        : initialState;
+        : { ...initialState, linkUrl: state.linkUrl, onlyLink: state.onlyLink };
 
     case SET_LINK_URL:
-      return { ...state, linkUrl: url };
+      return { ...state, linkUrl: url, onlyLink };
 
     case FINISH_AND_CLEAN:
       return initialState;

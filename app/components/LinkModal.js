@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
 import Lottie from 'react-lottie';
-import { string } from 'prop-types';
+import { bool, string } from 'prop-types';
 import styles from './LinkModal.scss';
 
 import mailAnimation from '../assets/mailAnimation.json';
 
-const LinkModal = ({ url }) => {
+const LinkModal = ({ url, onlyLink }) => {
   const [didCopy, setCopy] = useState(false);
 
   const closeModal = () => {
@@ -38,9 +38,13 @@ const LinkModal = ({ url }) => {
           }}
           height={100}
         />
-        <p className={styles.title}>Your email has been sent!</p>
+        <p className={styles.title}>
+          {onlyLink
+            ? 'Your link has been created!'
+            : 'Your email has been sent!'}
+        </p>
         <p className={styles.subtitle}>
-          You can also copy and share this link with anyone.
+          You can copy and share this link with anyone.
         </p>
         <input
           className={styles.input}
@@ -61,11 +65,13 @@ const LinkModal = ({ url }) => {
 };
 
 LinkModal.propTypes = {
-  url: string
+  url: string,
+  onlyLink: bool
 };
 
 LinkModal.defaultProps = {
-  url: ''
+  url: '',
+  onlyLink: false
 };
 
 export default LinkModal;
