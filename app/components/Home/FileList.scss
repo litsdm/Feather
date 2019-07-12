@@ -17,25 +17,6 @@
   padding: 12px;
 }
 
-.empty {
-  background-color: #fff;
-  font-size: 14px;
-  height: 414px;
-  padding: 24px;
-  position: relative;
-  text-align: center;
-  width: 100%;
-
-  p {
-    left: 50%;
-    opacity: 0.6;
-    position: absolute;
-    top: calc(50% - 98px);
-    transform: translate(-50%);
-    width: 85%;
-  }
-}
-
 .dropOverlay {
   align-items: center;
   background-color: rgba(255, 255, 255, 0.8); // rgba(0, 0, 0, 0.6);

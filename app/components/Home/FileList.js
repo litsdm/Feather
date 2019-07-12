@@ -6,6 +6,7 @@ import { fileShape } from '../../shapes';
 import styles from './FileList.scss';
 
 import FileRow from './FileRow';
+import Empty from './Empty';
 
 const FileList = ({ downloadFile, files, userId, removeFile }) => {
   const renderFiles = () =>
@@ -28,13 +29,7 @@ const FileList = ({ downloadFile, files, userId, removeFile }) => {
   return (
     <div className={styles.container}>
       <div className={styles.list}>
-        {files.length > 0 ? (
-          renderFiles()
-        ) : (
-          <div className={styles.empty}>
-            <p>You have no files yet. Drag any file above to upload it.</p>
-          </div>
-        )}
+        {files.length > 0 ? renderFiles() : <Empty />}
       </div>
     </div>
   );
