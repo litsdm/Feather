@@ -37,7 +37,7 @@ const SendModal = ({
   };
 
   const handleLink = () => {
-    uploadLink({}, true);
+    uploadLink({ from: userID }, true);
     resetState();
   };
 

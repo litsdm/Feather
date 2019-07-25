@@ -7,6 +7,7 @@ import rimraf from 'rimraf';
 import { emit } from '../socketClient';
 import { updateUser } from './user';
 import { addFile } from './file';
+import { addLink } from './link';
 import { displayUpgrade } from './upgrade';
 import { setIsLoading } from './loading';
 import callApi, { uploadFile } from '../helpers/apiCaller';
@@ -471,6 +472,7 @@ export const uploadToLink = (send, onlyLink = false) => async (
     };
 
     const handleFinish = file => {
+      dispatch(addLink(dbLink));
       dispatch(uploadComplete(file, true, onlyLink));
     };
 

@@ -47,6 +47,13 @@ const NavBar = ({ pathname, history, requestIndicator, updateAvailable }) => {
         </button>
       ) : null}
       <Link
+        to="/links"
+        className={styles.settings}
+        style={{ marginRight: '12px' }}
+      >
+        <i className="fa fa-paperclip" />
+      </Link>
+      <Link
         to="/friends"
         className={styles.settings}
         style={{ marginRight: '12px', position: 'relative' }}
@@ -62,6 +69,11 @@ const NavBar = ({ pathname, history, requestIndicator, updateAvailable }) => {
 
   const getConfig = () => {
     switch (pathname) {
+      case '/links':
+        return {
+          title: 'Links',
+          controlsRight: null
+        };
       case '/friends':
         return {
           title: 'Friends',
