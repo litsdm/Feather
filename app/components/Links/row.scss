@@ -20,6 +20,11 @@
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+
+  &.expired {
+    color: rgba(0, 0, 0, 0.6);
+    font-style: italic;
+  }
 }
 
 .date {

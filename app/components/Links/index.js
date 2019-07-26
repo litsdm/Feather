@@ -25,13 +25,12 @@ const Links = ({ links, removeLink }) => {
   const renderLinks = () =>
     links.map(({ _id, createdAt, expiresAt, s3Filename }, index) => {
       const dateString = moment(createdAt).format('MM/DD/YYYY');
-      const expiry = moment().to(expiresAt);
       return (
         <Fragment key={uuid()}>
           <Row
             id={_id}
             date={dateString}
-            expiry={expiry}
+            expiresAt={expiresAt}
             copyText={copyText}
             select={selectLink(index)}
             deleteLink={deleteLink(_id, index, s3Filename)}

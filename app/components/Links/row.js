@@ -1,11 +1,14 @@
 import React, { useState } from 'react';
 import { shell } from 'electron';
+import moment from 'moment';
 import { func, string } from 'prop-types';
 import styles from './row.scss';
 
-const Row = ({ id, date, expiry, copyText, select, deleteLink }) => {
+const Row = ({ id, date, expiresAt, copyText, select, deleteLink }) => {
   const [showMenu, setShowMenu] = useState(false);
   const url = `https://www.feathershare.com/${id}`;
+  const expiry = moment().to(expiresAt);
+  const isExpired = moment().diff(expiresAt) > 0;
 
   const handleCopy = () => {
     copyText(url);
@@ -14,12 +17,14 @@ const Row = ({ id, date, expiry, copyText, select, deleteLink }) => {
 
   const handleOpen = () => shell.openExternal(url);
 
+  const withExpired = style => `${style} ${isExpired ? styles.expired : ''}`;
+
   return (
     <div className={styles.row}>
       <div className={styles.info}>
-        <p className={styles.url}>{url}</p>
+        <p className={withExpired(styles.url)}>{url}</p>
         <p className={styles.date}>
-          {date} - Expires {expiry}
+          {date} - {isExpired ? 'Expired' : `Expires ${expiry}`}
         </p>
       </div>
       <div className={styles.actions}>
@@ -63,9 +68,10 @@ const Row = ({ id, date, expiry, copyText, select, deleteLink }) => {
 Row.propTypes = {
   id: string.isRequired,
   date: string.isRequired,
-  expiry: string.isRequired,
+  expiresAt: string.isRequired,
   copyText: func.isRequired,
-  select: func.isRequired
+  select: func.isRequired,
+  deleteLink: func.isRequired
 };
 
 export default Row;
