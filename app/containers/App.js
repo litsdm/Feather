@@ -22,6 +22,7 @@ import {
   addFriendRequest
 } from '../actions/friendRequest';
 import { addUserFromToken } from '../actions/user';
+import { addLink } from '../actions/link';
 
 import NavBar from '../components/NavBar';
 import PopUpContainer from './PopUpContainer';
@@ -46,11 +47,13 @@ const mapDispatchToProps = dispatch => ({
     dispatch(addFriendRequest(friendRequest)),
   waitForRecipients: files => dispatch(awaitRecipients(files)),
   addNewFriend: friend => dispatch(addFriend(friend)),
+  addNewLink: link => dispatch(addLink(link)),
   updateUser: token => dispatch(addUserFromToken(token))
 });
 
 const App = ({
   addNewFriend,
+  addNewLink,
   addReceivedFriendRequest,
   children,
   dAddFile,
@@ -125,12 +128,9 @@ const App = ({
         });
       }
     });
-    socket.on('removeFile', index => {
-      dRemoveFile(index);
-    });
-    socket.on('newFriend', friend => {
-      addNewFriend(friend);
-    });
+    socket.on('removeFile', index => dRemoveFile(index));
+    socket.on('newFriend', friend => addNewFriend(friend));
+    socket.on('newLink', link => addNewLink(link));
     socket.on('receiveFriendRequest', friendRequest => {
       addReceivedFriendRequest(friendRequest);
 
@@ -139,9 +139,7 @@ const App = ({
         body: 'You can see this request on your friends page.'
       });
     });
-    socket.on('updateUser', token => {
-      updateUser(token);
-    });
+    socket.on('updateUser', token => updateUser(token));
   };
 
   const handleTrayUpload = (e, files) => waitForRecipients(files);
@@ -183,6 +181,7 @@ App.propTypes = {
   addReceivedFriendRequest: func.isRequired,
   waitForRecipients: func.isRequired,
   addNewFriend: func.isRequired,
+  addNewLink: func.isRequired,
   friendRequests: arrayOf(friendRequestShape),
   user: userShape
 };

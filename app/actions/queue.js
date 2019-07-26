@@ -473,7 +473,10 @@ export const uploadToLink = (send, onlyLink = false) => async (
 
     const handleFinish = file => {
       const files = dbFiles.map(({ file: dbF }) => dbF);
-      dispatch(addLink({ ...dbLink, files }));
+      const linkToAdd = { ...dbLink, files };
+
+      emit('addLink', linkToAdd);
+      dispatch(addLink(linkToAdd));
       dispatch(uploadComplete(file, true, onlyLink));
     };
 
