@@ -7,6 +7,7 @@ import { fetchLinksIfNeeded, deleteLink } from '../actions/link';
 
 import Links from '../components/Links';
 import Loader from '../components/Loader';
+import Empty from '../components/Links/Empty';
 
 const mapStateToProps = ({ link: { links, isFetching } }) => ({
   links,
@@ -24,11 +25,14 @@ const LinksPage = ({ links, fetchLinks, isFetching, removeLink }) => {
     fetchLinks();
   }, []);
 
-  return isFetching ? (
-    <Loader />
-  ) : (
-    <Links links={links} removeLink={removeLink} />
-  );
+  const renderLinks = () =>
+    links.length > 0 ? (
+      <Links links={links} removeLink={removeLink} />
+    ) : (
+      <Empty />
+    );
+
+  return isFetching ? <Loader /> : renderLinks();
 };
 
 LinksPage.propTypes = {

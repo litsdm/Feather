@@ -1,0 +1,28 @@
+.empty {
+  align-items: center;
+  display: flex;
+  flex-direction: column;
+  height: 414px;
+  justify-content: center;
+  width: 100%;
+}
+
+.title {
+  font-size: 16px;
+  font-weight: 600;
+  margin-bottom: 18px;
+  text-align: center;
+  width: 90%;
+}
+
+.description {
+  font-size: 14px;
+  font-weight: 300;
+  opacity: 0.7;
+  text-align: center;
+  width: 80%;
+
+  i {
+    font-size: 12px;
+  }
+}
