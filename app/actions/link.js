@@ -82,10 +82,10 @@ export const fetchLinksIfNeeded = () => (dispatch, getState) => {
   }
 };
 
-const getInsertIndex = ({ username }, links) => {
+const getInsertIndex = ({ s3Filename }, links) => {
   for (let i = 0; i < links.length; i += 1) {
-    const { username: checkUsername } = links[i];
-    if (username.toLowerCase() < checkUsername.toLowerCase()) {
+    const { s3Filename: checkFilename } = links[i];
+    if (s3Filename.toLowerCase() < checkFilename.toLowerCase()) {
       return i;
     }
   }
