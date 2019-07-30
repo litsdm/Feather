@@ -112,11 +112,11 @@ const FriendsPage = ({
     });
 
   const sendRequest = async () => {
+    const queryProperty =
+      friendTag.split('#').length < 2 && friendTag.includes('@')
+        ? 'email'
+        : 'tag';
     try {
-      const queryProperty =
-        friendTag.split('#').length < 2 && friendTag.includes('@')
-          ? 'email'
-          : 'tag';
       const payload = { tag: friendTag, from: user.id, queryProperty };
       const friendRequest = await postRequest(payload);
 
@@ -137,6 +137,8 @@ const FriendsPage = ({
       displayBadge('Your request is on the way!', 'success');
     } catch (exception) {
       displayBadge("We couldn't find your friend.", 'error');
+      if (queryProperty === 'email')
+        callApi('email/newFriend', { to: [friendTag] }, 'POST');
       console.error(`[FriendsPage.sendRequest] ${exception.message}`);
     }
   };
