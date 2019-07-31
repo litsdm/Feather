@@ -62,6 +62,14 @@ const FileRow = ({
     }
   };
 
+  const formatFilename = () => {
+    const parts = filename.split('.');
+    const extension = `.${parts.pop()}`;
+    const formattedName = parts.join('');
+    return { formattedName, extension };
+  };
+
+  const { formattedName, extension } = formatFilename();
   const fileIcon = getFileIcon(filename);
 
   return (
@@ -102,7 +110,10 @@ const FileRow = ({
         />
       </div>
       <div>
-        <p className={styles.name}>{filename}</p>
+        <div className={styles.filename}>
+          <p className={styles.name}>{formattedName}</p>
+          <p className={styles.extension}>{extension}</p>
+        </div>
         <p className={styles.expiry}>Expires {moment().to(expiresAt)}</p>
       </div>
     </div>
