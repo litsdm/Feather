@@ -1,36 +1,73 @@
-import { ipcRenderer } from 'electron';
+/* eslint-disable no-restricted-syntax */
+import fs from 'fs';
 
-export const ADD_DOWNLOAD = 'ADD_DOWNLOAD';
-export const FINISH_DOWNLOAD = 'FINISH_DOWNLOAD';
-export const UPDATE_DOWNLOAD_PROGRESS = 'UPDATE_DOWNLOAD_PROGRESS';
+export const ADD_LOCAL_DOWNLOADS = 'ADD_LOCAL_DOWNLOADS';
+export const ADD_DOWNLOADED = 'ADD_DOWNLOADED';
+export const REMOVE_DOWNLOADED = 'REMOVE_DOWNLOADED';
 
-function addDownload(fileId) {
-  return {
-    fileId,
-    type: ADD_DOWNLOAD
-  };
-}
+const addStorageFiles = storageFiles => ({
+  type: ADD_LOCAL_DOWNLOADS,
+  storageFiles
+});
 
-export function downloadFile(fileId, url, filename) {
-  const localPath =
-    JSON.parse(localStorage.getItem('localConfig')).downloadPath || null;
-  return dispatch => {
-    ipcRenderer.send('download-file', { fileId, url, filename, localPath });
-    dispatch(addDownload(fileId));
-  };
-}
+export const removeDownloaded = fileID => ({
+  type: REMOVE_DOWNLOADED,
+  fileID
+});
 
-export function updateDownloadProgress(fileId, progress) {
-  return {
-    fileId,
-    progress,
-    type: UPDATE_DOWNLOAD_PROGRESS
-  };
-}
+const add = (fileID, savePath, user) => ({
+  type: ADD_DOWNLOADED,
+  fileID,
+  savePath,
+  user
+});
 
-export function finishDownload(fileId) {
-  return {
-    fileId,
-    type: FINISH_DOWNLOAD
-  };
-}
+export const addDownloaded = (fileID, savePath) => (dispatch, getState) => {
+  const {
+    user: { id },
+    download: dlFiles
+  } = getState();
+
+  localStorage.setItem(
+    'dlFiles',
+    JSON.stringify({
+      ...dlFiles,
+      [fileID]: { savePath, user: id }
+    })
+  );
+
+  return dispatch(add(fileID, savePath, id));
+};
+
+const filterExpiredDownloads = (fileIDs, storageFiles, userID) => {
+  const newStorageFiles = { ...storageFiles };
+  for (const [id, stored] of Object.entries(storageFiles)) {
+    const { savePath, user } = stored;
+    if (!fs.existsSync(savePath) || (!fileIDs[id] && user === userID)) {
+      delete newStorageFiles[id];
+    }
+  }
+
+  return newStorageFiles;
+};
+
+const getFileIDs = files => {
+  const ids = {};
+  files.forEach(({ _id }) => {
+    ids[_id] = true;
+  });
+  return ids;
+};
+
+export const addLocalDownloads = () => (dispatch, getState) => {
+  const {
+    file: { files },
+    user: { id }
+  } = getState();
+  let storageFiles = JSON.parse(localStorage.getItem('dlFiles'));
+  if (!storageFiles) return;
+
+  const fileIDs = getFileIDs(files);
+  storageFiles = filterExpiredDownloads(fileIDs, storageFiles, id);
+  return dispatch(addStorageFiles(storageFiles));
+};

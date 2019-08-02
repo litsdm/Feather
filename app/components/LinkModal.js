@@ -1,8 +1,13 @@
-import React from 'react';
-import { string } from 'prop-types';
+import React, { useState } from 'react';
+import Lottie from 'react-lottie';
+import { bool, string } from 'prop-types';
 import styles from './LinkModal.scss';
 
-const LinkModal = ({ url }) => {
+import mailAnimation from '../assets/mailAnimation.json';
+
+const LinkModal = ({ url, onlyLink }) => {
+  const [didCopy, setCopy] = useState(false);
+
   const closeModal = () => {
     document.getElementById('linkModal').style.display = 'none';
   };
@@ -10,37 +15,63 @@ const LinkModal = ({ url }) => {
   const copyText = ({ target }) => {
     target.select();
     document.execCommand('copy');
+
+    setCopy(true);
+    setTimeout(() => setCopy(false), 1500);
   };
 
   return (
-    <div id="linkModal" className={styles.wrapper}>
-      <button className={styles.overlay} type="button" onClick={closeModal} />
+    <div id="linkModal" className={styles.linkModal}>
+      <button type="button" className={styles.overlay} onClick={closeModal} />
       <div className={styles.modal}>
-        <div className={styles.header}>
-          <p>Share your Link</p>
-          <button type="button" className={styles.close} onClick={closeModal}>
-            <i className="fa fa-times" />
-          </button>
-        </div>
-        <div className={styles.content}>
-          <input
-            className={styles.input}
-            value={url}
-            onClick={copyText}
-            readOnly
-          />
-        </div>
+        <button type="button" className={styles.close} onClick={closeModal}>
+          <i className="fa fa-times" />
+        </button>
+        <Lottie
+          options={{
+            loop: false,
+            autoplay: true,
+            animationData: mailAnimation,
+            rendererSettings: {
+              preserveAspectRatio: 'xMidYMid slice'
+            }
+          }}
+          height={100}
+        />
+        <p className={styles.title}>
+          {onlyLink
+            ? 'Your link has been created!'
+            : 'Your email has been sent!'}
+        </p>
+        <p className={styles.subtitle}>
+          You can copy and share this link with anyone.
+        </p>
+        <input
+          className={styles.input}
+          value={url}
+          onClick={copyText}
+          readOnly
+        />
+      </div>
+      <div
+        className={`${styles.badgeNotification} ${
+          didCopy ? styles.display : ''
+        }`}
+      >
+        <p>Copied to clipboard</p>
       </div>
     </div>
   );
 };
 
 LinkModal.propTypes = {
-  url: string
+  url: string,
+  onlyLink: bool
 };
 
 LinkModal.defaultProps = {
-  url: ''
+  url: '',
+  onlyLink: false
 };
 
 export default LinkModal;

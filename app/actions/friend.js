@@ -6,6 +6,27 @@ export const REQUEST_FRIENDS = 'REQUEST_FRIENDS';
 export const RECEIVE_FRIENDS = 'RECEIVE_FRIENDS';
 export const REMOVE_FRIEND = 'REMOVE_FRIEND';
 
+const insertFriend = (friend, insertIndex) => ({
+  friend,
+  insertIndex,
+  type: ADD_FRIEND
+});
+
+export const removeFriend = index => ({
+  index,
+  type: REMOVE_FRIEND
+});
+
+const requestFriends = () => ({
+  type: REQUEST_FRIENDS
+});
+
+const receiveFriends = friends => ({
+  friends,
+  receivedAt: Date.now(),
+  type: RECEIVE_FRIENDS
+});
+
 export const addFriend = friend => (dispatch, getState) => {
   const {
     friend: { friends }
@@ -15,57 +36,39 @@ export const addFriend = friend => (dispatch, getState) => {
   dispatch(insertFriend(friend, insertIndex));
 };
 
-const insertFriend = (friend, insertIndex) => ({
-  friend,
-  insertIndex,
-  type: ADD_FRIEND
-});
+const getFriends = async userID => {
+  try {
+    const response = await callApi(`${userID}/friends`);
+    const { friends } = await response.json();
+    return friends;
+  } catch (exception) {
+    throw new Error(`[friend.getFriends] ${exception.message}`);
+  }
+};
 
-export function removeFriend(index) {
-  return {
-    index,
-    type: REMOVE_FRIEND
-  };
-}
-
-function requestFriends() {
-  return {
-    type: REQUEST_FRIENDS
-  };
-}
-
-function receiveFriends(friends) {
-  return {
-    type: RECEIVE_FRIENDS,
-    friends,
-    receivedAt: Date.now()
-  };
-}
-
-function fetchFriends(userId) {
-  return dispatch => {
+const fetchFriends = userID => async dispatch => {
+  try {
     dispatch(requestFriends());
-    return callApi(`${userId}/friends`)
-      .then(res => res.json())
-      .then(({ friends }) => dispatch(receiveFriends(friends)));
-  };
-}
+    const friends = await getFriends(userID);
+    return dispatch(receiveFriends(friends));
+  } catch (exception) {
+    console.error(exception.message);
+  }
+};
 
-function shouldFetchFriends({ friend: { friends, isFetching } }) {
+const shouldFetchFriends = ({ friend: { friends, isFetching } }) => {
   if (!friends || friends.length <= 0) return true;
   if (isFetching) return false;
 
   return false;
-}
+};
 
-export function fetchFriendsIfNeeded() {
-  return (dispatch, getState) => {
-    const state = getState();
-    if (shouldFetchFriends(state)) {
-      return dispatch(fetchFriends(state.user.id));
-    }
-  };
-}
+export const fetchFriendsIfNeeded = () => (dispatch, getState) => {
+  const state = getState();
+  if (shouldFetchFriends(state)) {
+    return dispatch(fetchFriends(state.user.id));
+  }
+};
 
 const getInsertIndex = ({ username }, friends) => {
   for (let i = 0; i < friends.length; i += 1) {

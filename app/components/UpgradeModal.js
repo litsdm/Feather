@@ -1,12 +1,13 @@
 import React from 'react';
 import { shell } from 'electron';
-import { func, string, number } from 'prop-types';
+import Lottie from 'react-lottie';
+import { func, string } from 'prop-types';
 import styles from './UpgradeModal.scss';
 
-import { humanFileSize } from '../helpers/file';
 import analytics from '../helpers/analytics';
+import crownAnimation from '../assets/crownAnimation.json';
 
-const UpgradeModal = ({ close, type, remainingBytes }) => {
+const UpgradeModal = ({ close, type }) => {
   const openLink = () => {
     analytics.send('event', {
       ec: 'Upgrade-El',
@@ -16,63 +17,47 @@ const UpgradeModal = ({ close, type, remainingBytes }) => {
     shell.openExternal('https://feather-client.herokuapp.com/upgrade');
   };
 
-  const getTitle = () => {
+  const getInitialText = () => {
     switch (type) {
       case 'fileSize':
-        return 'File size exceeds limit';
+        return 'Your file exceeds the free file limit of 2GB.';
       case 'remainingFiles':
-        return 'File limit exceeded';
+        return 'You have reached the free file amount limit.';
+      case 'remainingBytes':
+        return 'You have reached your free Feather storage space limit.';
       default:
-        return 'Not enough storage space';
-    }
-  };
-
-  const renderMessage = () => {
-    switch (type) {
-      case 'fileSize':
-        return (
-          <p className={styles.message}>
-            Your file size exceeds the maximum file size limit for your account
-            (2 GB). We have a solution for you, with <b>Feather Plus</b> you can
-            raise the limit up to 10 GB per file.
-          </p>
-        );
-      case 'remainingFiles':
-        return (
-          <p className={styles.message}>
-            You have exceeded the limit of 50 files per month for the free
-            account. Try <b>Feather Plus</b> now and upgrade your limit to{' '}
-            <b>10,000 files</b>.
-          </p>
-        );
-      default:
-        return (
-          <p className={styles.message}>
-            You don
-            {"'"}t have enough storage left on your account (
-            {humanFileSize(remainingBytes)}
-            ). Get <b>Feather Plus</b> to upgrade your limit to 50 GB per week.
-          </p>
-        );
+        return '';
     }
   };
 
   return (
-    <div id="upgradeModal" className={styles.wrapper}>
-      <button className={styles.overlay} type="button" onClick={close} />
+    <div id="upgradeModal" className={styles.upgradeModal}>
+      <button type="button" className={styles.overlay} onClick={close} />
       <div className={styles.modal}>
-        <div className={styles.header}>
-          <p>{getTitle()}</p>
-          <button type="button" className={styles.close} onClick={close}>
-            <i className="fa fa-times" />
-          </button>
-        </div>
-        <div className={styles.content}>
-          {renderMessage()}
-          <button type="button" className={styles.button} onClick={openLink}>
-            Get Feather Plus
-          </button>
-        </div>
+        <button type="button" className={styles.close} onClick={close}>
+          <i className="fa fa-times" />
+        </button>
+        <Lottie
+          options={{
+            loop: false,
+            autoplay: true,
+            animationData: crownAnimation,
+            rendererSettings: {
+              preserveAspectRatio: 'xMidYMid slice'
+            }
+          }}
+          height={100}
+        />
+        <p className={styles.title}>Upgrade to Pro</p>
+        <p className={styles.description}>
+          {getInitialText()} Feather is maintained by a single developer and as
+          much as I would like to give this service for free, it needs a way to
+          keep itself afloat. Please consider upgrading to our Pro subscription,
+          you can choose what to pay for it!
+        </p>
+        <button type="button" className={styles.open} onClick={openLink}>
+          Take me to the Upgrade page
+        </button>
       </div>
     </div>
   );
@@ -80,12 +65,11 @@ const UpgradeModal = ({ close, type, remainingBytes }) => {
 
 UpgradeModal.propTypes = {
   close: func.isRequired,
-  type: string,
-  remainingBytes: number.isRequired
+  type: string
 };
 
 UpgradeModal.defaultProps = {
-  type: 'fileSize'
+  type: ''
 };
 
 export default UpgradeModal;

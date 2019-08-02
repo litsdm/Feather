@@ -1,26 +1,26 @@
 import {
-  ADD_DOWNLOAD,
-  FINISH_DOWNLOAD,
-  UPDATE_DOWNLOAD_PROGRESS
+  ADD_LOCAL_DOWNLOADS,
+  ADD_DOWNLOADED,
+  REMOVE_DOWNLOADED
 } from '../actions/download';
 
 const initialState = {};
 
-const downloads = (state = initialState, { type, fileId, progress }) => {
+const downloads = (
+  state = initialState,
+  { type, storageFiles, fileID, savePath, user }
+) => {
   switch (type) {
-    case ADD_DOWNLOAD:
-      return { ...state, [fileId]: { progress: 0 } };
+    case ADD_LOCAL_DOWNLOADS:
+      return { ...storageFiles };
 
-    case FINISH_DOWNLOAD: {
-      const { [fileId]: removedValue, ...newState } = state;
-      return newState;
+    case ADD_DOWNLOADED:
+      return { ...state, [fileID]: { savePath, user } };
+
+    case REMOVE_DOWNLOADED: {
+      const { [fileID]: removeValue, ...nextState } = state;
+      return nextState;
     }
-
-    case UPDATE_DOWNLOAD_PROGRESS:
-      return {
-        ...state,
-        [fileId]: { progress }
-      };
 
     default:
       return state;

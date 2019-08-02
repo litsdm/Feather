@@ -248,7 +248,9 @@
   "dependencies": {
     "@fortawesome/fontawesome-free": "^5.6.3",
     "archiver": "^3.0.0",
-    "connected-react-router": "^5.0.1",
+    "clipboard-polyfill": "^2.8.1",
+    "connected-react-router": "^6.3.2",
+    "core-js": "2",
     "devtron": "^1.4.0",
     "electron-debug": "^2.0.0",
     "electron-dl": "^1.13.0",
@@ -258,14 +260,14 @@
     "history": "^4.7.2",
     "jwt-decode": "^2.2.0",
     "moment": "^2.24.0",
-    "react": "^16.7.0",
-    "react-dom": "^16.7.0",
-    "react-dropzone": "^8.1.0",
+    "react": "^16.8.6",
+    "react-dom": "^16.8.6",
     "react-hot-loader": "^4.6.3",
+    "react-lottie": "^1.2.3",
     "react-moment-proptypes": "^1.6.0",
-    "react-redux": "^5.1.1",
-    "react-router": "^4.3.1",
-    "react-router-dom": "^4.3.1",
+    "react-redux": "^6.0.1",
+    "react-router": "^5.0.0",
+    "react-router-dom": "^5.0.0",
     "redux": "^4.0.1",
     "redux-thunk": "^2.3.0",
     "socket.io": "^2.2.0",
@@ -277,10 +279,5 @@
     "npm": ">=4.x",
     "yarn": ">=0.21.3"
   },
-  "browserslist": "electron 1.6",
-  "husky": {
-    "hooks": {
-      "pre-commit": "lint-staged"
-    }
-  }
+  "browserslist": "electron 1.6"
 }

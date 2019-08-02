@@ -1,0 +1,103 @@
+.row {
+  align-items: center;
+  display: flex;
+  justify-content: space-between;
+}
+
+.info {
+  width: 90%;
+}
+
+.actions {
+  position: relative;
+}
+
+.url {
+  color: #2091f3;
+  font-size: 12px;
+  font-weight: 600;
+  margin-bottom: 6px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+
+  &.expired {
+    color: rgba(0, 0, 0, 0.6);
+    font-style: italic;
+  }
+}
+
+.date {
+  font-size: 12px;
+  font-weight: 100;
+}
+
+.options {
+  border: none;
+  border-radius: 50%;
+  cursor: pointer;
+  font-size: 14px;
+  opacity: 0.6;
+  outline: none;
+  padding: 3px 9px;
+  transition: 0.2s ease all;
+
+  &:hover,
+  &:focus {
+    background-color: rgba(0, 0, 0, 0.1);
+    opacity: 1;
+  }
+}
+
+.menu {
+  background-color: #303537;
+  border-radius: 8px;
+  min-width: 86px;
+  opacity: 0;
+  padding: 3px 0;
+  position: absolute;
+  right: 0px;
+  top: 26px;
+  transition: 0.1s ease all;
+  z-index: -1;
+
+  &.display,
+  &:focus-within {
+    opacity: 1;
+    z-index: 1;
+  }
+}
+
+.menuButton,
+.delete {
+  background-color: transparent;
+  border: none;
+  color: white;
+  cursor: pointer;
+  outline: none;
+  padding: 3px 6px;
+  text-align: left;
+  transition: 0.2s ease all;
+  width: 100%;
+
+  &:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+  }
+}
+
+.delete {
+  color: #F44336;
+  margin-bottom: 3px;
+
+  &:hover {
+    background-color: rgba(244, 67, 54, 0.2);
+  }
+}
+
+.menuDivider {
+  background-color: #fff;
+  height: 1px;
+  margin-top: 3px;
+  opacity: 0.2;
+  width: 100%;
+}

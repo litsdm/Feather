@@ -1,0 +1,56 @@
+.row {
+  align-items: center;
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+
+.left {
+  display: flex;
+  flex-basis: 66%;
+  flex-direction: column;
+}
+
+.name {
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.progressBar {
+  background-color: rgba(0, 0, 0, 0.15);
+  height: 2px;
+  margin-top: 12px;
+  width: 100%;
+}
+
+.progress {
+  background-color: #2091f3;
+  height: 2px;
+}
+
+.percentage {
+  font-weight: 600;
+  opacity: 0.5;
+  text-align: right;
+}
+
+.right {
+  align-items: center;
+  display: flex;
+  flex-basis: 33%;
+  justify-content: flex-end;
+};
+
+.downIcon,
+.upIcon {
+  margin-right: 12px;
+  opacity: 0.6;
+}
+
+.downIcon {
+  color: #4CAF50;
+}
+
+.upIcon {
+  color: #FF5722;
+}

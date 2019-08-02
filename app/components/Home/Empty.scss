@@ -1,0 +1,25 @@
+.empty {
+  background-color: #fff;
+  font-size: 14px;
+  height: 414px;
+  padding: 24px;
+  position: relative;
+  text-align: center;
+  width: 100%;
+}
+
+.title {
+  font-weight: 600;
+  margin-bottom: 12px;
+}
+
+.text {
+  font-size: 14px;
+  font-weight: 100;
+  opacity: 0.5;
+  width: 100%;
+}
+
+.animation {
+  display: flex;
+}

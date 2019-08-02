@@ -1,0 +1,22 @@
+.badgeNotification {
+  background-color: #F44336;
+  border-radius: 24px;
+  bottom: 0;
+  box-shadow: 0 3px 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23);
+  color: #fff;
+  opacity: 0;
+  padding: 6px 12px;
+  position: absolute;
+  text-align: center;
+  transition: all 0.3s cubic-bezier(.25, .8, .25, 1);
+
+  &.display {
+    bottom: 12px;
+    opacity: 1;
+  }
+
+  p {
+    font-size: 12px;
+    font-weight: bold;
+  }
+}

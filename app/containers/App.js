@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React, { useState, useEffect } from 'react';
 import { ipcRenderer } from 'electron';
 import { connect } from 'react-redux';
 import { withRouter } from 'react-router';
@@ -8,19 +8,26 @@ import { friendRequestShape, userShape } from '../shapes';
 import socket, { emit } from '../socketClient';
 
 import notify from '../helpers/notifications';
+import useDropzone from '../helpers/useDropzone';
 
 import { fetchFilesIfNeeded, addFile, removeFile } from '../actions/file';
-import { finishDownload, updateDownloadProgress } from '../actions/download';
-import { awaitSendForFiles } from '../actions/upload';
+import {
+  awaitRecipients,
+  completeDownload,
+  updateProgress
+} from '../actions/queue';
+import { addLocalDownloads } from '../actions/download';
 import { fetchFriendsIfNeeded, addFriend } from '../actions/friend';
 import {
   fetchFriendRequestsIfNeeded,
   addFriendRequest
 } from '../actions/friendRequest';
 import { addUserFromToken } from '../actions/user';
+import { addLink } from '../actions/link';
 
 import NavBar from '../components/NavBar';
 import PopUpContainer from './PopUpContainer';
+import DropOverlay from '../components/DropOverlay';
 
 const mapStateToProps = ({ user, friendRequest: { friendRequests } }) => ({
   user,
@@ -31,29 +38,46 @@ const mapDispatchToProps = dispatch => ({
   fetchFiles: () => dispatch(fetchFilesIfNeeded()),
   fetchFriends: () => dispatch(fetchFriendsIfNeeded()),
   fetchFriendRequests: () => dispatch(fetchFriendRequestsIfNeeded()),
-  dFinishDownload: fileId => dispatch(finishDownload(fileId)),
-  dUpdateDownloadProgress: (fileId, progress) =>
-    dispatch(updateDownloadProgress(fileId, progress)),
+  finishDownload: (fileID, filename, savePath) =>
+    dispatch(completeDownload(fileID, filename, savePath)),
+  updateDownloadProgress: (fileID, progress) =>
+    dispatch(updateProgress(fileID, progress)),
   dAddFile: file => dispatch(addFile(file)),
   dRemoveFile: index => dispatch(removeFile(index)),
   addReceivedFriendRequest: friendRequest =>
     dispatch(addFriendRequest(friendRequest)),
-  waitForRecipients: files => dispatch(awaitSendForFiles(files)),
+  waitForRecipients: files => dispatch(awaitRecipients(files)),
   addNewFriend: friend => dispatch(addFriend(friend)),
-  updateUser: token => dispatch(addUserFromToken(token))
+  addNewLink: link => dispatch(addLink(link)),
+  updateUser: token => dispatch(addUserFromToken(token)),
+  addStorageFiles: () => dispatch(addLocalDownloads())
 });
 
-class App extends React.Component {
-  state = {
-    updateAvailable: false
-  };
+const App = ({
+  addNewFriend,
+  addNewLink,
+  addReceivedFriendRequest,
+  children,
+  dAddFile,
+  finishDownload,
+  dRemoveFile,
+  updateDownloadProgress,
+  fetchFiles,
+  fetchFriends,
+  fetchFriendRequests,
+  friendRequests,
+  history,
+  location: { pathname },
+  updateUser,
+  user,
+  waitForRecipients,
+  addStorageFiles
+}) => {
+  const [updateAvailable, setUpdateAvailable] = useState(false);
+  const isDragging = useDropzone(waitForRecipients);
 
-  componentDidMount() {
-    const {
-      history,
-      location: { pathname }
-    } = this.props;
-    const { user } = this.props;
+  // component did mount equivalent (runs once)
+  useEffect(() => {
     const token = localStorage.getItem('tempoToken');
     const localConfig = localStorage.getItem('localConfig');
 
@@ -78,35 +102,27 @@ class App extends React.Component {
     if (Object.prototype.hasOwnProperty.call(user, 'id') || token) {
       const userId = user ? user.id : jwtDecode(token).id;
       emit('userConnection', userId);
-      this.fetchData();
+      fetchData();
     }
 
-    this.setupListeners();
-  }
+    setupListeners();
+  }, []);
 
-  fetchData = () => {
-    const { fetchFiles, fetchFriends, fetchFriendRequests } = this.props;
-    fetchFiles();
+  const fetchData = () => {
+    fetchFiles()
+      .then(() => addStorageFiles())
+      .catch();
     fetchFriends();
     fetchFriendRequests();
   };
 
-  setupListeners = () => {
-    const {
-      dAddFile,
-      dRemoveFile,
-      addReceivedFriendRequest,
-      addNewFriend,
-      updateUser
-    } = this.props;
+  const setupListeners = () => {
     const localConfig = JSON.parse(localStorage.getItem('localConfig'));
 
-    ipcRenderer.on('download-progress', this.handleDownloadProgress);
-    ipcRenderer.on('download-finish', this.handleDownloadFinish);
-    ipcRenderer.on('upload-from-tray', this.handleTrayUpload);
-    ipcRenderer.on('updateReady', () =>
-      this.setState({ updateAvailable: true })
-    );
+    ipcRenderer.on('download-progress', handleDownloadProgress);
+    ipcRenderer.on('download-finish', handleDownloadFinish);
+    ipcRenderer.on('upload-from-tray', handleTrayUpload);
+    ipcRenderer.on('updateReady', () => setUpdateAvailable(true));
     socket.on('recieveFile', file => {
       dAddFile(file);
 
@@ -117,12 +133,9 @@ class App extends React.Component {
         });
       }
     });
-    socket.on('removeFile', index => {
-      dRemoveFile(index);
-    });
-    socket.on('newFriend', friend => {
-      addNewFriend(friend);
-    });
+    socket.on('removeFile', index => dRemoveFile(index));
+    socket.on('newFriend', friend => addNewFriend(friend));
+    socket.on('newLink', link => addNewLink(link));
     socket.on('receiveFriendRequest', friendRequest => {
       addReceivedFriendRequest(friendRequest);
 
@@ -131,67 +144,41 @@ class App extends React.Component {
         body: 'You can see this request on your friends page.'
       });
     });
-    socket.on('updateUser', token => {
-      updateUser(token);
-    });
+    socket.on('updateUser', token => updateUser(token));
   };
 
-  handleTrayUpload = (e, files) => {
-    const { waitForRecipients } = this.props;
-    waitForRecipients(files);
-  };
+  const handleTrayUpload = (e, files) => waitForRecipients(files);
 
-  handleDownloadProgress = (e, { progress, fileId }) => {
-    const { dUpdateDownloadProgress } = this.props;
-    dUpdateDownloadProgress(fileId, progress);
-  };
+  const handleDownloadProgress = (e, { progress, fileId }) =>
+    updateDownloadProgress(fileId, progress);
 
-  handleDownloadFinish = (e, { fileId, filename }) => {
-    const { dFinishDownload } = this.props;
-    const localConfig = JSON.parse(localStorage.getItem('localConfig'));
+  const handleDownloadFinish = (e, { fileId, filename, savePath }) =>
+    finishDownload(fileId, filename, savePath);
 
-    dFinishDownload(fileId);
-
-    if (localConfig.notifyDownload) {
-      notify({
-        title: 'Download Complete',
-        body: `${filename} has finished downloading.`
-      });
-    }
-  };
-
-  render() {
-    const {
-      children,
-      location: { pathname },
-      history,
-      friendRequests
-    } = this.props;
-    const { updateAvailable } = this.state;
-    return (
-      <React.Fragment>
-        {pathname !== '/settings' && pathname !== '/auth' ? (
-          <NavBar
-            pathname={pathname}
-            history={history}
-            requestIndicator={friendRequests.length > 0}
-            updateAvailable={updateAvailable}
-          />
-        ) : null}
-        {children}
-        <PopUpContainer fetchData={this.fetchData} />
-      </React.Fragment>
-    );
-  }
-}
+  return (
+    <>
+      {pathname !== '/settings' && pathname !== '/auth' ? (
+        <NavBar
+          pathname={pathname}
+          history={history}
+          requestIndicator={friendRequests.length > 0}
+          updateAvailable={updateAvailable}
+        />
+      ) : null}
+      {children}
+      <PopUpContainer fetchData={fetchData} />
+      <DropOverlay visible={isDragging} />
+    </>
+  );
+};
 
 App.propTypes = {
   children: node.isRequired,
   location: object.isRequired, // eslint-disable-line react/forbid-prop-types
   history: object.isRequired, // eslint-disable-line react/forbid-prop-types
   fetchFiles: func.isRequired,
-  dFinishDownload: func.isRequired,
-  dUpdateDownloadProgress: func.isRequired,
+  finishDownload: func.isRequired,
+  updateDownloadProgress: func.isRequired,
   dAddFile: func.isRequired,
   dRemoveFile: func.isRequired,
   fetchFriends: func.isRequired,
@@ -200,7 +187,9 @@ App.propTypes = {
   addReceivedFriendRequest: func.isRequired,
   waitForRecipients: func.isRequired,
   addNewFriend: func.isRequired,
+  addNewLink: func.isRequired,
   friendRequests: arrayOf(friendRequestShape),
+  addStorageFiles: func.isRequired,
   user: userShape
 };
 

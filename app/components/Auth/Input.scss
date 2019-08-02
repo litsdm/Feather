@@ -1,0 +1,73 @@
+.label {
+  background-color: rgba(96, 125, 139, 0.1);
+  border: 1px solid transparent;
+  border-radius: 6px;
+  display: flex;
+  height: 50px;
+  margin-bottom: 12px;
+  position: relative;
+  transition: 0.2s ease all;
+  width: 85%;
+
+  p {
+    align-items: center;
+    color: #6A6D70;
+    cursor: text;
+    display: flex;
+    font-size: 0.875em;
+    font-weight: 600;
+    left: 24px;
+    position: absolute;
+    top: 50%;
+    transition: 0.2s ease all;
+    transform: translate(0%, -50%);
+  }
+
+  .icon {
+    align-items: center;
+    background-color: #EFF2F3;
+    bottom: 0;
+    border-radius: 6px;
+    color: rgba(0, 0, 0, 0.4);
+    display: flex;
+    font-size: 24px;
+    justify-content: center;
+    position: absolute;
+    right: 0;
+    top: 0;
+    transition: 0.2s ease all;
+    width: 50px;
+  }
+
+  &:focus-within {
+    background-color: #fff;
+    border-color: #2091f3;
+
+    p {
+      font-size: 0.75em;
+      top: 30%;
+    }
+
+    .icon {
+      background-color: #fff;
+      color: rgba(32, 145, 243, 0.6);
+    }
+  }
+}
+
+.hasValue {
+  font-size: 0.75em !important;
+  top: 30% !important;
+}
+
+.input {
+  background-color: transparent;
+  border-radius: 6px;
+  border: none;
+  font-size: 0.875em;
+  font-weight: 600;
+  outline: none;
+  padding: 0 24px;
+  padding-top: 18px;
+  width: 100%;
+}

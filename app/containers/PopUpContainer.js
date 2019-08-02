@@ -1,53 +1,46 @@
 import React, { Fragment } from 'react';
 import { connect } from 'react-redux';
-import { arrayOf, bool, func, number, shape, string } from 'prop-types';
-import { userShape, fileShape } from '../shapes';
+import { arrayOf, bool, func, shape, string } from 'prop-types';
+import { userShape } from '../shapes';
 
-import { stopWaiting, uploadWithSend, uploadToLink } from '../actions/upload';
+import {
+  finishSelectingRecipients,
+  stopWaiting,
+  uploadToLink
+} from '../actions/queue';
 import { hideUpgrade } from '../actions/upgrade';
 
-import SendPopUp from '../components/SendPopUp';
-import UploadQueue from '../components/UploadQueue';
+import SendModal from '../components/SendModal';
 import DisconnectedModal from '../components/DisconnectedModal';
 import UpgradeModal from '../components/UpgradeModal';
-import LinkProgress from '../components/LinkProgress';
 import LinkModal from '../components/LinkModal';
+import ModalLoader from '../components/ModalLoader';
 
 const mapStateToProps = ({
-  upload: {
-    isWaiting,
-    queue,
-    file,
-    progress,
-    isSending,
-    status,
-    statusProgress,
-    linkUrl
-  },
+  queue: { isWaiting, linkUrl, onlyLink },
   file: { failed, isFetching: isFetchingFiles },
   friend: { friends },
   upgrade,
-  user
+  user,
+  loading
 }) => ({
-  queue,
   isWaiting,
-  uploadFile: file,
-  uploadProgress: progress,
-  isSending,
-  status,
-  statusProgress,
   linkUrl,
   upgrade,
   user,
+  onlyLink,
   failed,
   isFetchingFiles,
-  friends
+  friends,
+  isLoading: loading
 });
 
 const mapDispatchToProps = dispatch => ({
   dStopWaiting: () => dispatch(stopWaiting()),
-  uploadFiles: (send, addToUser) => dispatch(uploadWithSend(send, addToUser)),
-  uploadLink: send => dispatch(uploadToLink(send)),
+  uploadFiles: (send, addToUser) =>
+    dispatch(finishSelectingRecipients(send, addToUser)),
+  uploadLink: (send, onlyLink = false) =>
+    dispatch(uploadToLink(send, onlyLink)),
   closeUpgrade: () => dispatch(hideUpgrade())
 });
 
@@ -57,42 +50,29 @@ const PopUpContainer = ({
   uploadFiles,
   friends,
   user,
-  queue,
-  uploadFile,
   uploadLink,
-  uploadProgress,
   failed,
   isFetchingFiles,
   upgrade,
   closeUpgrade,
-  isSending,
-  status,
-  statusProgress,
   linkUrl,
-  fetchData
+  fetchData,
+  isLoading,
+  onlyLink
 }) => (
   <Fragment>
-    <SendPopUp
+    <ModalLoader display={isLoading} />
+    <SendModal
       display={isWaiting}
       stopWaiting={dStopWaiting}
+      friends={friends}
+      userID={user.id}
       uploadFiles={uploadFiles}
       uploadLink={uploadLink}
-      user={user}
-      friends={[{ ...user, _id: user.id }, ...friends]}
     />
-    <UploadQueue queue={queue} file={uploadFile} progress={uploadProgress} />
-    <LinkProgress
-      visible={isSending}
-      status={status}
-      progress={statusProgress}
-    />
-    <LinkModal url={linkUrl} />
+    <LinkModal url={linkUrl} onlyLink={onlyLink} />
     {upgrade.visible ? (
-      <UpgradeModal
-        type={upgrade.messageType}
-        close={closeUpgrade}
-        remainingBytes={user.remainingBytes || 0}
-      />
+      <UpgradeModal type={upgrade.messageType} close={closeUpgrade} />
     ) : null}
     {failed ? (
       <DisconnectedModal retry={fetchData} isFetching={isFetchingFiles} />
@@ -107,28 +87,18 @@ PopUpContainer.propTypes = {
   fetchData: func.isRequired,
   closeUpgrade: func.isRequired,
   uploadLink: func.isRequired,
-  isSending: bool,
-  status: string,
-  statusProgress: number,
   friends: arrayOf(userShape),
-  queue: arrayOf(fileShape),
-  uploadFile: fileShape,
-  uploadProgress: number,
   user: userShape,
   failed: bool.isRequired,
   isFetchingFiles: bool.isRequired,
   linkUrl: string.isRequired,
+  isLoading: bool.isRequired,
+  onlyLink: bool.isRequired,
   upgrade: shape({ visible: bool, messageType: string }).isRequired
 };
 
 PopUpContainer.defaultProps = {
   friends: [],
-  queue: [],
-  isSending: false,
-  status: '',
-  statusProgress: 0,
-  uploadFile: null,
-  uploadProgress: 0,
   user: {}
 };
 

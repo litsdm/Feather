@@ -12,16 +12,22 @@ const callApi = (endpoint, body, method = 'GET') => {
   });
 };
 
-export const uploadFile = (file, signedRequest, progressCb, finishCb) => {
+export const uploadFile = (
+  file,
+  signedRequest,
+  progressCb,
+  finishCb,
+  errorCb
+) => {
   const oReq = new XMLHttpRequest();
-  oReq.addEventListener('load', finishCb);
+  oReq.addEventListener('load', () => finishCb(file));
   oReq.upload.addEventListener(
     'progress',
     ({ loaded, total, lengthComputable }) => {
-      if (lengthComputable) progressCb(loaded / total);
+      if (lengthComputable) progressCb(file.id, loaded / total);
     }
   );
-  oReq.addEventListener('error', e => console.log(e));
+  oReq.addEventListener('error', e => errorCb(e));
   oReq.open('PUT', signedRequest);
   oReq.send(file);
 };

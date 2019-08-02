@@ -8,6 +8,19 @@ import {
   string
 } from 'prop-types';
 
+export const linkShape = shape({
+  _id: string,
+  s3Url: string,
+  name: string,
+  s3Filename: string,
+  files: arrayOf(
+    shape({
+      name: string,
+      type: string
+    })
+  )
+});
+
 export const fileShape = shape({
   _id: string,
   name: string,

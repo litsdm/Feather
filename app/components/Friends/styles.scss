@@ -1,5 +1,5 @@
 .friends {
-  background-color: #f9f9fb;
+  background-color: #fff;
   height: 518px;
   overflow-y: scroll;
 }
@@ -14,15 +14,32 @@
 }
 
 .searchLabel {
-  background-color: #eeeff1;
+  background-color: rgba(96,125,139, 0.1);
+  border: 1px solid transparent;
   border-radius: 6px;
   cursor: text;
   display: flex;
   padding: 12px;
+  transition: 0.2s ease all;
+
+  &:focus-within {
+    border-color: #2091f3;
+    background-color: #fff;
+
+    input {
+      background-color: #fff;
+    }
+
+    i {
+      color: #2091f3;
+      opacity: 0.8;
+    }
+  }
 
   i {
     margin-right: 12px;
     opacity: 0.4;
+    transition: 0.2s ease all;
   }
 
   input {
@@ -32,6 +49,7 @@
     font-size: 12px;
     opacity: 0.7;
     outline: none;
+    transition: 0.2s ease all;
     width: 100%;
   }
 }
@@ -39,7 +57,7 @@
 .addIcon {
   align-items: center;
   background-color: #2091f3;
-  border-radius: 50%;
+  border-radius: 12px;
   display: flex;
   height: 36px;
   justify-content: center;
