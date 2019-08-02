@@ -3,6 +3,7 @@
   margin-bottom: 18px;
   margin-right: 18px;
   min-width: 82px;
+  outline: none;
   width: 82px;
 
   &:hover {
@@ -98,20 +99,21 @@
 .filename {
   display: flex;
   margin-bottom: 3px;
+  margin-top: 3px;
 }
 
 .name {
-  font-size: 14px;
+  font-size: 12px;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
 .extension {
-  font-size: 14px;
+  font-size: 12px;
 }
 
 .expiry {
-  font-size: 11px;
+  font-size: 9px;
   font-weight: 100;
 }

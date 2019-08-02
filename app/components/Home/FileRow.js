@@ -1,7 +1,9 @@
 import React from 'react';
+import { shell } from 'electron';
 import moment from 'moment';
+import fs from 'fs';
 import { momentObj } from 'react-moment-proptypes';
-import { func, number, string } from 'prop-types';
+import { func, number, shape, string } from 'prop-types';
 import styles from './FileRow.scss';
 
 import callApi from '../../helpers/apiCaller';
@@ -17,7 +19,9 @@ const FileRow = ({
   s3Filename,
   userId,
   removeFile,
-  index
+  index,
+  dlFiles,
+  removeDlPath
 }) => {
   const handleDownload = () => {
     analytics.send('event', {
@@ -26,6 +30,12 @@ const FileRow = ({
       el: `Download file ${id}`
     });
     downloadFile(id, s3Filename, filename);
+  };
+
+  const handleOpen = () => {
+    if (dlFiles[id] && fs.existsSync(dlFiles[id].savePath))
+      shell.openItem(dlFiles[id].savePath);
+    else handleDownload();
   };
 
   const deleteFile = async () => {
@@ -50,6 +60,7 @@ const FileRow = ({
       }
 
       removeFile(index);
+      removeDlPath(id);
       emit('removeFileFromRoom', { roomId: userId, index });
 
       analytics.send('event', {
@@ -76,6 +87,10 @@ const FileRow = ({
     <div
       className={styles.item}
       style={{ marginRight: (index + 1) % 3 === 0 ? '0' : '18px' }}
+      onClick={handleOpen}
+      role="button"
+      tabIndex={0}
+      onKeyUp={() => {}}
     >
       <div className={styles.square}>
         <div className={styles.overlay}>
@@ -128,7 +143,9 @@ FileRow.propTypes = {
   index: number.isRequired,
   removeFile: func.isRequired,
   userId: string.isRequired,
-  s3Filename: string.isRequired
+  s3Filename: string.isRequired,
+  removeDlPath: func.isRequired,
+  dlFiles: shape({ fileID: string }).isRequired
 };
 
 export default FileRow;

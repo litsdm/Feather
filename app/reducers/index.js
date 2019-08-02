@@ -9,11 +9,13 @@ import upgrade from './upgrade';
 import queue from './queue';
 import loading from './loading';
 import link from './link';
+import download from './download';
 
 import { USER_LOGOUT } from '../actions/user';
 
 const appReducer = history =>
   combineReducers({
+    download,
     file,
     router: connectRouter(history),
     friend,

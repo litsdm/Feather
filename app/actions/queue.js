@@ -10,6 +10,7 @@ import { addFile } from './file';
 import { addLink } from './link';
 import { displayUpgrade } from './upgrade';
 import { setIsLoading } from './loading';
+import { addDownloaded } from './download';
 import callApi, { uploadFile } from '../helpers/apiCaller';
 import notify from '../helpers/notifications';
 
@@ -67,7 +68,10 @@ const finishAndClean = () => ({
   type: FINISH_AND_CLEAN
 });
 
-export const completeDownload = (fileID, filename) => (dispatch, getState) => {
+export const completeDownload = (fileID, filename, savePath) => (
+  dispatch,
+  getState
+) => {
   const {
     queue: { files, completedCount }
   } = getState();
@@ -75,6 +79,8 @@ export const completeDownload = (fileID, filename) => (dispatch, getState) => {
   if (completedCount + 1 === Object.keys(files).length)
     dispatch(finishUploading());
   else dispatch(completeFile(completedCount + 1));
+
+  dispatch(addDownloaded(fileID, savePath));
 
   const localConfig = JSON.parse(localStorage.getItem('localConfig'));
   if (localConfig.notifyDownload) {

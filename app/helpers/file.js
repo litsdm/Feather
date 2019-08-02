@@ -41,6 +41,7 @@ export const getFileIcon = filename => {
     case 'tif':
     case 'tiff':
     case 'icns':
+    case 'webp':
       return { icon: 'far fa-image', color: '#536DFE' };
     // Code files
     case 'asp':
@@ -119,6 +120,14 @@ export const getFileIcon = filename => {
     // pdf files
     case 'pdf':
       return { icon: 'fas fa-file-pdf', color: '#ff0000' };
+    // ebook Files
+    case 'azw3':
+    case 'azw':
+    case 'epub':
+    case 'mobi':
+    case 'oeb':
+    case 'iba':
+      return { icon: 'fas fa-book', color: '#FF9800' };
     default:
       return { icon: 'fas fa-file', color: '#000' };
   }

@@ -16,6 +16,7 @@ import {
   completeDownload,
   updateProgress
 } from '../actions/queue';
+import { addLocalDownloads } from '../actions/download';
 import { fetchFriendsIfNeeded, addFriend } from '../actions/friend';
 import {
   fetchFriendRequestsIfNeeded,
@@ -37,8 +38,8 @@ const mapDispatchToProps = dispatch => ({
   fetchFiles: () => dispatch(fetchFilesIfNeeded()),
   fetchFriends: () => dispatch(fetchFriendsIfNeeded()),
   fetchFriendRequests: () => dispatch(fetchFriendRequestsIfNeeded()),
-  finishDownload: (fileID, filename) =>
-    dispatch(completeDownload(fileID, filename)),
+  finishDownload: (fileID, filename, savePath) =>
+    dispatch(completeDownload(fileID, filename, savePath)),
   updateDownloadProgress: (fileID, progress) =>
     dispatch(updateProgress(fileID, progress)),
   dAddFile: file => dispatch(addFile(file)),
@@ -48,7 +49,8 @@ const mapDispatchToProps = dispatch => ({
   waitForRecipients: files => dispatch(awaitRecipients(files)),
   addNewFriend: friend => dispatch(addFriend(friend)),
   addNewLink: link => dispatch(addLink(link)),
-  updateUser: token => dispatch(addUserFromToken(token))
+  updateUser: token => dispatch(addUserFromToken(token)),
+  addStorageFiles: () => dispatch(addLocalDownloads())
 });
 
 const App = ({
@@ -68,7 +70,8 @@ const App = ({
   location: { pathname },
   updateUser,
   user,
-  waitForRecipients
+  waitForRecipients,
+  addStorageFiles
 }) => {
   const [updateAvailable, setUpdateAvailable] = useState(false);
   const isDragging = useDropzone(waitForRecipients);
@@ -106,7 +109,9 @@ const App = ({
   }, []);
 
   const fetchData = () => {
-    fetchFiles();
+    fetchFiles()
+      .then(() => addStorageFiles())
+      .catch();
     fetchFriends();
     fetchFriendRequests();
   };
@@ -143,11 +148,12 @@ const App = ({
   };
 
   const handleTrayUpload = (e, files) => waitForRecipients(files);
+
   const handleDownloadProgress = (e, { progress, fileId }) =>
     updateDownloadProgress(fileId, progress);
 
-  const handleDownloadFinish = (e, { fileId, filename }) =>
-    finishDownload(fileId, filename);
+  const handleDownloadFinish = (e, { fileId, filename, savePath }) =>
+    finishDownload(fileId, filename, savePath);
 
   return (
     <>
@@ -183,6 +189,7 @@ App.propTypes = {
   addNewFriend: func.isRequired,
   addNewLink: func.isRequired,
   friendRequests: arrayOf(friendRequestShape),
+  addStorageFiles: func.isRequired,
   user: userShape
 };
 

@@ -12,6 +12,7 @@ import { addUser } from '../actions/user';
 import { fetchFilesIfNeeded } from '../actions/file';
 import { fetchFriendsIfNeeded } from '../actions/friend';
 import { fetchFriendRequestsIfNeeded } from '../actions/friendRequest';
+import { addLocalDownloads } from '../actions/download';
 
 const mapDispatchToProps = dispatch => ({
   addUserFromToken: token => {
@@ -21,7 +22,8 @@ const mapDispatchToProps = dispatch => ({
   },
   fetchFiles: () => dispatch(fetchFilesIfNeeded()),
   fetchFriends: () => dispatch(fetchFriendsIfNeeded()),
-  fetchFriendRequests: () => dispatch(fetchFriendRequestsIfNeeded())
+  fetchFriendRequests: () => dispatch(fetchFriendRequestsIfNeeded()),
+  addStorageFiles: () => dispatch(addLocalDownloads())
 });
 
 const AuthPage = ({
@@ -29,7 +31,8 @@ const AuthPage = ({
   fetchFriends,
   fetchFriendRequests,
   addUserFromToken,
-  history
+  history,
+  addStorageFiles
 }) => {
   const [error, setError] = useState('');
   const [username, setUsername] = useState('');
@@ -61,7 +64,9 @@ const AuthPage = ({
   };
 
   const fetchOnAuth = () => {
-    fetchFiles();
+    fetchFiles()
+      .then(() => addStorageFiles())
+      .catch();
     fetchFriends();
     fetchFriendRequests();
   };
@@ -99,6 +104,7 @@ AuthPage.propTypes = {
   fetchFiles: func.isRequired,
   fetchFriends: func.isRequired,
   fetchFriendRequests: func.isRequired,
+  addStorageFiles: func.isRequired,
   history: object.isRequired // eslint-disable-line
 };
 

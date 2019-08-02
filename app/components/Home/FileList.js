@@ -1,14 +1,21 @@
 import React from 'react';
 import uuid from 'uuid/v4';
 import moment from 'moment';
-import { arrayOf, func, string } from 'prop-types';
+import { arrayOf, func, shape, string } from 'prop-types';
 import { fileShape } from '../../shapes';
 import styles from './FileList.scss';
 
 import FileRow from './FileRow';
 import Empty from './Empty';
 
-const FileList = ({ downloadFile, files, userId, removeFile }) => {
+const FileList = ({
+  downloadFile,
+  files,
+  userId,
+  removeFile,
+  dlFiles,
+  removeDlPath
+}) => {
   const renderFiles = () =>
     files.map(({ name, s3Filename, _id, expiresAt }, index) =>
       moment().diff(expiresAt) < 0 ? (
@@ -22,6 +29,8 @@ const FileList = ({ downloadFile, files, userId, removeFile }) => {
           index={index}
           userId={userId}
           removeFile={removeFile}
+          dlFiles={dlFiles}
+          removeDlPath={removeDlPath}
         />
       ) : null
     );
@@ -39,7 +48,13 @@ FileList.propTypes = {
   downloadFile: func.isRequired,
   files: arrayOf(fileShape).isRequired,
   userId: string.isRequired,
-  removeFile: func.isRequired
+  removeFile: func.isRequired,
+  dlFiles: shape({ fileID: string }),
+  removeDlPath: func.isRequired
+};
+
+FileList.defaultProps = {
+  dlFiles: {}
 };
 
 export default FileList;

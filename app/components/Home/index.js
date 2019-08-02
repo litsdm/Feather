@@ -1,5 +1,5 @@
 import React from 'react';
-import { arrayOf, bool, func, number, object, string } from 'prop-types';
+import { arrayOf, bool, func, number, object, shape, string } from 'prop-types';
 import { fileShape } from '../../shapes';
 import styles from './styles.scss';
 
@@ -15,7 +15,9 @@ const Home = ({
   awaitSendForFiles,
   removeFile,
   queueFiles,
-  completedCount
+  completedCount,
+  dlFiles,
+  removeDlPath
 }) => {
   const handleFileChange = ({ target: { files: selectedFiles } }) => {
     awaitSendForFiles(selectedFiles);
@@ -42,6 +44,8 @@ const Home = ({
           downloadFile={downloadFile}
           removeFile={removeFile}
           userId={userId}
+          dlFiles={dlFiles}
+          removeDlPath={removeDlPath}
         />
       )}
       <Queue files={queueFiles} completedCount={completedCount} />
@@ -57,11 +61,14 @@ Home.propTypes = {
   awaitSendForFiles: func.isRequired,
   removeFile: func.isRequired,
   completedCount: number,
+  dlFiles: shape({ fileID: string }),
+  removeDlPath: func.isRequired,
   queueFiles: object.isRequired // eslint-disable-line react/forbid-prop-types
 };
 
 Home.defaultProps = {
-  completedCount: 0
+  completedCount: 0,
+  dlFiles: {}
 };
 
 export default Home;
