@@ -1,6 +1,7 @@
 import moment from 'moment';
 
 import callApi from '../helpers/apiCaller';
+import { emit } from '../socketClient';
 
 export const ADD_LINK = 'ADD_LINK';
 export const REQUEST_LINKS = 'REQUEST_LINKS';
@@ -28,10 +29,18 @@ const receiveLinks = links => ({
   type: RECEIVE_LINKS
 });
 
-export const deleteLink = (id, index, s3Filename) => async dispatch => {
+export const deleteLink = (id, index, s3Filename) => async (
+  dispatch,
+  getState
+) => {
   try {
+    const {
+      user: { id: roomId }
+    } = getState();
+
     await callApi(`links/${id}`, {}, 'DELETE');
     await callApi('delete-s3', { filename: s3Filename }, 'POST');
+    emit('removeLinkFromRoom', { roomId, index });
     dispatch(removeLink(index));
   } catch (exception) {
     console.error(`[link.deleteLink] ${exception.message}`);

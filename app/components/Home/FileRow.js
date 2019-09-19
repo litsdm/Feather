@@ -87,10 +87,6 @@ const FileRow = ({
     <div
       className={styles.item}
       style={{ marginRight: (index + 1) % 3 === 0 ? '0' : '18px' }}
-      onClick={handleOpen}
-      role="button"
-      tabIndex={0}
-      onKeyUp={() => {}}
     >
       <div className={styles.square}>
         <div className={styles.overlay}>
@@ -124,7 +120,13 @@ const FileRow = ({
           style={{ color: fileIcon.color }}
         />
       </div>
-      <div>
+      <div
+        onClick={handleOpen}
+        role="button"
+        tabIndex={0}
+        onKeyUp={() => {}}
+        style={{ outline: 'none' }}
+      >
         <div className={styles.filename}>
           <p className={styles.name}>{formattedName}</p>
           <p className={styles.extension}>{extension}</p>

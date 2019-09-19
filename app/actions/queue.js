@@ -152,7 +152,7 @@ const uploadComplete = (file, isLink = false, onlyLink = false) => (
   getState
 ) => {
   const {
-    user: { remainingBytes, remainingFiles, username },
+    user: { remainingBytes, remainingFiles, username, id },
     queue: { files, completedCount }
   } = getState();
   const dbFile = files[file.id];
@@ -165,6 +165,7 @@ const uploadComplete = (file, isLink = false, onlyLink = false) => (
     if (onlyLink) {
       dispatch(setLinkUrl(`https://www.feathershare.com/${dbFile._id}`, true));
       document.getElementById('linkModal').style.display = 'flex';
+      emit('addLink', { roomId: id, link: dbFile });
     } else sendEmail(dbFile, username, dispatch);
     deleteDirectories();
   } else {
@@ -488,7 +489,7 @@ export const uploadToLink = (send, onlyLink = false) => async (
 
     dispatch(
       addFileToQueue({
-        _id: dbLink._id,
+        ...dbLink,
         name: 'FeatherFiles.zip',
         progress: 0,
         size: zipFile.size,

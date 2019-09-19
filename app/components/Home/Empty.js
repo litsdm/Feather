@@ -39,8 +39,8 @@ const Empty = () => {
       </div>
       <p className={styles.title}>Welcome to Feather!</p>
       <p className={styles.text}>
-        You have no files yet. You will receive your files here or you can drag
-        and drop a file anywhere to upload it.
+        It looks like you don&#39;t have any files. Drag and drop your files to
+        share them.
       </p>
     </div>
   );
