@@ -19,11 +19,11 @@ const Links = ({ links, removeLink }) => {
 
   const selectLink = index => () => setIndex(index);
 
-  const deleteLink = (id, index, s3Filename) => () =>
-    removeLink(id, index, s3Filename);
+  const deleteLink = link => () => removeLink(link);
 
   const renderLinks = () =>
-    links.map(({ _id, createdAt, expiresAt, s3Filename }, index) => {
+    links.map((link, index) => {
+      const { _id, createdAt, expiresAt } = link;
       const dateString = moment(createdAt).format('MM/DD/YYYY');
       return (
         <Fragment key={uuid()}>
@@ -33,7 +33,7 @@ const Links = ({ links, removeLink }) => {
             expiresAt={expiresAt}
             copyText={copyText}
             select={selectLink(index)}
-            deleteLink={deleteLink(_id, index, s3Filename)}
+            deleteLink={deleteLink(link)}
           />
           {index !== links.length - 1 ? (
             <div className={styles.divider} />

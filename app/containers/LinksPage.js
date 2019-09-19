@@ -16,8 +16,7 @@ const mapStateToProps = ({ link: { links, isFetching } }) => ({
 
 const mapDispatchToProps = dispatch => ({
   fetchLinks: () => dispatch(fetchLinksIfNeeded()),
-  removeLink: (id, index, s3Filename) =>
-    dispatch(deleteLink(id, index, s3Filename))
+  removeLink: link => dispatch(deleteLink(link))
 });
 
 const LinksPage = ({ links, fetchLinks, isFetching, removeLink }) => {

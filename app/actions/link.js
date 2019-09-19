@@ -29,17 +29,35 @@ const receiveLinks = links => ({
   type: RECEIVE_LINKS
 });
 
-export const deleteLink = (id, index, s3Filename) => async (
-  dispatch,
-  getState
-) => {
+const deleteFiles = async files => {
+  try {
+    const s3Promises = [];
+    const fileIDs = [];
+
+    files.forEach(({ _id, s3Filename }) => {
+      s3Promises.push(callApi('delete-s3', { filename: s3Filename }, 'POST'));
+      fileIDs.push(_id);
+    });
+
+    await Promise.all(s3Promises);
+    await callApi('files', { files: fileIDs }, 'DELETE');
+  } catch (exception) {
+    throw exception;
+  }
+};
+
+export const deleteLink = link => async (dispatch, getState) => {
   try {
     const {
       user: { id: roomId }
     } = getState();
-
+    const { id, index, s3Filename, files } = link;
     await callApi(`links/${id}`, {}, 'DELETE');
-    await callApi('delete-s3', { filename: s3Filename }, 'POST');
+
+    if (s3Filename)
+      await callApi('delete-s3', { filename: s3Filename }, 'POST');
+    else await deleteFiles(files);
+
     emit('removeLinkFromRoom', { roomId, index });
     dispatch(removeLink(index));
   } catch (exception) {
