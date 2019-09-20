@@ -158,7 +158,7 @@ const uploadComplete = (file, isLink = false, onlyLink = false) => (
   const dbFile = files[file.id];
 
   const newRemainingFiles =
-    remainingFiles && remainingFiles <= 10 ? remainingFiles - 1 : 9;
+    remainingFiles && remainingFiles <= 3 ? remainingFiles - 1 : 2;
   const newRemainingBytes = remainingBytes - dbFile.size;
 
   if (isLink) {

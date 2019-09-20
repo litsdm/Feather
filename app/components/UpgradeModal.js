@@ -22,7 +22,7 @@ const UpgradeModal = ({ close, type }) => {
       case 'fileSize':
         return 'Your file exceeds the free file limit of 2GB.';
       case 'remainingFiles':
-        return 'You have reached the free file amount limit.';
+        return 'You have reached the free file amount limit of 3 files a day.';
       case 'remainingBytes':
         return 'You have reached your free Feather storage space limit.';
       default:
