@@ -33,7 +33,7 @@ const Links = ({ links, removeLink }) => {
             expiresAt={expiresAt}
             copyText={copyText}
             select={selectLink(index)}
-            deleteLink={deleteLink(link)}
+            deleteLink={deleteLink({ ...link, index })}
           />
           {index !== links.length - 1 ? (
             <div className={styles.divider} />

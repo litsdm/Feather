@@ -23,7 +23,7 @@ import {
   addFriendRequest
 } from '../actions/friendRequest';
 import { addUserFromToken } from '../actions/user';
-import { addLink } from '../actions/link';
+import { addLink, removeLink } from '../actions/link';
 
 import NavBar from '../components/NavBar';
 import PopUpContainer from './PopUpContainer';
@@ -50,7 +50,8 @@ const mapDispatchToProps = dispatch => ({
   addNewFriend: friend => dispatch(addFriend(friend)),
   addNewLink: link => dispatch(addLink(link)),
   updateUser: token => dispatch(addUserFromToken(token)),
-  addStorageFiles: () => dispatch(addLocalDownloads())
+  addStorageFiles: () => dispatch(addLocalDownloads()),
+  deleteLink: index => dispatch(removeLink(index)),
 });
 
 const App = ({
@@ -71,7 +72,8 @@ const App = ({
   updateUser,
   user,
   waitForRecipients,
-  addStorageFiles
+  addStorageFiles,
+  deleteLink
 }) => {
   const [updateAvailable, setUpdateAvailable] = useState(false);
   const isDragging = useDropzone(waitForRecipients);
@@ -136,6 +138,7 @@ const App = ({
     socket.on('removeFile', index => dRemoveFile(index));
     socket.on('newFriend', friend => addNewFriend(friend));
     socket.on('newLink', link => addNewLink(link));
+    socket.on('removeLink', index => deleteLink(index));
     socket.on('receiveFriendRequest', friendRequest => {
       addReceivedFriendRequest(friendRequest);
 
@@ -188,6 +191,7 @@ App.propTypes = {
   waitForRecipients: func.isRequired,
   addNewFriend: func.isRequired,
   addNewLink: func.isRequired,
+  deleteLink: func.isRequired,
   friendRequests: arrayOf(friendRequestShape),
   addStorageFiles: func.isRequired,
   user: userShape

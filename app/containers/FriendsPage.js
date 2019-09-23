@@ -65,9 +65,9 @@ const FriendsPage = ({
     element.style.display = 'flex';
   };
 
-  const deleteRequest = url =>
-    new Promise(async (resolve, reject) => {
-      const { status } = await callApi(url, {}, 'DELETE');
+  const deleteRequest = async url => {
+    const { status } = await callApi(url, {}, 'DELETE');
+    return new Promise((resolve, reject) => {
       if (status !== 200)
         reject(
           new Error(
@@ -77,6 +77,7 @@ const FriendsPage = ({
 
       resolve();
     });
+  };
 
   const resolveRequest = (_id, index, type) => async () => {
     try {
@@ -103,13 +104,14 @@ const FriendsPage = ({
     setTimeout(() => setRequestMessage(null), 1800);
   };
 
-  const postRequest = payload =>
-    new Promise(async (resolve, reject) => {
-      const response = await callApi('friendRequest', payload, 'POST');
-      const { friendRequest, message } = await response.json();
+  const postRequest = async payload => {
+    const response = await callApi('friendRequest', payload, 'POST');
+    const { friendRequest, message } = await response.json();
+    return new Promise((resolve, reject) => {
       if (message) reject(new Error(message));
       resolve(friendRequest);
     });
+  };
 
   const sendRequest = async () => {
     const queryProperty =

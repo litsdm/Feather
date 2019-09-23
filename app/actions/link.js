@@ -8,9 +8,9 @@ export const REQUEST_LINKS = 'REQUEST_LINKS';
 export const RECEIVE_LINKS = 'RECEIVE_LINKS';
 export const REMOVE_LINK = 'REMOVE_LINK';
 
-const insertLink = (link, insertIndex) => ({
+export const addLink = link => ({
   link,
-  insertIndex,
+  insertIndex: null,
   type: ADD_LINK
 });
 
@@ -51,8 +51,8 @@ export const deleteLink = link => async (dispatch, getState) => {
     const {
       user: { id: roomId }
     } = getState();
-    const { id, index, s3Filename, files } = link;
-    await callApi(`links/${id}`, {}, 'DELETE');
+    const { _id, index, s3Filename, files } = link;
+    await callApi(`links/${_id}`, {}, 'DELETE');
 
     if (s3Filename)
       await callApi('delete-s3', { filename: s3Filename }, 'POST');
@@ -63,15 +63,6 @@ export const deleteLink = link => async (dispatch, getState) => {
   } catch (exception) {
     console.error(`[link.deleteLink] ${exception.message}`);
   }
-};
-
-export const addLink = link => (dispatch, getState) => {
-  const {
-    link: { links }
-  } = getState();
-  const insertIndex = getInsertIndex(link, links);
-
-  dispatch(insertLink(link, insertIndex));
 };
 
 const getLinks = async userID => {
@@ -107,17 +98,6 @@ export const fetchLinksIfNeeded = () => (dispatch, getState) => {
   if (shouldFetchLinks(state)) {
     return dispatch(fetchLinks(state.user.id));
   }
-};
-
-const getInsertIndex = ({ s3Filename }, links) => {
-  for (let i = 0; i < links.length; i += 1) {
-    const { s3Filename: checkFilename } = links[i];
-    if (s3Filename.toLowerCase() < checkFilename.toLowerCase()) {
-      return i;
-    }
-  }
-
-  return null;
 };
 
 const removeLinksIfExpired = links => async dispatch => {
