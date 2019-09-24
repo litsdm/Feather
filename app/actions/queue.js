@@ -358,7 +358,7 @@ const postLink = async link => {
 const getLinkSignedRequest = async () => {
   try {
     const response = await callApi(
-      'sign-s3?file-name=FeatherFiles.zip&file-type=application/zip&folder-name=Files'
+      'sign-s3?file-name=FeatherFiles.zip&file-type=application%2Fzip&folder-name=Files'
     );
 
     return response.json();
@@ -449,7 +449,7 @@ export const uploadToLink = (send, onlyLink = false) => async (
     await copyFiles(waitFiles, directoryPath);
     await compressFiles(directoryPath, outputPath);
 
-    let zipFile = getFileFromPath(outputPath);
+    const zipFile = getFileFromPath(outputPath);
     if (!shouldSend(zipFile.size, 1, dispatch, getState)) {
       deleteDirectories();
       return;
@@ -497,7 +497,7 @@ export const uploadToLink = (send, onlyLink = false) => async (
       })
     );
 
-    zipFile = { ...zipFile, id: dbLink._id };
+    zipFile.id = dbLink._id;
     uploadFile(zipFile, signedRequest, handleProgress, handleFinish);
   } catch (exception) {
     console.error(exception.message);
