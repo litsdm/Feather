@@ -24,7 +24,18 @@ export const SET_LINK_URL = 'SET_LINK_URL';
 export const FINISH_ON_ERROR = 'FINISH_ON_ERROR';
 export const FINISH_AND_CLEAN = 'FINISH_AND_CLEAN';
 
-export const awaitRecipients = waitFiles => ({
+export const awaitRecipients = waitFiles => (dispatch, getState) => {
+  const {
+    user: { isPro }
+  } = getState();
+
+  if (!isPro && waitFiles.length > 3)
+    return dispatch(displayUpgrade('remainingFiles'));
+
+  return dispatch(waitForRecipients(waitFiles));
+};
+
+const waitForRecipients = waitFiles => ({
   waitFiles,
   type: AWAIT_RECIPIENTS
 });
@@ -513,7 +524,7 @@ const shouldSend = (size, count, dispatch, getState) => {
   let type = '';
 
   if (!isPro && size > 2147483648) type = 'fileSize';
-  else if (!isPro && remainingFiles - count < 0) type = 'remainingFiles';
+  else if (!isPro && remainingFiles - count < 0) type = 'remainingTransfers';
   else if (!isPro && size > remainingBytes) type = 'remainingBytes';
 
   if (isPro && size > 10737418240) {

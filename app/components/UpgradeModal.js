@@ -22,7 +22,9 @@ const UpgradeModal = ({ close, type }) => {
       case 'fileSize':
         return 'Your file exceeds the free file limit of 2GB.';
       case 'remainingFiles':
-        return 'You have reached the free file amount limit of 3 files a day.';
+        return 'You can only upload up to 3 files per transfer with the free version of Feather.';
+      case 'remainingTransfers':
+        return 'You have exceeded your 3 transfers per day.';
       case 'remainingBytes':
         return 'You have reached your free Feather storage space limit.';
       default:
@@ -50,10 +52,7 @@ const UpgradeModal = ({ close, type }) => {
         />
         <p className={styles.title}>Upgrade to Pro</p>
         <p className={styles.description}>
-          {getInitialText()} Feather is maintained by a single developer and as
-          much as I would like to give this service for free, it needs a way to
-          keep itself afloat. Please consider upgrading to our Pro subscription,
-          you can choose what to pay for it!
+          {getInitialText()} Upgrade now to Feather Pro for only $3.00 USD.
         </p>
         <button type="button" className={styles.open} onClick={openLink}>
           Take me to the Upgrade page
