@@ -117,3 +117,15 @@
   font-size: 9px;
   font-weight: 100;
 }
+
+.sentBy {
+  bottom: 6px;
+  font-size: 9px;
+  left: 0;
+  position: absolute;
+  overflow: hidden;
+  right: 0;
+  text-align: center;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}

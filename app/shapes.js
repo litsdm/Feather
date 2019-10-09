@@ -25,7 +25,13 @@ export const fileShape = shape({
   _id: string,
   name: string,
   s3Url: string,
-  from: string,
+  from: oneOfType([
+    string,
+    shape({
+      _id: string,
+      username: string
+    })
+  ]),
   size: number,
   to: arrayOf(string)
 });

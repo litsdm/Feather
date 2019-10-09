@@ -3,7 +3,7 @@ import { shell } from 'electron';
 import moment from 'moment';
 import fs from 'fs';
 import { momentObj } from 'react-moment-proptypes';
-import { func, number, shape, string } from 'prop-types';
+import { func, number, oneOfType, shape, string } from 'prop-types';
 import styles from './FileRow.scss';
 
 import callApi from '../../helpers/apiCaller';
@@ -21,7 +21,8 @@ const FileRow = ({
   removeFile,
   index,
   dlFiles,
-  removeDlPath
+  removeDlPath,
+  from
 }) => {
   const handleDownload = () => {
     analytics.send('event', {
@@ -119,6 +120,11 @@ const FileRow = ({
           className={`${styles.centerIcon} ${fileIcon.icon}`}
           style={{ color: fileIcon.color }}
         />
+        {typeof from === 'object' && from._id !== userId ? (
+          <p className={styles.sentBy} style={{ color: fileIcon.color }}>
+            Sent by {from.username}
+          </p>
+        ) : null}
       </div>
       <div
         onClick={handleOpen}
@@ -147,7 +153,14 @@ FileRow.propTypes = {
   userId: string.isRequired,
   s3Filename: string.isRequired,
   removeDlPath: func.isRequired,
-  dlFiles: shape({ fileID: string }).isRequired
+  dlFiles: shape({ fileID: string }).isRequired,
+  from: oneOfType([
+    string,
+    shape({
+      _id: string,
+      username: string
+    })
+  ]).isRequired
 };
 
 export default FileRow;

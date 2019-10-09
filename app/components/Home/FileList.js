@@ -17,7 +17,7 @@ const FileList = ({
   removeDlPath
 }) => {
   const renderFiles = () =>
-    files.map(({ name, s3Filename, _id, expiresAt }, index) =>
+    files.map(({ name, s3Filename, _id, expiresAt, from }, index) =>
       moment().diff(expiresAt) < 0 ? (
         <FileRow
           key={uuid()}
@@ -31,6 +31,7 @@ const FileList = ({
           removeFile={removeFile}
           dlFiles={dlFiles}
           removeDlPath={removeDlPath}
+          from={from}
         />
       ) : null
     );
