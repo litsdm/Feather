@@ -187,7 +187,9 @@ const uploadComplete = (file, isLink = false, onlyLink = false) => (
   }
 
   if (dbFile.addToUser) dispatch(addFile(dbFile));
+
   dispatch(addSentFile(dbFile));
+  emit('addSentFile', { roomId: id, file: dbFile });
 
   if (completedCount + 1 === Object.keys(files).length)
     dispatch(finishUploading());

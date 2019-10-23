@@ -66,6 +66,7 @@ const FileRow = ({
       removeSentFile(id);
       removeDlPath(id);
       emit('removeFileFromRoom', { roomId: userId, index });
+      emit('removeSentFileFromRoom', { roomId: userId, id });
 
       analytics.send('event', {
         ec: 'File-El',

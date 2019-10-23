@@ -11,7 +11,11 @@ import notify from '../helpers/notifications';
 import useDropzone from '../helpers/useDropzone';
 
 import { fetchFilesIfNeeded, addFile, removeFile } from '../actions/file';
-import { fetchSentFilesIfNeeded } from '../actions/sentFile';
+import {
+  fetchSentFilesIfNeeded,
+  addSentFile,
+  removeSentFileById
+} from '../actions/sentFile';
 import {
   awaitRecipients,
   completeDownload,
@@ -53,7 +57,9 @@ const mapDispatchToProps = dispatch => ({
   addNewLink: link => dispatch(addLink(link)),
   updateUser: token => dispatch(addUserFromToken(token)),
   addStorageFiles: () => dispatch(addLocalDownloads()),
-  deleteLink: index => dispatch(removeLink(index))
+  deleteLink: index => dispatch(removeLink(index)),
+  receiveSentFile: file => dispatch(addSentFile(file)),
+  deleteSentFile: id => dispatch(removeSentFileById(id))
 });
 
 const App = ({
@@ -76,7 +82,9 @@ const App = ({
   user,
   waitForRecipients,
   addStorageFiles,
-  deleteLink
+  deleteLink,
+  deleteSentFile,
+  receiveSentFile
 }) => {
   const [updateAvailable, setUpdateAvailable] = useState(false);
   const isDragging = useDropzone(waitForRecipients);
@@ -140,6 +148,8 @@ const App = ({
       }
     });
     socket.on('removeFile', index => dRemoveFile(index));
+    socket.on('receiveSentFile', file => receiveSentFile(file));
+    socket.on('removeSentFile', id => deleteSentFile(id));
     socket.on('newFriend', friend => addNewFriend(friend));
     socket.on('newLink', link => addNewLink(link));
     socket.on('removeLink', index => deleteLink(index));
@@ -189,6 +199,8 @@ App.propTypes = {
   updateDownloadProgress: func.isRequired,
   dAddFile: func.isRequired,
   dRemoveFile: func.isRequired,
+  receiveSentFile: func.isRequired,
+  deleteSentFile: func.isRequired,
   fetchFriends: func.isRequired,
   updateUser: func.isRequired,
   fetchFriendRequests: func.isRequired,
