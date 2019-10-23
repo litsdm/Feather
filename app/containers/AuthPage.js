@@ -10,6 +10,7 @@ import Signup from '../components/Auth/Signup';
 
 import { addUser } from '../actions/user';
 import { fetchFilesIfNeeded } from '../actions/file';
+import { fetchSentFilesIfNeeded } from '../actions/sentFile';
 import { fetchFriendsIfNeeded } from '../actions/friend';
 import { fetchFriendRequestsIfNeeded } from '../actions/friendRequest';
 import { addLocalDownloads } from '../actions/download';
@@ -23,11 +24,13 @@ const mapDispatchToProps = dispatch => ({
   fetchFiles: () => dispatch(fetchFilesIfNeeded()),
   fetchFriends: () => dispatch(fetchFriendsIfNeeded()),
   fetchFriendRequests: () => dispatch(fetchFriendRequestsIfNeeded()),
+  fetchSentFiles: () => dispatch(fetchSentFilesIfNeeded()),
   addStorageFiles: () => dispatch(addLocalDownloads())
 });
 
 const AuthPage = ({
   fetchFiles,
+  fetchSentFiles,
   fetchFriends,
   fetchFriendRequests,
   addUserFromToken,
@@ -67,6 +70,7 @@ const AuthPage = ({
     fetchFiles()
       .then(() => addStorageFiles())
       .catch();
+    fetchSentFiles();
     fetchFriends();
     fetchFriendRequests();
   };
@@ -102,6 +106,7 @@ const AuthPage = ({
 AuthPage.propTypes = {
   addUserFromToken: func.isRequired,
   fetchFiles: func.isRequired,
+  fetchSentFiles: func.isRequired,
   fetchFriends: func.isRequired,
   fetchFriendRequests: func.isRequired,
   addStorageFiles: func.isRequired,

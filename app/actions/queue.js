@@ -7,6 +7,7 @@ import rimraf from 'rimraf';
 import { emit } from '../socketClient';
 import { updateUser } from './user';
 import { addFile } from './file';
+import { addSentFile } from './sentFile';
 import { addLink } from './link';
 import { displayUpgrade } from './upgrade';
 import { setIsLoading } from './loading';
@@ -186,6 +187,7 @@ const uploadComplete = (file, isLink = false, onlyLink = false) => (
   }
 
   if (dbFile.addToUser) dispatch(addFile(dbFile));
+  dispatch(addSentFile(dbFile));
 
   if (completedCount + 1 === Object.keys(files).length)
     dispatch(finishUploading());

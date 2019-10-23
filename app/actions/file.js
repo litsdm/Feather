@@ -57,11 +57,11 @@ const fetchFiles = userID => async dispatch => {
   try {
     dispatch(requestFiles());
     const files = await getFiles(userID);
-    dispatch(removeFilesIfExpired(userID, files));
-    return dispatch(receiveFiles(files));
+    const addFiles = await dispatch(removeFilesIfExpired(userID, files));
+    return dispatch(receiveFiles(addFiles));
   } catch (exception) {
     dispatch(requestFailed());
-    console.error(exception.message);
+    console.log(exception.message);
   }
 };
 
@@ -81,19 +81,22 @@ export const fetchFilesIfNeeded = () => (dispatch, getState) => {
 
 const removeFilesIfExpired = (userId, files) => async dispatch => {
   try {
+    const addFiles = [];
     const deletePromises = [];
     const s3Promises = [];
 
-    files.forEach(({ expiresAt, s3Filename, _id }, index) => {
+    files.forEach((file, index) => {
+      const { expiresAt, s3Filename, _id } = file;
       if (moment().diff(expiresAt) > 0) {
         deletePromises.push(callApi(`${userId}/files/${_id}`, {}, 'DELETE'));
         s3Promises.push(callApi('delete-s3', { filename: s3Filename }, 'POST'));
         dispatch(removeFile(index));
-      }
+      } else addFiles.push(file);
     });
 
     await deletePromises;
     await s3Promises;
+    return addFiles;
   } catch (exception) {
     console.error(exception.message);
   }

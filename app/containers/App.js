@@ -11,6 +11,7 @@ import notify from '../helpers/notifications';
 import useDropzone from '../helpers/useDropzone';
 
 import { fetchFilesIfNeeded, addFile, removeFile } from '../actions/file';
+import { fetchSentFilesIfNeeded } from '../actions/sentFile';
 import {
   awaitRecipients,
   completeDownload,
@@ -38,6 +39,7 @@ const mapDispatchToProps = dispatch => ({
   fetchFiles: () => dispatch(fetchFilesIfNeeded()),
   fetchFriends: () => dispatch(fetchFriendsIfNeeded()),
   fetchFriendRequests: () => dispatch(fetchFriendRequestsIfNeeded()),
+  fetchSentFiles: () => dispatch(fetchSentFilesIfNeeded()),
   finishDownload: (fileID, filename, savePath) =>
     dispatch(completeDownload(fileID, filename, savePath)),
   updateDownloadProgress: (fileID, progress) =>
@@ -51,7 +53,7 @@ const mapDispatchToProps = dispatch => ({
   addNewLink: link => dispatch(addLink(link)),
   updateUser: token => dispatch(addUserFromToken(token)),
   addStorageFiles: () => dispatch(addLocalDownloads()),
-  deleteLink: index => dispatch(removeLink(index)),
+  deleteLink: index => dispatch(removeLink(index))
 });
 
 const App = ({
@@ -66,6 +68,7 @@ const App = ({
   fetchFiles,
   fetchFriends,
   fetchFriendRequests,
+  fetchSentFiles,
   friendRequests,
   history,
   location: { pathname },
@@ -114,6 +117,7 @@ const App = ({
     fetchFiles()
       .then(() => addStorageFiles())
       .catch();
+    fetchSentFiles();
     fetchFriends();
     fetchFriendRequests();
   };
@@ -180,6 +184,7 @@ App.propTypes = {
   location: object.isRequired, // eslint-disable-line react/forbid-prop-types
   history: object.isRequired, // eslint-disable-line react/forbid-prop-types
   fetchFiles: func.isRequired,
+  fetchSentFiles: func.isRequired,
   finishDownload: func.isRequired,
   updateDownloadProgress: func.isRequired,
   dAddFile: func.isRequired,

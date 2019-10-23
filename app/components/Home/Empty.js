@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
 import Lottie from 'react-lottie';
+import { bool } from 'prop-types';
 import styles from './Empty.scss';
 
 import hiAnimation from '../../assets/hiAnimation.json';
 
-const Empty = () => {
+const Empty = ({ sent }) => {
   const [isPaused, setPaused] = useState(false);
   const options = {
     loop: true,
@@ -37,13 +38,25 @@ const Empty = () => {
           isPaused={isPaused}
         />
       </div>
-      <p className={styles.title}>Welcome to Feather!</p>
+      <p className={styles.title}>
+        {!sent ? 'Welcome to Feather!' : 'No sent files'}
+      </p>
       <p className={styles.text}>
-        It looks like you don&#39;t have any files. Drag and drop your files to
-        share them.
+        {!sent
+          ? "It looks like you don't have any files"
+          : "It looks like you haven't sent any files"}
+        . Drag and drop your files to share them.
       </p>
     </div>
   );
+};
+
+Empty.propTypes = {
+  sent: bool
+};
+
+Empty.defaultProps = {
+  sent: false
 };
 
 export default Empty;

@@ -3,7 +3,7 @@ import { shell } from 'electron';
 import moment from 'moment';
 import fs from 'fs';
 import { momentObj } from 'react-moment-proptypes';
-import { func, number, oneOfType, shape, string } from 'prop-types';
+import { bool, func, number, oneOfType, shape, string } from 'prop-types';
 import styles from './FileRow.scss';
 
 import callApi from '../../helpers/apiCaller';
@@ -19,10 +19,12 @@ const FileRow = ({
   s3Filename,
   userId,
   removeFile,
+  removeSentFile,
   index,
   dlFiles,
   removeDlPath,
-  from
+  from,
+  sent
 }) => {
   const handleDownload = () => {
     analytics.send('event', {
@@ -61,6 +63,7 @@ const FileRow = ({
       }
 
       removeFile(index);
+      removeSentFile(id);
       removeDlPath(id);
       emit('removeFileFromRoom', { roomId: userId, index });
 
@@ -101,16 +104,18 @@ const FileRow = ({
             </button>
             Download
           </div>
-          <div className={styles.overlayCol}>
-            <button
-              type="button"
-              className={styles.deleteButton}
-              onClick={handleDelete}
-            >
-              <i className="far fa-trash-alt" />
-            </button>
-            Delete
-          </div>
+          {!sent ? (
+            <div className={styles.overlayCol}>
+              <button
+                type="button"
+                className={styles.deleteButton}
+                onClick={handleDelete}
+              >
+                <i className="far fa-trash-alt" />
+              </button>
+              Delete
+            </div>
+          ) : null}
         </div>
         <div
           className={styles.innerSquare}
@@ -150,9 +155,11 @@ FileRow.propTypes = {
   id: string.isRequired,
   index: number.isRequired,
   removeFile: func.isRequired,
+  removeSentFile: func.isRequired,
   userId: string.isRequired,
   s3Filename: string.isRequired,
   removeDlPath: func.isRequired,
+  sent: bool.isRequired,
   dlFiles: shape({ fileID: string }).isRequired,
   from: oneOfType([
     string,

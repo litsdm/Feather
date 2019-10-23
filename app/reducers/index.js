@@ -10,6 +10,7 @@ import queue from './queue';
 import loading from './loading';
 import link from './link';
 import download from './download';
+import sentFile from './sentFile';
 
 import { USER_LOGOUT } from '../actions/user';
 
@@ -24,6 +25,7 @@ const appReducer = history =>
     upgrade,
     loading,
     link,
+    sentFile,
     queue
   });
 
