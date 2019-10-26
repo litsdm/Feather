@@ -9,6 +9,7 @@ import {
   uploadToLink
 } from '../actions/queue';
 import { hideUpgrade } from '../actions/upgrade';
+import { fetchRecentEmailsIfNeeded, setRecentEmails } from '../actions/user';
 
 import SendModal from '../components/SendModal';
 import DisconnectedModal from '../components/DisconnectedModal';
@@ -41,6 +42,8 @@ const mapDispatchToProps = dispatch => ({
     dispatch(finishSelectingRecipients(send, addToUser)),
   uploadLink: (send, onlyLink = false) =>
     dispatch(uploadToLink(send, onlyLink)),
+  updateRecentEmails: usedEmails => dispatch(setRecentEmails(usedEmails)),
+  fetchRecentEmails: () => dispatch(fetchRecentEmailsIfNeeded()),
   closeUpgrade: () => dispatch(hideUpgrade())
 });
 
@@ -58,7 +61,9 @@ const PopUpContainer = ({
   linkUrl,
   fetchData,
   isLoading,
-  onlyLink
+  onlyLink,
+  fetchRecentEmails,
+  updateRecentEmails
 }) => (
   <Fragment>
     <ModalLoader display={isLoading} />
@@ -69,6 +74,9 @@ const PopUpContainer = ({
       userID={user.id}
       uploadFiles={uploadFiles}
       uploadLink={uploadLink}
+      recentEmails={user.recentEmails}
+      fetchRecentEmails={fetchRecentEmails}
+      updateRecentEmails={updateRecentEmails}
     />
     <LinkModal url={linkUrl} onlyLink={onlyLink} />
     {upgrade.visible ? (
@@ -94,7 +102,9 @@ PopUpContainer.propTypes = {
   linkUrl: string.isRequired,
   isLoading: bool.isRequired,
   onlyLink: bool.isRequired,
-  upgrade: shape({ visible: bool, messageType: string }).isRequired
+  upgrade: shape({ visible: bool, messageType: string }).isRequired,
+  fetchRecentEmails: func.isRequired,
+  updateRecentEmails: func.isRequired
 };
 
 PopUpContainer.defaultProps = {

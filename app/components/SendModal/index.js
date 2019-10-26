@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { arrayOf, bool, func, string } from 'prop-types';
 import { userShape } from '../../shapes';
 import styles from './styles.scss';
@@ -14,7 +14,10 @@ const SendModal = ({
   userID,
   display,
   uploadFiles,
-  uploadLink
+  uploadLink,
+  recentEmails,
+  fetchRecentEmails,
+  updateRecentEmails
 }) => {
   const [error, setError] = useState('');
   const [emails, setEmails] = useState([]);
@@ -24,6 +27,10 @@ const SendModal = ({
   const sendActive =
     (tab === 0 && Object.keys(selectedFriends).length > 0) ||
     (tab === 1 && (emails.length > 0 || validateEmail(currentEmail)));
+
+  useEffect(() => {
+    if (userID) fetchRecentEmails();
+  }, [userID]);
 
   const resetState = () => {
     setSelectedFriends({});
@@ -55,7 +62,10 @@ const SendModal = ({
     };
 
     if (tab === 0) uploadFiles(send, addToUser);
-    else if (tab === 1) uploadLink(send);
+    else if (tab === 1) {
+      uploadLink(send);
+      updateRecentEmails(finalEmails);
+    }
 
     resetState();
   };
@@ -77,6 +87,11 @@ const SendModal = ({
     const index = emails.indexOf(email);
 
     newEmails.splice(index, 1);
+    setEmails(newEmails);
+  };
+
+  const addEmail = email => () => {
+    const newEmails = [email, ...emails];
     setEmails(newEmails);
   };
 
@@ -122,7 +137,9 @@ const SendModal = ({
             handleEmailChange={handleEmailChange}
             handleKeyDown={handleKeyDown}
             removeEmail={removeEmail}
+            addEmail={addEmail}
             error={error}
+            recentEmails={recentEmails}
           />
         );
       default:
@@ -191,11 +208,15 @@ SendModal.propTypes = {
   userID: string,
   display: bool.isRequired,
   uploadFiles: func.isRequired,
-  uploadLink: func.isRequired
+  uploadLink: func.isRequired,
+  recentEmails: arrayOf(string),
+  fetchRecentEmails: func.isRequired,
+  updateRecentEmails: func.isRequired
 };
 
 SendModal.defaultProps = {
   friends: [],
+  recentEmails: [],
   userID: ''
 };
 

@@ -55,7 +55,7 @@ const mapDispatchToProps = dispatch => ({
   waitForRecipients: files => dispatch(awaitRecipients(files)),
   addNewFriend: friend => dispatch(addFriend(friend)),
   addNewLink: link => dispatch(addLink(link)),
-  updateUser: token => dispatch(addUserFromToken(token)),
+  updateUser: (token, cb = null) => dispatch(addUserFromToken(token, cb)),
   addStorageFiles: () => dispatch(addLocalDownloads()),
   deleteLink: index => dispatch(removeLink(index)),
   receiveSentFile: file => dispatch(addSentFile(file)),
@@ -115,7 +115,7 @@ const App = ({
     if (Object.prototype.hasOwnProperty.call(user, 'id') || token) {
       const userId = user ? user.id : jwtDecode(token).id;
       emit('userConnection', userId);
-      fetchData();
+      updateUser(token, () => fetchData());
     }
 
     setupListeners();

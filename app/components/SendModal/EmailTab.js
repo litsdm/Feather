@@ -1,6 +1,6 @@
 import React, { Fragment } from 'react';
 import uuid from 'uuid/v4';
-import { arrayOf, func, string } from 'prop-types';
+import { arrayOf, bool, func, string } from 'prop-types';
 import styles from './EmailTab.scss';
 
 const Input = ({ value, onChange, onKeyDown, error }) => (
@@ -39,6 +39,19 @@ Input.propTypes = {
   error: string.isRequired
 };
 
+const RecentEmailRow = ({ email, addEmail, isAdded }) => (
+  <div className={`${styles.row} ${styles.recentRow}`}>
+    <p>{email}</p>
+    <button
+      type="button"
+      className={`${styles.add} ${isAdded ? styles.disabled : ''}`}
+      onClick={addEmail}
+    >
+      Add
+    </button>
+  </div>
+);
+
 const EmailRow = ({ email, removeEmail }) => (
   <div className={styles.row}>
     <p>{email}</p>
@@ -63,7 +76,9 @@ const EmailTab = ({
   handleEmailChange,
   handleKeyDown,
   removeEmail,
-  error
+  error,
+  recentEmails,
+  addEmail
 }) => {
   const renderEmails = () =>
     emails.map((email, index) => (
@@ -75,6 +90,19 @@ const EmailTab = ({
       </Fragment>
     ));
 
+  const renderRecentEmails = () =>
+    recentEmails.map(email => {
+      const isAdded = emails.indexOf(email) > -1;
+      return (
+        <RecentEmailRow
+          key={uuid()}
+          email={email}
+          addEmail={addEmail(email)}
+          isAdded={isAdded}
+        />
+      );
+    });
+
   return (
     <div className={styles.emailContainer}>
       <Input
@@ -83,9 +111,24 @@ const EmailTab = ({
         onKeyDown={handleKeyDown}
         error={error}
       />
-      <div className={styles.emails}>{renderEmails()}</div>
+      <div className={styles.lists}>
+        <div className={styles.emails}>{renderEmails()}</div>
+        {recentEmails.length ? (
+          <div className={styles.recentEmails}>
+            <div className={styles.recentDivider} />
+            <p className={styles.recentTitle}>Recently Sent To:</p>
+            {renderRecentEmails()}
+          </div>
+        ) : null}
+      </div>
     </div>
   );
+};
+
+RecentEmailRow.propTypes = {
+  email: string.isRequired,
+  addEmail: func.isRequired,
+  isAdded: bool.isRequired
 };
 
 EmailTab.propTypes = {
@@ -94,12 +137,15 @@ EmailTab.propTypes = {
   error: string,
   handleEmailChange: func.isRequired,
   handleKeyDown: func.isRequired,
-  removeEmail: func.isRequired
+  removeEmail: func.isRequired,
+  addEmail: func.isRequired,
+  recentEmails: arrayOf(string)
 };
 
 EmailTab.defaultProps = {
   currentEmail: '',
   emails: [],
+  recentEmails: [],
   error: ''
 };
 

@@ -1,13 +1,22 @@
-import jwtDecode from 'jwt-decode';
-import { ADD_USER } from '../actions/user';
+import {
+  ADD_USER,
+  REQUEST_RECENT_EMAILS,
+  RECEIVE_RECENT_EMAILS
+} from '../actions/user';
 
-const token = localStorage.getItem('tempoToken');
-const initialState = token ? jwtDecode(token) : {};
+const initialState = {
+  isFetching: false,
+  recentEmails: []
+};
 
-const users = (state = initialState, { type, user }) => {
+const users = (state = initialState, { type, user, recentEmails }) => {
   switch (type) {
     case ADD_USER:
-      return user;
+      return { ...state, ...user };
+    case REQUEST_RECENT_EMAILS:
+      return { ...state, isFetching: true };
+    case RECEIVE_RECENT_EMAILS:
+      return { ...state, recentEmails, isFetching: false };
     default:
       return state;
   }
