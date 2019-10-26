@@ -52,6 +52,12 @@ const RecentEmailRow = ({ email, addEmail, isAdded }) => (
   </div>
 );
 
+RecentEmailRow.propTypes = {
+  email: string.isRequired,
+  addEmail: func.isRequired,
+  isAdded: bool.isRequired
+};
+
 const EmailRow = ({ email, removeEmail }) => (
   <div className={styles.row}>
     <p>{email}</p>
@@ -123,12 +129,6 @@ const EmailTab = ({
       </div>
     </div>
   );
-};
-
-RecentEmailRow.propTypes = {
-  email: string.isRequired,
-  addEmail: func.isRequired,
-  isAdded: bool.isRequired
 };
 
 EmailTab.propTypes = {
