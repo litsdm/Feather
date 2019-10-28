@@ -9,6 +9,7 @@ export const REQUEST_FILES = 'REQUEST_FILES';
 export const RECEIVE_FILES = 'RECEIVE_FILES';
 export const REMOVE_FILE = 'REMOVE_FILE';
 export const REQUEST_FAILED = 'REQUEST_FAILED';
+export const REMOVE_FILE_BY_ID = 'REMOVE_FILE_BY_ID';
 
 export const addFile = file => ({
   file,
@@ -18,6 +19,11 @@ export const addFile = file => ({
 export const removeFile = index => ({
   index,
   type: REMOVE_FILE
+});
+
+export const removeFileById = id => ({
+  id,
+  type: REMOVE_FILE_BY_ID
 });
 
 export const updateProgress = progress => ({

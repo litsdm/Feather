@@ -5,7 +5,7 @@ import { fileShape } from '../shapes';
 
 import Home from '../components/Home';
 
-import { removeFile } from '../actions/file';
+import { removeFileById } from '../actions/file';
 import { removeSentFileById } from '../actions/sentFile';
 import { awaitRecipients, downloadFile } from '../actions/queue';
 import { removeDownloaded } from '../actions/download';
@@ -29,7 +29,7 @@ const mapStateToProps = ({
 const mapDispatchToProps = dispatch => ({
   dDownloadFile: (fileId, url, filename) =>
     dispatch(downloadFile(fileId, url, filename)),
-  dRemoveFile: index => dispatch(removeFile(index)),
+  removeFile: id => dispatch(removeFileById(id)),
   removeSentFile: id => dispatch(removeSentFileById(id)),
   waitForRecipients: files => dispatch(awaitRecipients(files)),
   removeDlPath: fileID => dispatch(removeDownloaded(fileID))
@@ -40,7 +40,7 @@ const HomePage = ({
   userId,
   isFetching,
   dDownloadFile,
-  dRemoveFile,
+  removeFile,
   removeSentFile,
   waitForRecipients,
   queueFiles,
@@ -54,7 +54,7 @@ const HomePage = ({
     userId={userId}
     isFetching={isFetching}
     downloadFile={dDownloadFile}
-    removeFile={dRemoveFile}
+    removeFile={removeFile}
     awaitSendForFiles={waitForRecipients}
     queueFiles={queueFiles}
     completedCount={completedCount}
@@ -71,7 +71,7 @@ HomePage.propTypes = {
   userId: string.isRequired,
   isFetching: bool.isRequired,
   dDownloadFile: func.isRequired,
-  dRemoveFile: func.isRequired,
+  removeFile: func.isRequired,
   removeSentFile: func.isRequired,
   waitForRecipients: func.isRequired,
   completedCount: number,

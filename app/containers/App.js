@@ -10,7 +10,12 @@ import socket, { emit } from '../socketClient';
 import notify from '../helpers/notifications';
 import useDropzone from '../helpers/useDropzone';
 
-import { fetchFilesIfNeeded, addFile, removeFile } from '../actions/file';
+import {
+  fetchFilesIfNeeded,
+  addFile,
+  removeFile,
+  removeFileById
+} from '../actions/file';
 import {
   fetchSentFilesIfNeeded,
   addSentFile,
@@ -28,7 +33,7 @@ import {
   addFriendRequest
 } from '../actions/friendRequest';
 import { addUserFromToken } from '../actions/user';
-import { addLink, removeLink } from '../actions/link';
+import { addLink, removeLink, removeLinkById } from '../actions/link';
 
 import NavBar from '../components/NavBar';
 import PopUpContainer from './PopUpContainer';
@@ -59,7 +64,9 @@ const mapDispatchToProps = dispatch => ({
   addStorageFiles: () => dispatch(addLocalDownloads()),
   deleteLink: index => dispatch(removeLink(index)),
   receiveSentFile: file => dispatch(addSentFile(file)),
-  deleteSentFile: id => dispatch(removeSentFileById(id))
+  deleteSentFile: id => dispatch(removeSentFileById(id)),
+  deleteFileById: id => dispatch(removeFileById(id)),
+  deleteLinkById: id => dispatch(removeLinkById(id))
 });
 
 const App = ({
@@ -84,7 +91,9 @@ const App = ({
   addStorageFiles,
   deleteLink,
   deleteSentFile,
-  receiveSentFile
+  receiveSentFile,
+  deleteFileById,
+  deleteLinkById
 }) => {
   const [updateAvailable, setUpdateAvailable] = useState(false);
   const isDragging = useDropzone(waitForRecipients);
@@ -113,7 +122,9 @@ const App = ({
     }
 
     if (Object.prototype.hasOwnProperty.call(user, 'id') || token) {
-      const userId = user ? user.id : jwtDecode(token).id;
+      const userId = Object.prototype.hasOwnProperty.call(user, 'id')
+        ? user.id
+        : jwtDecode(token).id;
       emit('userConnection', userId);
       updateUser(token, () => fetchData());
     }
@@ -148,11 +159,13 @@ const App = ({
       }
     });
     socket.on('removeFile', index => dRemoveFile(index));
+    socket.on('removeFileById', id => deleteFileById(id));
     socket.on('receiveSentFile', file => receiveSentFile(file));
     socket.on('removeSentFile', id => deleteSentFile(id));
     socket.on('newFriend', friend => addNewFriend(friend));
     socket.on('newLink', link => addNewLink(link));
     socket.on('removeLink', index => deleteLink(index));
+    socket.on('removeLinkById', id => deleteLinkById(id));
     socket.on('receiveFriendRequest', friendRequest => {
       addReceivedFriendRequest(friendRequest);
 
@@ -211,6 +224,8 @@ App.propTypes = {
   deleteLink: func.isRequired,
   friendRequests: arrayOf(friendRequestShape),
   addStorageFiles: func.isRequired,
+  deleteFileById: func.isRequired,
+  deleteLinkById: func.isRequired,
   user: userShape
 };
 

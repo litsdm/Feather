@@ -62,10 +62,10 @@ const FileRow = ({
         await callApi('delete-s3', { filename: s3Filename }, 'POST');
       }
 
-      removeFile(index);
+      removeFile(id);
       removeSentFile(id);
       removeDlPath(id);
-      emit('removeFileFromRoom', { roomId: userId, index });
+      emit('removeFileByIdFromRoom', { roomId: userId, id });
       emit('removeSentFileFromRoom', { roomId: userId, id });
 
       analytics.send('event', {

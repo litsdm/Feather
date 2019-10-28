@@ -7,6 +7,7 @@ export const ADD_LINK = 'ADD_LINK';
 export const REQUEST_LINKS = 'REQUEST_LINKS';
 export const RECEIVE_LINKS = 'RECEIVE_LINKS';
 export const REMOVE_LINK = 'REMOVE_LINK';
+export const REMOVE_LINK_BY_ID = 'REMOVE_LINK_BY_ID';
 
 export const addLink = link => ({
   link,
@@ -17,6 +18,11 @@ export const addLink = link => ({
 export const removeLink = index => ({
   index,
   type: REMOVE_LINK
+});
+
+export const removeLinkById = id => ({
+  id,
+  type: REMOVE_LINK_BY_ID
 });
 
 const requestLinks = () => ({
@@ -58,7 +64,7 @@ export const deleteLink = link => async (dispatch, getState) => {
       await callApi('delete-s3', { filename: s3Filename }, 'POST');
     else await deleteFiles(files);
 
-    emit('removeLinkFromRoom', { roomId, index });
+    emit('removeLinkByIdFromRoom', { roomId, id: _id });
     dispatch(removeLink(index));
   } catch (exception) {
     console.error(`[link.deleteLink] ${exception.message}`);

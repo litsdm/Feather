@@ -5,7 +5,8 @@ import {
   REQUEST_FILES,
   RECEIVE_FILES,
   REMOVE_FILE,
-  REQUEST_FAILED
+  REQUEST_FAILED,
+  REMOVE_FILE_BY_ID
 } from '../actions/file';
 
 const initialState = {
@@ -19,7 +20,7 @@ const initialState = {
 
 export default function counter(
   state = initialState,
-  { type, file, upload, progress, files, index }
+  { type, file, upload, progress, files, index, id }
 ) {
   switch (type) {
     case ADD_FILE:
@@ -58,6 +59,11 @@ export default function counter(
       return {
         ...state,
         files: [...state.files.slice(0, index), ...state.files.slice(index + 1)]
+      };
+    case REMOVE_FILE_BY_ID:
+      return {
+        ...state,
+        files: state.files.filter(({ _id }) => _id !== id)
       };
     case REQUEST_FAILED:
       return {

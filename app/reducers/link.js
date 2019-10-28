@@ -2,7 +2,8 @@ import {
   ADD_LINK,
   REQUEST_LINKS,
   RECEIVE_LINKS,
-  REMOVE_LINK
+  REMOVE_LINK,
+  REMOVE_LINK_BY_ID
 } from '../actions/link';
 
 const initialState = {
@@ -12,7 +13,7 @@ const initialState = {
 
 export default function counter(
   state = initialState,
-  { type, link, links, index, insertIndex }
+  { type, link, links, index, insertIndex, id }
 ) {
   switch (type) {
     case ADD_LINK: {
@@ -48,6 +49,12 @@ export default function counter(
       return {
         ...state,
         links: [...state.links.slice(0, index), ...state.links.slice(index + 1)]
+      };
+
+    case REMOVE_LINK_BY_ID:
+      return {
+        ...state,
+        links: state.links.filter(({ _id }) => _id !== id)
       };
 
     default:
